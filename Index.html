@@ -1,0 +1,2235 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Java COMPLETO — Tracker de Estudos</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f5f4f0;color:#1a1a18;min-height:100vh}
+a{color:inherit;text-decoration:none}
+
+/* LAYOUT */
+.app{display:flex;flex-direction:column;min-height:100vh}
+.topbar{background:#1a1a18;color:#f5f4f0;padding:14px 24px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;position:sticky;top:0;z-index:100}
+.topbar h1{font-size:15px;font-weight:600;letter-spacing:-.2px}
+.topbar p{font-size:12px;color:#888;margin-top:1px}
+.top-badges{display:flex;gap:8px;flex-wrap:wrap}
+.badge{font-size:11px;font-weight:600;padding:4px 12px;border-radius:20px;letter-spacing:.2px}
+.badge-green{background:#1D9E75;color:#fff}
+.badge-blue{background:#185FA5;color:#fff}
+.badge-amber{background:#BA7517;color:#fff}
+
+.main{display:flex;flex:1;gap:0}
+
+/* SIDEBAR */
+.sidebar{width:300px;min-width:260px;background:#fff;border-right:1px solid #e8e6e0;overflow-y:auto;height:calc(100vh - 56px);position:sticky;top:56px;flex-shrink:0}
+.sidebar-tabs{display:flex;border-bottom:1px solid #e8e6e0}
+.stab{flex:1;padding:10px;font-size:12px;font-weight:600;text-align:center;cursor:pointer;color:#888;border-bottom:2px solid transparent;background:none;border-left:none;border-right:none;border-top:none;letter-spacing:.3px;text-transform:uppercase;transition:all .15s}
+.stab.active{color:#1a1a18;border-bottom-color:#1a1a18}
+
+.section-group{border-bottom:1px solid #f0eeea}
+.section-hdr{display:flex;align-items:center;gap:10px;padding:12px 16px;cursor:pointer;user-select:none;transition:background .1s}
+.section-hdr:hover{background:#faf9f7}
+.section-hdr.open{background:#faf9f7}
+.sec-num{font-size:10px;font-weight:700;width:22px;height:22px;border-radius:6px;display:flex;align-items:center;justify-content:center;flex-shrink:0;background:#f0eeea;color:#666}
+.sec-title{flex:1;font-size:12px;font-weight:600;color:#1a1a18;line-height:1.35}
+.sec-prog{font-size:10px;color:#888;white-space:nowrap}
+.sec-arrow{font-size:10px;color:#bbb;transition:transform .2s}
+.sec-arrow.open{transform:rotate(90deg)}
+.sec-progress-bar{height:2px;background:#f0eeea;margin:0 16px 0}
+.sec-progress-fill{height:100%;background:#1D9E75;transition:width .3s;border-radius:1px}
+
+.lessons-list{display:none;padding:4px 0 8px}
+.lessons-list.open{display:block}
+.lesson-row{display:flex;align-items:flex-start;gap:8px;padding:6px 16px 6px 14px;cursor:pointer;transition:background .1s;border-left:2px solid transparent}
+.lesson-row:hover{background:#faf9f7}
+.lesson-row.active-lesson{background:#f0f7ff;border-left-color:#185FA5}
+.lesson-check{width:14px;height:14px;border:1.5px solid #ccc;border-radius:3px;flex-shrink:0;margin-top:2px;display:flex;align-items:center;justify-content:center;transition:all .15s;cursor:pointer}
+.lesson-check.done{background:#1D9E75;border-color:#1D9E75}
+.lesson-check.done::after{content:'✓';font-size:8px;font-weight:800;color:#fff}
+.lesson-num{font-size:10px;color:#aaa;min-width:22px;margin-top:2px;flex-shrink:0}
+.lesson-title{font-size:12px;color:#333;line-height:1.4;flex:1}
+.lesson-title.done{color:#aaa;text-decoration:line-through}
+.lesson-dur{font-size:10px;color:#bbb;flex-shrink:0;margin-top:2px}
+
+/* CONTENT AREA */
+.content{flex:1;overflow-y:auto;padding:24px;height:calc(100vh - 56px)}
+
+.welcome-card{background:#fff;border:1px solid #e8e6e0;border-radius:12px;padding:32px;text-align:center;color:#888;margin-bottom:20px}
+.welcome-card h2{font-size:16px;color:#1a1a18;margin-bottom:8px}
+.welcome-card p{font-size:13px;line-height:1.6}
+
+/* STATS ROW */
+.stats-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:10px;margin-bottom:20px}
+.stat-c{background:#fff;border:1px solid #e8e6e0;border-radius:10px;padding:14px 16px;text-align:center}
+.stat-n{font-size:20px;font-weight:700;color:#1a1a18}
+.stat-l{font-size:11px;color:#888;margin-top:2px}
+
+/* LESSON DETAIL */
+.lesson-detail{background:#fff;border:1px solid #e8e6e0;border-radius:12px;padding:24px;margin-bottom:16px}
+.ld-header{display:flex;align-items:flex-start;gap:14px;margin-bottom:20px;flex-wrap:wrap}
+.ld-check-big{width:32px;height:32px;border:2px solid #ddd;border-radius:8px;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;transition:all .2s;font-size:16px}
+.ld-check-big.done{background:#1D9E75;border-color:#1D9E75;color:#fff}
+.ld-info{flex:1}
+.ld-sec{font-size:11px;color:#888;font-weight:600;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px}
+.ld-title{font-size:17px;font-weight:700;color:#1a1a18;line-height:1.3;margin-bottom:6px}
+.ld-meta{display:flex;gap:12px;font-size:12px;color:#aaa}
+.ld-actions{display:flex;gap:8px;margin-left:auto;align-items:flex-start;flex-wrap:wrap}
+
+/* EDITABLE TITLE */
+.edit-title-input{font-size:17px;font-weight:700;color:#1a1a18;border:none;border-bottom:2px solid #185FA5;background:none;width:100%;outline:none;padding-bottom:2px}
+
+/* NOTES SECTION */
+.notes-area{margin-top:4px}
+.notes-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.notes-hdr h3{font-size:13px;font-weight:700;color:#1a1a18;text-transform:uppercase;letter-spacing:.5px}
+
+.note-type-btns{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}
+.ntb{font-size:11px;padding:4px 12px;border-radius:20px;border:1.5px solid #e8e6e0;background:none;cursor:pointer;color:#888;font-weight:600;transition:all .15s}
+.ntb.sel-tip{background:#EAF3DE;color:#27500A;border-color:#639922}
+.ntb.sel-doubt{background:#FAEEDA;color:#633806;border-color:#BA7517}
+.ntb.sel-important{background:#EEEDFE;color:#3C3489;border-color:#534AB7}
+.ntb.sel-concept{background:#E6F1FB;color:#0C447C;border-color:#185FA5}
+
+.note-input-area{display:flex;flex-direction:column;gap:8px}
+.note-input-area input,.note-input-area textarea{font-size:13px;padding:9px 12px;border:1px solid #e8e6e0;border-radius:8px;background:#faf9f7;color:#1a1a18;font-family:inherit;transition:border .15s;outline:none}
+.note-input-area input:focus,.note-input-area textarea:focus{border-color:#185FA5;background:#fff}
+.note-input-area textarea{resize:vertical;min-height:80px;line-height:1.6}
+.btn-add-note{font-size:12px;font-weight:700;padding:9px 20px;background:#1a1a18;color:#fff;border:none;border-radius:8px;cursor:pointer;align-self:flex-start;transition:opacity .15s;letter-spacing:.2px}
+.btn-add-note:hover{opacity:.8}
+
+.notes-list{display:flex;flex-direction:column;gap:8px;margin-top:14px}
+.note-card{background:#faf9f7;border:1px solid #e8e6e0;border-radius:10px;padding:12px 14px}
+.note-card-hdr{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.note-badge{font-size:10px;font-weight:700;padding:2px 9px;border-radius:20px;flex-shrink:0}
+.nb-tip{background:#EAF3DE;color:#27500A}
+.nb-doubt{background:#FAEEDA;color:#633806}
+.nb-important{background:#EEEDFE;color:#3C3489}
+.nb-concept{background:#E6F1FB;color:#0C447C}
+.note-card-title{font-size:12px;font-weight:600;color:#1a1a18;flex:1}
+.note-card-body{font-size:12px;color:#666;line-height:1.6;white-space:pre-wrap}
+.note-actions{display:flex;gap:4px;margin-left:auto}
+.icon-btn{background:none;border:none;cursor:pointer;font-size:12px;color:#bbb;padding:2px 5px;border-radius:4px;transition:all .15s}
+.icon-btn:hover{color:#1a1a18;background:#f0eeea}
+.icon-btn.del:hover{color:#A32D2D}
+
+/* EDITING NOTE */
+.note-edit-area{display:flex;flex-direction:column;gap:6px;margin-top:6px}
+.note-edit-area input,.note-edit-area textarea{font-size:12px;padding:7px 10px;border:1px solid #185FA5;border-radius:6px;background:#fff;color:#1a1a18;font-family:inherit;outline:none}
+.note-edit-area textarea{resize:vertical;min-height:60px;line-height:1.5}
+.edit-actions{display:flex;gap:6px}
+.btn-save{font-size:11px;font-weight:700;padding:6px 14px;background:#185FA5;color:#fff;border:none;border-radius:6px;cursor:pointer}
+.btn-cancel{font-size:11px;font-weight:600;padding:6px 14px;background:none;border:1px solid #ddd;border-radius:6px;cursor:pointer;color:#888}
+
+/* DIARIO */
+.diario-form{background:#fff;border:1px solid #e8e6e0;border-radius:12px;padding:20px;margin-bottom:16px}
+.diario-form h3{font-size:13px;font-weight:700;color:#1a1a18;margin-bottom:14px;text-transform:uppercase;letter-spacing:.5px}
+.form-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:10px}
+.form-field{display:flex;flex-direction:column;gap:4px}
+.form-field label{font-size:11px;font-weight:600;color:#888;text-transform:uppercase;letter-spacing:.3px}
+.form-field input,.form-field select,.form-field textarea{font-size:13px;padding:8px 11px;border:1px solid #e8e6e0;border-radius:8px;background:#faf9f7;color:#1a1a18;font-family:inherit;outline:none;transition:border .15s}
+.form-field input:focus,.form-field select:focus,.form-field textarea:focus{border-color:#185FA5;background:#fff}
+.form-field.full{grid-column:1/-1}
+.form-field textarea{resize:vertical;min-height:70px;line-height:1.5}
+.btn-log{font-size:12px;font-weight:700;padding:9px 24px;background:#1a1a18;color:#fff;border:none;border-radius:8px;cursor:pointer;transition:opacity .15s}
+.btn-log:hover{opacity:.8}
+
+.log-entries{display:flex;flex-direction:column;gap:8px}
+.log-card{background:#fff;border:1px solid #e8e6e0;border-radius:10px;padding:14px 16px;display:flex;align-items:flex-start;gap:14px}
+.log-date-blk{text-align:center;min-width:44px}
+.log-day{font-size:20px;font-weight:800;color:#1a1a18;line-height:1}
+.log-month{font-size:10px;color:#888;text-transform:uppercase;font-weight:600}
+.log-sep{width:1px;background:#f0eeea;align-self:stretch;flex-shrink:0}
+.log-body{flex:1}
+.log-title-txt{font-size:13px;font-weight:600;color:#1a1a18}
+.log-desc-txt{font-size:12px;color:#888;margin-top:3px;line-height:1.5}
+.log-hours-blk{text-align:right;flex-shrink:0}
+.log-h{font-size:16px;font-weight:700;color:#185FA5}
+.log-hl{font-size:10px;color:#aaa}
+
+/* OVERVIEW TAB */
+.overview-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px}
+.ov-card{background:#fff;border:1px solid #e8e6e0;border-radius:10px;padding:16px}
+.ov-card h3{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#888;margin-bottom:12px}
+.progress-list{display:flex;flex-direction:column;gap:8px}
+.prog-item{display:flex;align-items:center;gap:10px}
+.prog-label{font-size:11px;color:#555;width:140px;flex-shrink:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.prog-track{flex:1;height:4px;background:#f0eeea;border-radius:2px}
+.prog-fill{height:100%;border-radius:2px;background:#1D9E75;transition:width .3s}
+.prog-pct{font-size:10px;color:#aaa;min-width:28px;text-align:right}
+
+/* EMPTY */
+.empty{text-align:center;padding:32px 16px;color:#bbb;font-size:13px}
+
+/* TABS CONTENT */
+.ctab{display:none}
+.ctab.active{display:block}
+.content-tabs{display:flex;gap:0;border-bottom:1px solid #e8e6e0;margin-bottom:20px}
+.ctab-btn{font-size:12px;font-weight:600;padding:10px 18px;border:none;background:none;cursor:pointer;color:#888;border-bottom:2px solid transparent;margin-bottom:-1px;transition:all .15s;letter-spacing:.2px}
+.ctab-btn.active{color:#1a1a18;border-bottom-color:#1a1a18}
+
+/* SEARCH */
+.search-box{padding:10px 16px;border-bottom:1px solid #f0eeea;position:sticky;top:0;background:#fff;z-index:10}
+.search-box input{width:100%;font-size:12px;padding:7px 10px;border:1px solid #e8e6e0;border-radius:7px;background:#faf9f7;color:#1a1a18;font-family:inherit;outline:none}
+.search-box input:focus{border-color:#185FA5;background:#fff}
+
+/* ============================================================
+   MOBILE — full redesign for screens ≤ 700px
+   ============================================================ */
+@media(max-width:700px){
+
+  /* TOPBAR — compact single line */
+  .topbar{padding:10px 14px;gap:6px}
+  .topbar h1{font-size:13px}
+  .topbar p{display:none}
+  .top-badges{gap:5px}
+  .badge{font-size:10px;padding:3px 9px}
+  #btn-export-top{font-size:10px;padding:3px 10px}
+
+  /* HIDE desktop sidebar entirely on mobile */
+  .sidebar{display:none}
+
+  /* MAIN becomes a single full-height pane */
+  .main{flex-direction:column;flex:1}
+
+  /* CONTENT — fills viewport below topbar and above bottom nav */
+  .content{
+    height:calc(100vh - 56px - 62px);
+    padding:0;
+    overflow-y:auto;
+    -webkit-overflow-scrolling:touch;
+  }
+
+  /* ---- MOBILE SCREENS (views) ---- */
+  /* Each .m-screen is a full-height scrollable view */
+  .m-screen{
+    display:none;
+    flex-direction:column;
+    height:100%;
+    overflow-y:auto;
+    -webkit-overflow-scrolling:touch;
+    padding:12px 14px 16px;
+  }
+  .m-screen.active{display:flex}
+
+  /* SECTIONS LIST screen */
+  .m-sec-card{
+    background:#fff;border:1px solid #e8e6e0;border-radius:12px;
+    margin-bottom:10px;overflow:hidden;
+  }
+  .m-sec-hdr{
+    display:flex;align-items:center;gap:10px;padding:12px 14px;
+    cursor:pointer;user-select:none;
+  }
+  .m-sec-icon{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;flex-shrink:0}
+  .m-sec-info{flex:1;min-width:0}
+  .m-sec-title{font-size:13px;font-weight:700;color:#1a1a18;line-height:1.3}
+  .m-sec-sub{font-size:11px;color:#888;margin-top:2px}
+  .m-sec-arrow{font-size:11px;color:#bbb;transition:transform .2s;flex-shrink:0}
+  .m-sec-arrow.open{transform:rotate(90deg)}
+  .m-sec-bar{height:3px;background:#f0eeea}
+  .m-sec-bar-fill{height:100%;background:#1D9E75;transition:width .3s}
+  .m-sec-lessons{display:none;padding:4px 0 8px;border-top:1px solid #f5f4f0}
+  .m-sec-lessons.open{display:block}
+  .m-lesson-row{
+    display:flex;align-items:center;gap:10px;
+    padding:9px 14px;cursor:pointer;
+    border-left:3px solid transparent;
+    transition:background .1s;
+  }
+  .m-lesson-row:active{background:#f5f4f0}
+  .m-lesson-row.done-row{opacity:.7}
+  .m-lesson-chk{width:18px;height:18px;border:2px solid #ccc;border-radius:5px;flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all .15s}
+  .m-lesson-chk.done{background:#1D9E75;border-color:#1D9E75;color:#fff;font-size:10px;font-weight:800}
+  .m-lesson-num{font-size:10px;color:#aaa;min-width:22px;flex-shrink:0}
+  .m-lesson-title{flex:1;font-size:13px;color:#1a1a18;line-height:1.4}
+  .m-lesson-title.done{color:#bbb;text-decoration:line-through}
+  .m-lesson-dur{font-size:11px;color:#bbb;flex-shrink:0}
+
+  /* AULA DETAIL screen — compact, no scroll needed for key actions */
+  .m-aula-screen{padding:0}
+  .m-aula-topbar{
+    display:flex;align-items:center;gap:10px;padding:12px 14px;
+    background:#fff;border-bottom:1px solid #e8e6e0;position:sticky;top:0;z-index:10;
+  }
+  .m-back-btn{
+    width:34px;height:34px;border-radius:8px;border:1px solid #e8e6e0;
+    background:none;cursor:pointer;display:flex;align-items:center;justify-content:center;
+    font-size:16px;flex-shrink:0;
+  }
+  .m-aula-topbar-info{flex:1;min-width:0}
+  .m-aula-topbar-sec{font-size:10px;color:#888;font-weight:600;text-transform:uppercase;letter-spacing:.4px}
+  .m-aula-topbar-title{font-size:13px;font-weight:700;color:#1a1a18;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+  /* Hero status card */
+  .m-aula-hero{
+    margin:12px 14px;background:#fff;border:1px solid #e8e6e0;
+    border-radius:14px;padding:16px;
+  }
+  .m-aula-title{font-size:15px;font-weight:700;color:#1a1a18;line-height:1.4;margin-bottom:8px}
+  .m-aula-meta{display:flex;gap:10px;font-size:12px;color:#aaa;margin-bottom:14px;flex-wrap:wrap}
+  .m-aula-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  .m-aula-btn{
+    padding:11px 8px;border-radius:10px;border:none;cursor:pointer;
+    font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;gap:6px;
+    transition:all .15s;
+  }
+  .m-aula-btn.primary{background:#1D9E75;color:#fff}
+  .m-aula-btn.primary.undone{background:#f0eeea;color:#1a1a18}
+  .m-aula-btn.secondary{background:#f0f7ff;color:#185FA5}
+  .m-aula-btn.edit{background:#f5f4f0;color:#666}
+  .m-aula-btn:active{transform:scale(.97)}
+
+  /* Notes section inside aula */
+  .m-notes-section{margin:0 14px 14px}
+  .m-notes-hdr{
+    display:flex;align-items:center;justify-content:space-between;
+    margin-bottom:10px;
+  }
+  .m-notes-hdr h3{font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;color:#888}
+  .m-note-types{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}
+  .m-note-input{display:flex;flex-direction:column;gap:8px;margin-bottom:12px}
+  .m-note-input input,.m-note-input textarea{
+    font-size:14px;padding:10px 12px;border:1px solid #e8e6e0;border-radius:10px;
+    background:#faf9f7;color:#1a1a18;font-family:inherit;outline:none;
+    -webkit-appearance:none;
+  }
+  .m-note-input input:focus,.m-note-input textarea:focus{border-color:#185FA5;background:#fff}
+  .m-note-input textarea{resize:none;height:80px;line-height:1.6}
+  .m-btn-add-note{
+    width:100%;padding:12px;border:none;border-radius:10px;background:#1a1a18;
+    color:#fff;font-size:14px;font-weight:700;cursor:pointer;
+  }
+  .m-note-card{background:#fff;border:1px solid #e8e6e0;border-radius:10px;padding:12px;margin-bottom:8px}
+
+  /* STATS screen */
+  .m-stats-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
+  .m-stat-c{background:#fff;border:1px solid #e8e6e0;border-radius:10px;padding:14px;text-align:center}
+  .m-stat-n{font-size:22px;font-weight:800;color:#1a1a18}
+  .m-stat-l{font-size:11px;color:#888;margin-top:2px}
+  .m-prog-card{background:#fff;border:1px solid #e8e6e0;border-radius:12px;padding:14px;margin-bottom:10px}
+  .m-prog-card h3{font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;color:#888;margin-bottom:12px}
+
+  /* DIARIO screen */
+  .m-log-form{background:#fff;border:1px solid #e8e6e0;border-radius:12px;padding:14px;margin-bottom:14px}
+  .m-log-form h3{font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;color:#888;margin-bottom:12px}
+  .m-log-form input,.m-log-form select,.m-log-form textarea{
+    width:100%;font-size:14px;padding:10px 12px;border:1px solid #e8e6e0;border-radius:10px;
+    background:#faf9f7;color:#1a1a18;font-family:inherit;outline:none;margin-bottom:8px;
+    -webkit-appearance:none;
+  }
+  .m-log-form input:focus,.m-log-form select:focus,.m-log-form textarea:focus{border-color:#185FA5;background:#fff}
+  .m-log-form textarea{resize:none;height:70px;line-height:1.5}
+  .m-log-form label{font-size:11px;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:.3px;display:block;margin-bottom:4px}
+  .m-log-row2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  .m-btn-log{width:100%;padding:12px;border:none;border-radius:10px;background:#1a1a18;color:#fff;font-size:14px;font-weight:700;cursor:pointer}
+
+  /* BOTTOM NAV */
+  .bottom-nav{
+    display:flex;position:fixed;bottom:0;left:0;right:0;
+    background:#fff;border-top:1px solid #e8e6e0;
+    height:62px;z-index:200;
+    padding-bottom:env(safe-area-inset-bottom,0px);
+  }
+  .bnav-btn{
+    flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
+    gap:3px;background:none;border:none;cursor:pointer;
+    color:#aaa;font-size:10px;font-weight:600;letter-spacing:.2px;
+    transition:color .15s;padding:6px 4px;
+  }
+  .bnav-btn.active{color:#185FA5}
+  .bnav-icon{font-size:20px;line-height:1}
+
+  /* HIDE desktop-only elements on mobile */
+  .content-tabs{display:none}
+  .stats-row{display:none}
+  .overview-grid{display:none}
+  .lesson-detail{display:none}
+  .welcome-card{display:none}
+  .diario-form{display:none}
+  .log-entries{display:none}
+
+  /* form-grid 1 col on mobile (for desktop diario form, hidden anyway) */
+  .form-grid{grid-template-columns:1fr}
+
+  /* SEARCH screen */
+  .m-search-bar{
+    display:flex;gap:8px;align-items:center;
+    padding:10px 14px;background:#fff;border-bottom:1px solid #e8e6e0;
+    position:sticky;top:0;z-index:10;
+  }
+  .m-search-bar input{
+    flex:1;font-size:14px;padding:9px 12px;border:1px solid #e8e6e0;border-radius:10px;
+    background:#faf9f7;color:#1a1a18;font-family:inherit;outline:none;-webkit-appearance:none;
+  }
+  .m-search-bar input:focus{border-color:#185FA5;background:#fff}
+  .m-search-results{padding:8px 14px}
+  .m-search-item{
+    display:flex;align-items:center;gap:10px;padding:10px 12px;
+    background:#fff;border:1px solid #e8e6e0;border-radius:10px;margin-bottom:8px;
+    cursor:pointer;
+  }
+  .m-search-item:active{background:#f0f7ff}
+}
+
+/* Desktop: hide mobile elements */
+@media(min-width:701px){
+  .bottom-nav{display:none}
+  .m-screen{display:none!important}
+  .m-aula-topbar{display:none}
+}
+
+/* SCROLLBAR */
+::-webkit-scrollbar{width:5px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:#ddd;border-radius:10px}
+
+/* EXPORT MODAL */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:999;align-items:center;justify-content:center;padding:16px}
+.modal-overlay.open{display:flex}
+.modal{background:#fff;border-radius:16px;width:100%;max-width:600px;max-height:90vh;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.25)}
+.modal-hdr{padding:20px 24px 16px;border-bottom:1px solid #f0eeea;display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.modal-hdr h2{font-size:15px;font-weight:700;color:#1a1a18}
+.modal-hdr p{font-size:12px;color:#888;margin-top:2px}
+.modal-close{background:none;border:none;font-size:18px;cursor:pointer;color:#bbb;padding:4px 8px;border-radius:6px}
+.modal-close:hover{color:#1a1a18;background:#f0eeea}
+.modal-tabs{display:flex;gap:0;padding:0 24px;border-bottom:1px solid #f0eeea;flex-shrink:0}
+.mtab{font-size:12px;font-weight:600;padding:10px 14px;border:none;background:none;cursor:pointer;color:#888;border-bottom:2px solid transparent;margin-bottom:-1px;transition:all .15s}
+.mtab.active{color:#1a1a18;border-bottom-color:#1a1a18}
+.modal-body{padding:20px 24px;overflow-y:auto;flex:1}
+.modal-footer{padding:16px 24px;border-top:1px solid #f0eeea;display:flex;gap:10px;flex-wrap:wrap;flex-shrink:0;background:#faf9f7}
+.export-preview{background:#f5f4f0;border:1px solid #e8e6e0;border-radius:10px;padding:16px;font-size:12px;line-height:1.8;color:#333;white-space:pre-wrap;max-height:320px;overflow-y:auto;font-family:'Courier New',monospace}
+.export-options{display:flex;flex-direction:column;gap:10px;margin-bottom:16px}
+.export-opt{display:flex;align-items:center;gap:10px;padding:10px 14px;border:1.5px solid #e8e6e0;border-radius:10px;cursor:pointer;transition:all .15s}
+.export-opt:hover,.export-opt.sel{border-color:#185FA5;background:#f0f7ff}
+.export-opt input{accent-color:#185FA5}
+.export-opt-label{font-size:13px;font-weight:600;color:#1a1a18}
+.export-opt-sub{font-size:11px;color:#888;margin-top:1px}
+.btn-export{font-size:13px;font-weight:700;padding:10px 20px;border:none;border-radius:10px;cursor:pointer;display:flex;align-items:center;gap:8px;transition:all .15s;text-decoration:none}
+.btn-wpp{background:#25D366;color:#fff}
+.btn-wpp:hover{background:#1ebe5d}
+.btn-email{background:#EA4335;color:#fff}
+.btn-email:hover{background:#d03020}
+.btn-copy{background:#1a1a18;color:#fff}
+.btn-copy:hover{opacity:.8}
+.btn-copy.copied{background:#1D9E75}
+.section-scope-sel{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+.scope-btn{font-size:12px;font-weight:600;padding:6px 16px;border-radius:20px;border:1.5px solid #e8e6e0;background:none;cursor:pointer;color:#888;transition:all .15s}
+.scope-btn.active{background:#1a1a18;color:#fff;border-color:#1a1a18}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="topbar">
+    <div>
+      <h1>☕ Java COMPLETO — Tracker de Estudos</h1>
+      <p>Nelio Alves · Udemy · POO + Projetos · 263 aulas</p>
+    </div>
+    <div class="top-badges">
+      <span class="badge badge-green" id="hdr-pct">0% concluído</span>
+      <span class="badge badge-blue" id="hdr-aulas">0/263 aulas</span>
+      <span class="badge badge-amber" id="hdr-hours">0h estudadas</span>
+      <button onclick="openExportGeral()" style="font-size:11px;font-weight:700;padding:4px 14px;border-radius:20px;border:none;background:#fff;color:#1a1a18;cursor:pointer;letter-spacing:.2px">📤 Exportar</button>
+    </div>
+  </div>
+
+  <!-- EXPORT MODAL -->
+  <div class="modal-overlay" id="export-modal" onclick="if(event.target===this)closeExport()">
+    <div class="modal">
+      <div class="modal-hdr">
+        <div>
+          <h2>📤 Exportar Conteúdo</h2>
+          <p id="export-modal-subtitle">Compartilhe seu progresso via WhatsApp ou E-mail</p>
+        </div>
+        <button class="modal-close" onclick="closeExport()">✕</button>
+      </div>
+      <div class="modal-tabs">
+        <button class="mtab active" onclick="setExportTab('aula')">Aula Atual</button>
+        <button class="mtab" onclick="setExportTab('secao')">Seção Completa</button>
+        <button class="mtab" onclick="setExportTab('geral')">Progresso Geral</button>
+      </div>
+      <div class="modal-body">
+        <!-- AULA TAB -->
+        <div id="etab-aula">
+          <div class="export-options">
+            <label class="export-opt sel" id="opt-status">
+              <input type="checkbox" id="chk-status" checked onchange="refreshPreview()"/>
+              <div><div class="export-opt-label">✅ Status da aula</div><div class="export-opt-sub">Concluída / Pendente, duração</div></div>
+            </label>
+            <label class="export-opt" id="opt-notes">
+              <input type="checkbox" id="chk-notes" onchange="refreshPreview()"/>
+              <div><div class="export-opt-label">📝 Incluir anotações</div><div class="export-opt-sub">Dicas, dúvidas, conceitos e pontos importantes</div></div>
+            </label>
+          </div>
+          <div class="export-preview" id="export-preview-aula"></div>
+        </div>
+        <!-- SECAO TAB -->
+        <div id="etab-secao" style="display:none">
+          <div class="section-scope-sel" id="sec-scope-sel"></div>
+          <div class="export-options">
+            <label class="export-opt sel">
+              <input type="checkbox" id="chk-sec-progress" checked onchange="refreshPreview()"/>
+              <div><div class="export-opt-label">📊 Progresso da seção</div><div class="export-opt-sub">Aulas concluídas e percentual</div></div>
+            </label>
+            <label class="export-opt">
+              <input type="checkbox" id="chk-sec-lessons" onchange="refreshPreview()"/>
+              <div><div class="export-opt-label">📋 Lista de aulas</div><div class="export-opt-sub">Todas as aulas com status individual</div></div>
+            </label>
+            <label class="export-opt">
+              <input type="checkbox" id="chk-sec-notes" onchange="refreshPreview()"/>
+              <div><div class="export-opt-label">📝 Anotações da seção</div><div class="export-opt-sub">Todas as anotações das aulas desta seção</div></div>
+            </label>
+          </div>
+          <div class="export-preview" id="export-preview-secao"></div>
+        </div>
+        <!-- GERAL TAB -->
+        <div id="etab-geral" style="display:none">
+          <div class="export-options">
+            <label class="export-opt sel">
+              <input type="checkbox" id="chk-geral-stats" checked onchange="refreshPreview()"/>
+              <div><div class="export-opt-label">📈 Estatísticas gerais</div><div class="export-opt-sub">Progresso total, horas, sessões</div></div>
+            </label>
+            <label class="export-opt sel">
+              <input type="checkbox" id="chk-geral-secs" checked onchange="refreshPreview()"/>
+              <div><div class="export-opt-label">📚 Progresso por seção</div><div class="export-opt-sub">Percentual de cada seção</div></div>
+            </label>
+            <label class="export-opt">
+              <input type="checkbox" id="chk-geral-notes" onchange="refreshPreview()"/>
+              <div><div class="export-opt-label">📝 Todas as anotações</div><div class="export-opt-sub">Resumo completo de anotações</div></div>
+            </label>
+          </div>
+          <div class="export-preview" id="export-preview-geral"></div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-export btn-wpp" onclick="exportWhatsApp()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.107.549 4.09 1.509 5.815L.057 23.428a.5.5 0 0 0 .609.61l5.703-1.49A11.943 11.943 0 0 0 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.882a9.874 9.874 0 0 1-5.031-1.375l-.361-.214-3.735.977.998-3.645-.235-.374A9.865 9.865 0 0 1 2.118 12C2.118 6.527 6.527 2.118 12 2.118c5.473 0 9.882 4.409 9.882 9.882 0 5.473-4.409 9.882-9.882 9.882z"/></svg>
+          WhatsApp
+        </button>
+        <button class="btn-export btn-email" onclick="exportEmail()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>
+          E-mail
+        </button>
+        <button class="btn-export btn-copy" id="btn-copy-txt" onclick="copyToClipboard()">
+          📋 Copiar texto
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="main">
+    <!-- SIDEBAR -->
+    <div class="sidebar">
+      <div class="sidebar-tabs">
+        <button class="stab active" onclick="setSideTab('secoes')">Seções</button>
+        <button class="stab" onclick="setSideTab('busca')">Buscar</button>
+      </div>
+      <div id="side-secoes">
+        <div id="sections-nav"></div>
+      </div>
+      <div id="side-busca" style="display:none">
+        <div class="search-box"><input type="text" placeholder="Buscar aula..." oninput="searchLessons(this.value)" /></div>
+        <div id="search-results"></div>
+      </div>
+    </div>
+
+    <!-- CONTENT -->
+    <div class="content" id="main-content">
+      <div class="stats-row">
+        <div class="stat-c"><div class="stat-n" id="st-pct">0%</div><div class="stat-l">Progresso</div></div>
+        <div class="stat-c"><div class="stat-n" id="st-aulas">0/263</div><div class="stat-l">Aulas</div></div>
+        <div class="stat-c"><div class="stat-n" id="st-secs">0/20</div><div class="stat-l">Seções</div></div>
+        <div class="stat-c"><div class="stat-n" id="st-notes">0</div><div class="stat-l">Anotações</div></div>
+        <div class="stat-c"><div class="stat-n" id="st-hours">0h</div><div class="stat-l">Horas</div></div>
+        <div class="stat-c"><div class="stat-n" id="st-sessions">0</div><div class="stat-l">Sessões</div></div>
+      </div>
+
+      <div class="content-tabs">
+        <button class="ctab-btn active" onclick="setContentTab('visao')">Visão Geral</button>
+        <button class="ctab-btn" onclick="setContentTab('aula')">Aula Atual</button>
+        <button class="ctab-btn" onclick="setContentTab('notas')">Anotações</button>
+        <button class="ctab-btn" onclick="setContentTab('diario')">Diário</button>
+      </div>
+
+      <!-- VISAO GERAL -->
+      <div id="ctab-visao" class="ctab active">
+        <div class="overview-grid" id="overview-grid"></div>
+      </div>
+
+      <!-- AULA ATUAL -->
+      <div id="ctab-aula" class="ctab">
+        <div id="lesson-detail-area">
+          <div class="welcome-card">
+            <h2>Selecione uma aula</h2>
+            <p>Clique em qualquer aula na barra lateral para ver detalhes, marcar como concluída e adicionar anotações.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- NOTAS GLOBAIS -->
+      <div id="ctab-notas" class="ctab">
+        <div id="global-notes-area"></div>
+      </div>
+
+      <!-- DIARIO -->
+      <div id="ctab-diario" class="ctab">
+        <div class="diario-form">
+          <h3>Registrar Sessão de Estudo</h3>
+          <div class="form-grid">
+            <div class="form-field">
+              <label>Data</label>
+              <input type="date" id="log-date" />
+            </div>
+            <div class="form-field">
+              <label>Horas estudadas</label>
+              <input type="number" id="log-hours" min="0.5" max="12" step="0.5" placeholder="Ex: 1.5" />
+            </div>
+            <div class="form-field">
+              <label>Seção</label>
+              <select id="log-sec"><option value="">Selecione...</option></select>
+            </div>
+            <div class="form-field full">
+              <label>O que você estudou?</label>
+              <textarea id="log-desc" placeholder="Descreva o que foi estudado, dificuldades, insights..."></textarea>
+            </div>
+          </div>
+          <button class="btn-log" onclick="addLog()">Registrar sessão</button>
+        </div>
+        <div class="log-entries" id="log-list"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== MOBILE UI ===================== -->
+  <nav class="bottom-nav" id="bottom-nav">
+    <button class="bnav-btn active" onclick="mSetScreen('secoes')" id="bnav-secoes">
+      <span class="bnav-icon">📚</span>Seções
+    </button>
+    <button class="bnav-btn" onclick="mSetScreen('busca')" id="bnav-busca">
+      <span class="bnav-icon">🔍</span>Buscar
+    </button>
+    <button class="bnav-btn" onclick="mSetScreen('stats')" id="bnav-stats">
+      <span class="bnav-icon">📊</span>Progresso
+    </button>
+    <button class="bnav-btn" onclick="mSetScreen('notas')" id="bnav-notas">
+      <span class="bnav-icon">📝</span>Notas
+    </button>
+    <button class="bnav-btn" onclick="mSetScreen('diario')" id="bnav-diario">
+      <span class="bnav-icon">📓</span>Diário
+    </button>
+  </nav>
+
+  <!-- Mobile screens injected into a fixed-position layer -->
+  <div id="mobile-layer" style="display:none;position:fixed;inset:0;top:56px;bottom:62px;background:#f5f4f0;overflow:hidden;z-index:50;flex-direction:column">
+
+    <!-- SECOES screen -->
+    <div class="m-screen active" id="m-secoes" style="overflow-y:auto;padding:10px 12px 8px">
+      <div id="m-sections-list"></div>
+    </div>
+
+    <!-- BUSCA screen -->
+    <div class="m-screen" id="m-busca" style="padding:0;display:flex;flex-direction:column">
+      <div class="m-search-bar">
+        <input type="text" placeholder="Buscar aula por nome ou número..." oninput="mSearchLessons(this.value)" id="m-search-input"/>
+      </div>
+      <div style="flex:1;overflow-y:auto;padding:10px 12px">
+        <div class="m-search-results" id="m-search-results">
+          <div class="empty">Digite para buscar uma aula...</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- AULA screen -->
+    <div class="m-screen" id="m-aula" style="padding:0;display:flex;flex-direction:column">
+      <div class="m-aula-topbar">
+        <button class="m-back-btn" onclick="mGoBack()">←</button>
+        <div class="m-aula-topbar-info">
+          <div class="m-aula-topbar-sec" id="m-aula-sec-label"></div>
+          <div class="m-aula-topbar-title" id="m-aula-top-title"></div>
+        </div>
+        <button onclick="mOpenExport()" style="background:none;border:none;cursor:pointer;font-size:22px;padding:4px 8px">📤</button>
+      </div>
+      <div style="flex:1;overflow-y:auto" id="m-aula-body"></div>
+    </div>
+
+    <!-- STATS screen -->
+    <div class="m-screen" id="m-stats" style="overflow-y:auto;padding:12px">
+      <div class="m-stats-grid">
+        <div class="m-stat-c"><div class="m-stat-n" id="ms-pct">0%</div><div class="m-stat-l">Progresso</div></div>
+        <div class="m-stat-c"><div class="m-stat-n" id="ms-aulas">0/263</div><div class="m-stat-l">Aulas</div></div>
+        <div class="m-stat-c"><div class="m-stat-n" id="ms-secs">0/20</div><div class="m-stat-l">Seções</div></div>
+        <div class="m-stat-c"><div class="m-stat-n" id="ms-notes">0</div><div class="m-stat-l">Anotações</div></div>
+        <div class="m-stat-c"><div class="m-stat-n" id="ms-hours">0h</div><div class="m-stat-l">Horas</div></div>
+        <div class="m-stat-c"><div class="m-stat-n" id="ms-sessions">0</div><div class="m-stat-l">Sessões</div></div>
+      </div>
+      <div class="m-prog-card">
+        <h3>Progresso por Seção</h3>
+        <div id="m-prog-list"></div>
+      </div>
+      <div style="text-align:center;margin-top:8px">
+        <button onclick="openExportGeral()" style="font-size:13px;font-weight:700;padding:12px 28px;border-radius:12px;border:none;background:#1a1a18;color:#fff;cursor:pointer;width:100%">📤 Exportar Progresso</button>
+      </div>
+    </div>
+
+    <!-- NOTAS screen -->
+    <div class="m-screen" id="m-notas" style="overflow-y:auto;padding:12px">
+      <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px" id="m-note-filters">
+        <button class="ntb" style="background:#f0eeea;color:#1a1a18;border-color:#888" onclick="mFilterNotes('all',this)">Todas</button>
+        <button class="ntb" onclick="mFilterNotes('tip',this)">💡 Dicas</button>
+        <button class="ntb" onclick="mFilterNotes('doubt',this)">❓ Dúvidas</button>
+        <button class="ntb" onclick="mFilterNotes('important',this)">⭐ Imp.</button>
+        <button class="ntb" onclick="mFilterNotes('concept',this)">📖 Conc.</button>
+      </div>
+      <div id="m-notes-list"></div>
+    </div>
+
+    <!-- DIARIO screen -->
+    <div class="m-screen" id="m-diario" style="overflow-y:auto;padding:12px">
+      <div class="m-log-form">
+        <h3>Registrar Sessão</h3>
+        <div class="m-log-row2">
+          <div>
+            <label>Data</label>
+            <input type="date" id="m-log-date"/>
+          </div>
+          <div>
+            <label>Horas</label>
+            <input type="number" id="m-log-hours" min="0.5" max="12" step="0.5" placeholder="1.5"/>
+          </div>
+        </div>
+        <label>Seção</label>
+        <select id="m-log-sec"><option value="">Selecione...</option></select>
+        <label>O que estudou?</label>
+        <textarea id="m-log-desc" placeholder="Progresso, dificuldades, insights..."></textarea>
+        <button class="m-btn-log" onclick="mAddLog()">Registrar sessão ↗</button>
+      </div>
+      <div id="m-log-list"></div>
+    </div>
+
+  </div><!-- end mobile-layer -->
+
+<script>
+// ============================================================
+// DATA — All 263 lessons from the course
+// ============================================================
+const SECTIONS = [
+  {id:'s1',num:1,title:'Apresentação do curso',dur:'19m',color:'#185FA5',lessons:[
+    {n:1,t:'Conteúdo programático - o que você vai aprender?',d:'5m'},
+    {n:2,t:'Mapa de estudos da carreira Java',d:'4m'},
+    {n:3,t:'Conteúdos bônus',d:'5m'},
+    {n:4,t:'Atualização do curso',d:'3m'},
+    {n:5,t:'Como sanar suas dúvidas sobre o curso',d:'2m'},
+  ]},
+  {id:'s2',num:2,title:'Conceitos de programação',dur:'24m',color:'#0F6E56',lessons:[
+    {n:6,t:'Visão geral do capítulo',d:'1m'},
+    {n:7,t:'Material de apoio do capítulo',d:'1m'},
+    {n:8,t:'Algoritmo, Automação, Programa de Computador',d:'3m'},
+    {n:9,t:'O que é preciso para se fazer um programa de computador',d:'2m'},
+    {n:10,t:'Linguagem de programação, léxica, sintática',d:'4m'},
+    {n:11,t:'IDE - Ambiente Integrado de Desenvolvimento',d:'2m'},
+    {n:12,t:'Compilação, interpretação, código fonte, código objeto, máquina virtual',d:'11m'},
+  ]},
+  {id:'s3',num:3,title:'Introdução à linguagem Java',dur:'40m',color:'#3C3489',lessons:[
+    {n:13,t:'Visão geral do capítulo',d:'1m'},
+    {n:14,t:'Material de apoio do capítulo',d:'1m'},
+    {n:15,t:'Entendendo as versões do Java',d:'3m'},
+    {n:16,t:'Histórico e edições de Java',d:'8m'},
+    {n:17,t:'JDK / JVM - Máquina Virtual do Java',d:'7m'},
+    {n:18,t:'Estrutura de uma aplicação Java',d:'3m'},
+    {n:19,t:'Instale o JDK neste momento',d:'3m'},
+    {n:20,t:'Instalando o Java JDK',d:'1m'},
+    {n:21,t:'Selecionando a IDE para escrever os programas',d:'2m'},
+    {n:22,t:'Instalação do Eclipse (Spring Tools - STS)',d:'4m'},
+    {n:23,t:'Customizando o JDK no Eclipse',d:'2m'},
+    {n:24,t:'Primeiro programa Java no Eclipse',d:'5m'},
+    {n:25,t:'Sintaxe simplificada do Java 25',d:'2m'},
+  ]},
+  {id:'s4',num:4,title:'Estrutura sequencial',dur:'1h 10m',color:'#712B13',lessons:[
+    {n:26,t:'Visão geral do capítulo',d:'1m'},
+    {n:27,t:'Material de apoio do capítulo',d:'1m'},
+    {n:28,t:'Expressões aritméticas',d:'5m'},
+    {n:29,t:'Variáveis e tipos básicos em Java',d:'12m'},
+    {n:30,t:'As três operações básicas de programação',d:'2m'},
+    {n:31,t:'Saída de dados em Java',d:'18m'},
+    {n:32,t:'Processamento de dados em Java, Casting',d:'8m'},
+    {n:33,t:'Entrada de dados em Java - Parte 1',d:'14m'},
+    {n:34,t:'Entrada de dados em Java - Parte 2',d:'7m'},
+    {n:35,t:'Funções matemáticas em Java',d:'5m'},
+    {n:36,t:'AVISO: exercícios para iniciantes PARTE 1',d:'2m'},
+    {n:37,t:'Exercícios para Iniciantes - PARTE 1',d:'1m'},
+  ]},
+  {id:'s5',num:5,title:'Estrutura condicional',dur:'54m',color:'#633806',lessons:[
+    {n:38,t:'Visão geral do capítulo',d:'1m'},
+    {n:39,t:'Material de apoio do capítulo',d:'1m'},
+    {n:40,t:'Expressões comparativas',d:'2m'},
+    {n:41,t:'Expressões lógicas',d:'10m'},
+    {n:42,t:'Estrutura condicional (if-else)',d:'17m'},
+    {n:43,t:'AVISO: exercícios para iniciantes PARTE 2',d:'1m'},
+    {n:44,t:'Exercícios para Iniciantes - PARTE 2',d:'1m'},
+    {n:45,t:'Sintaxe opcional - operadores de atribuição cumulativa',d:'6m'},
+    {n:46,t:'Sintaxe opcional - switch-case',d:'6m'},
+    {n:47,t:'Expressão condicional ternária',d:'4m'},
+    {n:48,t:'Escopo e inicialização',d:'6m'},
+  ]},
+  {id:'s6',num:6,title:'Estruturas repetitivas',dur:'1h 10m',color:'#27500A',lessons:[
+    {n:49,t:'Visão geral do capítulo',d:'1m'},
+    {n:50,t:'Material de apoio do capítulo',d:'1m'},
+    {n:51,t:'Como utilizar o DEBUG no Eclipse (execução passo a passo)',d:'10m'},
+    {n:52,t:'Estrutura repetitiva enquanto (while)',d:'14m'},
+    {n:53,t:'Teste de mesa com estrutura repetitiva enquanto',d:'6m'},
+    {n:54,t:'Exercícios de teste de mesa com while',d:'1m'},
+    {n:55,t:'AVISO: exercícios para iniciantes PARTE 3',d:'1m'},
+    {n:56,t:'Exercícios para Iniciantes - PARTE 3',d:'1m'},
+    {n:57,t:'Estrutura repetitiva para (for)',d:'17m'},
+    {n:58,t:'Teste de mesa com estrutura repetitiva para',d:'6m'},
+    {n:59,t:'Exercícios de testes de mesa com for',d:'1m'},
+    {n:60,t:'AVISO: exercícios para iniciantes PARTE 4',d:'1m'},
+    {n:61,t:'Exercícios para iniciantes PARTE 4',d:'1m'},
+  ]},
+  {id:'s7',num:7,title:'Outros tópicos básicos sobre Java',dur:'49m',color:'#444441',lessons:[
+    {n:63,t:'Material de apoio do capítulo',d:'1m'},
+    {n:64,t:'Restrições e convenções para nomes',d:'4m'},
+    {n:65,t:'Operadores bitwise',d:'11m'},
+    {n:66,t:'Funções interessantes para String',d:'13m'},
+    {n:67,t:'Comentários em Java (básico)',d:'2m'},
+    {n:68,t:'Funções (sintaxe)',d:'19m'},
+  ]},
+  {id:'s8',num:8,title:'Introdução à Programação Orientada a Objetos',dur:'1h 29m',color:'#534AB7',lessons:[
+    {n:69,t:'Visão geral do capítulo',d:'1m'},
+    {n:70,t:'Material de apoio do capítulo',d:'1m'},
+    {n:71,t:'Resolvendo um problema sem orientação a objetos',d:'7m'},
+    {n:72,t:'Criando uma classe com três atributos para representar melhor o triângulo',d:'15m'},
+    {n:73,t:'Criando um método para obtermos os benefícios de reaproveitamento e delegação',d:'10m'},
+    {n:74,t:'Começando a resolver um segundo problema exemplo',d:'12m'},
+    {n:75,t:'Object e toString',d:'10m'},
+    {n:76,t:'Finalizando o programa',d:'4m'},
+    {n:77,t:'Exercícios de fixação',d:'5m'},
+    {n:78,t:'Membros estáticos - Parte 1',d:'16m'},
+    {n:79,t:'Membros estáticos - Parte 2',d:'7m'},
+    {n:80,t:'Exercício de fixação',d:'1m'},
+  ]},
+  {id:'s9',num:9,title:'Construtores, palavra this, sobrecarga, encapsulamento',dur:'1h 16m',color:'#993C1D',lessons:[
+    {n:81,t:'Visão geral do capítulo',d:'2m'},
+    {n:82,t:'Material de apoio do capítulo',d:'1m'},
+    {n:83,t:'Construtores',d:'14m'},
+    {n:84,t:'Palavra this',d:'5m'},
+    {n:85,t:'Sobrecarga',d:'5m'},
+    {n:86,t:'Encapsulamento',d:'14m'},
+    {n:87,t:'Gerando automaticamente construtores, getters e setters com Eclipse',d:'4m'},
+    {n:88,t:'Modificadores de acesso',d:'7m'},
+    {n:89,t:'Exercício de fixação',d:'2m'},
+    {n:90,t:'Correção do exercício de fixação - Parte 1',d:'11m'},
+    {n:91,t:'Correção do exercício de fixação - Parte 2',d:'13m'},
+  ]},
+  {id:'s10',num:10,title:'Comportamento de memória, arrays, listas',dur:'2h 40m',color:'#185FA5',lessons:[
+    {n:92,t:'Visão geral do capítulo',d:'1m'},
+    {n:93,t:'Material de apoio do capítulo',d:'1m'},
+    {n:94,t:'Tipos referência vs. tipos valor',d:'13m'},
+    {n:95,t:'Desalocação de memória - garbage collector e escopo local',d:'7m'},
+    {n:96,t:'Vetores - Parte 1',d:'15m'},
+    {n:97,t:'Vetores - Parte 2',d:'11m'},
+    {n:98,t:'Exercícios de fixação sobre vetores',d:'3m'},
+    {n:99,t:'Correção do exercício negativos',d:'6m'},
+    {n:100,t:'Correção do exercício alturas',d:'17m'},
+    {n:101,t:'Desafio sobre vetores (pensionato)',d:'5m'},
+    {n:102,t:'Correção do desafio sobre vetores (pensionato)',d:'16m'},
+    {n:103,t:'Boxing, unboxing e wrapper classes',d:'8m'},
+    {n:104,t:'Laço for each',d:'4m'},
+    {n:105,t:'Listas - Parte 1',d:'8m'},
+    {n:106,t:'Listas - Parte 2',d:'18m'},
+    {n:107,t:'Exercício proposto',d:'3m'},
+    {n:108,t:'Correção em vídeo do exercício proposto',d:'1m'},
+    {n:109,t:'Matrizes',d:'3m'},
+    {n:110,t:'Exercício resolvido',d:'19m'},
+    {n:111,t:'Exercício proposto',d:'3m'},
+  ]},
+  {id:'s11',num:11,title:'Tópicos especiais em Java: data-hora',dur:'1h 49m',color:'#3B6D11',lessons:[
+    {n:112,t:'Boas-vindas e avisos',d:'2m'},
+    {n:113,t:'Material de apoio do capítulo',d:'1m'},
+    {n:114,t:'Introdução a data-hora e duração',d:'8m'},
+    {n:115,t:'Entendendo timezone (fuso horário)',d:'4m'},
+    {n:116,t:'Padrão ISO 8601',d:'4m'},
+    {n:117,t:'Operações importantes com data-hora',d:'6m'},
+    {n:118,t:'Instanciando data-hora em Java',d:'21m'},
+    {n:119,t:'Convertendo data-hora para texto',d:'14m'},
+    {n:120,t:'Convertendo data-hora global para local',d:'9m'},
+    {n:121,t:'Cálculos com data-hora',d:'14m'},
+    {n:122,t:'Aviso: próximas duas aulas são sobre Date e Calendar',d:'1m'},
+    {n:123,t:'Trabalhando com datas - Date',d:'20m'},
+    {n:124,t:'Manipulando um Date com Calendar',d:'8m'},
+  ]},
+  {id:'s12',num:12,title:'Enumerações, composição',dur:'1h 28m',color:'#712B13',lessons:[
+    {n:125,t:'Visão geral do capítulo Enumerações e Composição',d:'2m'},
+    {n:126,t:'Material de apoio do capítulo',d:'1m'},
+    {n:127,t:'Enumerações',d:'11m'},
+    {n:128,t:'Vamos falar um pouco sobre design',d:'5m'},
+    {n:129,t:'Composição',d:'5m'},
+    {n:130,t:'Exercício resolvido 1 - Parte 1',d:'22m'},
+    {n:131,t:'Exercício resolvido 1 - Parte 2',d:'21m'},
+    {n:132,t:'Exercício resolvido 2 (demo StringBuilder)',d:'19m'},
+    {n:133,t:'Exercício de fixação',d:'3m'},
+    {n:134,t:'Correção em vídeo do exercício de fixação',d:'1m'},
+  ]},
+  {id:'s13',num:13,title:'Herança e polimorfismo',dur:'2h 1m',color:'#534AB7',lessons:[
+    {n:135,t:'Visão geral do capítulo Herança e Polimorfismo',d:'1m'},
+    {n:136,t:'Material de apoio do capítulo',d:'1m'},
+    {n:137,t:'Herança',d:'17m'},
+    {n:138,t:'Upcasting e downcasting',d:'18m'},
+    {n:139,t:'Sobreposição, palavra super, anotação @Override',d:'12m'},
+    {n:140,t:'Classes e métodos final',d:'8m'},
+    {n:141,t:'Introdução ao polimorfismo',d:'8m'},
+    {n:142,t:'Exercício resolvido',d:'20m'},
+    {n:143,t:'Exercício de fixação',d:'2m'},
+    {n:144,t:'Classes abstratas',d:'13m'},
+    {n:145,t:'Métodos abstratos',d:'21m'},
+    {n:146,t:'Exercício de fixação',d:'1m'},
+    {n:147,t:'Correção em vídeo do exercício de fixação',d:'1m'},
+  ]},
+  {id:'s14',num:14,title:'Tratamento de exceções',dur:'1h 46m',color:'#A32D2D',lessons:[
+    {n:148,t:'Visão geral do capítulo Tratamento de Exceções',d:'1m'},
+    {n:149,t:'Material de apoio do capítulo',d:'1m'},
+    {n:150,t:'Discussão inicial sobre exceções',d:'8m'},
+    {n:151,t:'Estrutura try-catch',d:'9m'},
+    {n:152,t:'Pilha de chamadas de métodos (stack trace)',d:'8m'},
+    {n:153,t:'Bloco finally',d:'6m'},
+    {n:154,t:'Criando exceções personalizadas',d:'18m'},
+    {n:155,t:'Primeira solução - muito ruim',d:'17m'},
+    {n:156,t:'Segunda solução - ruim',d:'11m'},
+    {n:157,t:'Terceira solução - boa',d:'26m'},
+    {n:158,t:'Exercício de fixação',d:'2m'},
+    {n:159,t:'Correção do exercício de fixação',d:'1m'},
+  ]},
+  {id:'s15',num:15,title:'Trabalhando com arquivos',dur:'39m',color:'#27500A',lessons:[
+    {n:160,t:'Visão geral do capítulo Trabalhando com Arquivos',d:'1m'},
+    {n:161,t:'Material de apoio do capítulo',d:'1m'},
+    {n:162,t:'Lendo arquivo texto com classes File e Scanner',d:'8m'},
+    {n:163,t:'FileReader e BufferedReader',d:'8m'},
+    {n:164,t:'Bloco try-with-resources',d:'3m'},
+    {n:165,t:'FileWriter e BufferedWriter',d:'6m'},
+    {n:166,t:'Manipulando pastas com File',d:'8m'},
+    {n:167,t:'Informações do caminho do arquivo',d:'3m'},
+    {n:168,t:'Exercício proposto',d:'3m'},
+    {n:169,t:'Correção em vídeo do exercício proposto',d:'1m'},
+  ]},
+  {id:'s16',num:16,title:'Interfaces',dur:'3h 11m',color:'#0C447C',lessons:[
+    {n:170,t:'Visão geral do capítulo Interfaces',d:'2m'},
+    {n:171,t:'Material de apoio do capítulo',d:'1m'},
+    {n:172,t:'Interfaces',d:'9m'},
+    {n:173,t:'Solução do problema - PARTE 1',d:'16m'},
+    {n:174,t:'Solução do problema - PARTE 2 (sem interface)',d:'25m'},
+    {n:175,t:'Solução do problema - PARTE 3',d:'8m'},
+    {n:176,t:'Inversão de controle e injeção de dependência',d:'8m'},
+    {n:177,t:'Exercício de fixação',d:'16m'},
+    {n:178,t:'Correção do exercício de fixação PARTE 1',d:'19m'},
+    {n:179,t:'Correção do exercício de fixação PARTE 2',d:'14m'},
+    {n:180,t:'Herdar vs. cumprir contrato',d:'17m'},
+    {n:181,t:'Herança múltipla e o problema do diamante',d:'18m'},
+    {n:182,t:'Interface Comparable',d:'18m'},
+    {n:183,t:'Default methods',d:'19m'},
+  ]},
+  {id:'s17',num:17,title:'Generics, Set, Map',dur:'2h 7m',color:'#3C3489',lessons:[
+    {n:184,t:'Visão geral do capítulo Generics, Set, Map',d:'1m'},
+    {n:185,t:'Material de apoio do capítulo',d:'1m'},
+    {n:186,t:'Introdução aos Generics',d:'17m'},
+    {n:187,t:'Genéricos delimitados',d:'15m'},
+    {n:188,t:'Tipos curinga',d:'6m'},
+    {n:189,t:'Curingas delimitados',d:'19m'},
+    {n:190,t:'HashCode e Equals',d:'16m'},
+    {n:191,t:'Set',d:'12m'},
+    {n:192,t:'Como Set testa igualdade',d:'4m'},
+    {n:193,t:'Como TreeSet compara os elementos',d:'5m'},
+    {n:194,t:'Exercício resolvido (Set)',d:'12m'},
+    {n:195,t:'Exercício de fixação (Set)',d:'1m'},
+    {n:196,t:'Map',d:'18m'},
+    {n:197,t:'Exercício de fixação (Map)',d:'2m'},
+  ]},
+  {id:'s18',num:18,title:'Programação funcional e expressões lambda',dur:'2h 4m',color:'#085041',lessons:[
+    {n:198,t:'Visão geral do capítulo Programação Funcional e Expressões Lambda',d:'2m'},
+    {n:199,t:'Material de apoio do capítulo',d:'1m'},
+    {n:200,t:'Uma experiência com Comparator',d:'18m'},
+    {n:201,t:'Programação funcional e cálculo lambda',d:'14m'},
+    {n:202,t:'Interface funcional',d:'4m'},
+    {n:203,t:'Predicate',d:'15m'},
+    {n:204,t:'Consumer',d:'11m'},
+    {n:205,t:'Function',d:'15m'},
+    {n:206,t:'Criando funções que recebem funções como parâmetro',d:'9m'},
+    {n:207,t:'Stream',d:'18m'},
+    {n:208,t:'Pipeline (demo)',d:'6m'},
+    {n:209,t:'Exercício resolvido (stream)',d:'12m'},
+    {n:210,t:'Exercício de fixação',d:'1m'},
+  ]},
+  {id:'s19',num:19,title:'Bônus: Nivelamento sobre Git e Github',dur:'2h 15m',color:'#444441',lessons:[
+    {n:211,t:'Apresentação do bônus Git e Github',d:'3m'},
+    {n:212,t:'Material de apoio do capítulo',d:'1m'},
+    {n:213,t:'Introdução ao Git e Github',d:'4m'},
+    {n:214,t:'Repositório local e repositório remoto',d:'5m'},
+    {n:215,t:'Instalação do Git no Windows',d:'5m'},
+    {n:216,t:'Configurando sua identificação',d:'1m'},
+    {n:217,t:'Mostrar arquivos ocultos e extensões',d:'1m'},
+    {n:218,t:'Configurar chave SSH no Github',d:'5m'},
+    {n:219,t:'Salvando primeira versão de um projeto no Github',d:'13m'},
+    {n:220,t:'Salvando um novo commit',d:'4m'},
+    {n:221,t:'Demo - clonar e modificar um projeto',d:'12m'},
+    {n:222,t:'Git log para verificar histórico de versões',d:'1m'},
+    {n:223,t:'Entendendo git status e stage',d:'9m'},
+    {n:224,t:'Git diff e recurso source control do VS Code',d:'3m'},
+    {n:225,t:'Git checkout',d:'13m'},
+    {n:226,t:'Arquivo .gitignore',d:'1m'}, // estimated
+    {n:227,t:'Visão geral da segunda parte',d:'1m'},
+    {n:228,t:'Removendo arquivos da área de stage',d:'2m'},
+    {n:229,t:'Desfazendo modificações não salvas',d:'3m'},
+    {n:230,t:'O que fazer quando abre o editor VIM',d:'4m'},
+    {n:231,t:'Deletando último commit sem deletar modificações nos arquivos',d:'4m'},
+    {n:232,t:'Deletando commits e também modificações nos arquivos',d:'4m'},
+    {n:233,t:'Como atualizar o repositório local em relação ao remoto',d:'2m'},
+    {n:234,t:'Como resolver push rejeitado por históricos diferentes',d:'11m'},
+    {n:235,t:'Resolvendo pull com conflito',d:'8m'},
+    {n:236,t:'Como sobrescrever um histórico no Github',d:'3m'},
+    {n:237,t:'Como apontar para outro repositório remoto',d:'4m'},
+  ]},
+  {id:'s20',num:20,title:'Bônus: Acesso a banco de dados com JDBC',dur:'3h 52m',color:'#993C1D',lessons:[
+    {n:238,t:'Visão geral do capítulo',d:'2m'},
+    {n:239,t:'Material de apoio do capítulo',d:'1m'},
+    {n:240,t:'Visão geral do JDBC',d:'2m'},
+    {n:241,t:'Nivelamento: Álgebra Relacional e SQL',d:'13m'},
+    {n:242,t:'Instalando o MySQL',d:'10m'},
+    {n:243,t:'Preparação do primeiro projeto no Eclipse - PARTE 1',d:'13m'},
+    {n:244,t:'Preparação do primeiro projeto no Eclipse - PARTE 2',d:'13m'},
+    {n:245,t:'Demo - recuperar dados',d:'19m'},
+    {n:246,t:'Demo - inserir dados',d:'22m'},
+    {n:247,t:'Demo - atualizar dados',d:'8m'},
+    {n:248,t:'Demo - deletar dados',d:'8m'},
+    {n:249,t:'Demo - transações',d:'13m'},
+    {n:250,t:'Padrão de projeto DAO (Data Access Object)',d:'7m'},
+    {n:251,t:'PROJETO - criando projeto e repositório Git',d:'9m'},
+    {n:252,t:'Classe Department',d:'7m'},
+    {n:253,t:'Classe Seller',d:'6m'},
+    {n:254,t:'Interfaces DepartmentDao e SellerDao',d:'6m'},
+    {n:255,t:'SellerDaoJDBC e DaoFactory',d:'6m'},
+    {n:256,t:'Implementando findById',d:'18m'},
+    {n:257,t:'Reutilizando a instanciação',d:'6m'},
+    {n:258,t:'Implementando findByDepartment',d:'16m'},
+    {n:259,t:'Implementando findAll',d:'4m'},
+    {n:260,t:'Implementando insert',d:'11m'},
+    {n:261,t:'Implementando update',d:'6m'},
+    {n:262,t:'Implementando delete',d:'6m'},
+    {n:263,t:'Implementação e teste do DepartmentDao',d:'3m'},
+  ]},
+];
+
+// ============================================================
+// STATE
+// ============================================================
+const TOTAL_LESSONS = SECTIONS.reduce((s,sec)=>s+sec.lessons.length,0);
+
+let state = {
+  done: {},         // lessonKey -> bool
+  notes: {},        // lessonKey -> [{id,type,title,body,date}]
+  logs: [],         // [{id,date,hours,sec,desc}]
+  customTitles: {}, // lessonKey -> string (edited titles)
+};
+
+function lk(secId, n) { return secId + '_' + n; }
+
+function saveState() {
+  try { localStorage.setItem('jt2_state', JSON.stringify(state)); } catch(e){}
+}
+
+function loadState() {
+  try {
+    const d = localStorage.getItem('jt2_state');
+    if (d) {
+      const parsed = JSON.parse(d);
+      state = Object.assign(state, parsed);
+      // ensure sub-objects
+      if (!state.done) state.done = {};
+      if (!state.notes) state.notes = {};
+      if (!state.logs) state.logs = [];
+      if (!state.customTitles) state.customTitles = {};
+    }
+  } catch(e){}
+}
+
+function calcStats() {
+  let totalDone = 0;
+  SECTIONS.forEach(sec => {
+    sec.lessons.forEach(l => {
+      if (state.done[lk(sec.id, l.n)]) totalDone++;
+    });
+  });
+  const pct = Math.round(totalDone / TOTAL_LESSONS * 100);
+  const secsDone = SECTIONS.filter(sec => sec.lessons.every(l => state.done[lk(sec.id, l.n)])).length;
+  const notesCount = Object.values(state.notes).reduce((s,arr)=>s+(arr?arr.length:0),0);
+  const hours = state.logs.reduce((s,l)=>s+(parseFloat(l.hours)||0),0);
+  return {totalDone, pct, secsDone, notesCount, hours, sessions: state.logs.length};
+}
+
+function updateTopStats() {
+  const {totalDone, pct, secsDone, notesCount, hours, sessions} = calcStats();
+  document.getElementById('hdr-pct').textContent = pct + '% concluído';
+  document.getElementById('hdr-aulas').textContent = totalDone + '/' + TOTAL_LESSONS + ' aulas';
+  document.getElementById('hdr-hours').textContent = hours.toFixed(1) + 'h estudadas';
+  document.getElementById('st-pct').textContent = pct + '%';
+  document.getElementById('st-aulas').textContent = totalDone + '/' + TOTAL_LESSONS;
+  document.getElementById('st-secs').textContent = secsDone + '/20';
+  document.getElementById('st-notes').textContent = notesCount;
+  document.getElementById('st-hours').textContent = hours.toFixed(1) + 'h';
+  document.getElementById('st-sessions').textContent = sessions;
+}
+
+// ============================================================
+// SIDEBAR
+// ============================================================
+let activeLessonKey = null;
+
+function renderSidebar() {
+  const container = document.getElementById('sections-nav');
+  let html = '';
+  SECTIONS.forEach(sec => {
+    const done = sec.lessons.filter(l => state.done[lk(sec.id, l.n)]).length;
+    const total = sec.lessons.length;
+    const pct = Math.round(done/total*100);
+    const isOpen = sec._open || false;
+    html += `<div class="section-group">
+      <div class="section-hdr ${isOpen?'open':''}" onclick="toggleSection('${sec.id}')">
+        <div class="sec-num" style="background:${sec.color}22;color:${sec.color}">${sec.num}</div>
+        <div>
+          <div class="sec-title">${sec.title}</div>
+          <div class="sec-prog">${done}/${total} · ${sec.dur}</div>
+        </div>
+        <div class="sec-arrow ${isOpen?'open':''}">▶</div>
+      </div>
+      <div class="sec-progress-bar"><div class="sec-progress-fill" style="width:${pct}%"></div></div>
+      <div class="lessons-list ${isOpen?'open':'' }" id="lessons-${sec.id}">`;
+    sec.lessons.forEach(l => {
+      const key = lk(sec.id, l.n);
+      const isDone = !!state.done[key];
+      const title = state.customTitles[key] || l.t;
+      const isActive = activeLessonKey === key;
+      html += `<div class="lesson-row ${isActive?'active-lesson':''}" onclick="openLesson('${sec.id}',${l.n})">
+        <div class="lesson-check ${isDone?'done':''}" onclick="event.stopPropagation();toggleDone('${sec.id}',${l.n})"></div>
+        <div class="lesson-num">${l.n}</div>
+        <div class="lesson-title ${isDone?'done':''}">${title}</div>
+        <div class="lesson-dur">${l.d}</div>
+      </div>`;
+    });
+    html += `</div></div>`;
+  });
+  container.innerHTML = html;
+}
+
+function toggleSection(secId) {
+  const sec = SECTIONS.find(s => s.id === secId);
+  if (sec) sec._open = !sec._open;
+  renderSidebar();
+}
+
+function toggleDone(secId, n) {
+  const key = lk(secId, n);
+  state.done[key] = !state.done[key];
+  saveState();
+  renderSidebar();
+  updateTopStats();
+  renderOverview();
+  if (activeLessonKey === key) renderLessonDetail(secId, n);
+}
+
+// ============================================================
+// LESSON DETAIL
+// ============================================================
+function openLesson(secId, n) {
+  activeLessonKey = lk(secId, n);
+  setContentTab('aula');
+  renderSidebar();
+  renderLessonDetail(secId, n);
+}
+
+function renderLessonDetail(secId, n) {
+  const sec = SECTIONS.find(s => s.id === secId);
+  const lesson = sec.lessons.find(l => l.n === n);
+  const key = lk(secId, n);
+  const isDone = !!state.done[key];
+  const title = state.customTitles[key] || lesson.t;
+  const notes = state.notes[key] || [];
+
+  const area = document.getElementById('lesson-detail-area');
+  area.innerHTML = `
+    <div class="lesson-detail">
+      <div class="ld-header">
+        <div class="ld-check-big ${isDone?'done':''}" onclick="toggleDone('${secId}',${n})">${isDone?'✓':''}</div>
+        <div class="ld-info">
+          <div class="ld-sec">Seção ${sec.num} · ${sec.title}</div>
+          <div class="ld-title" id="ld-title-display">${title}</div>
+          <div class="ld-meta">
+            <span>Aula ${n}</span>
+            <span>${lesson.d}</span>
+            ${isDone?'<span style="color:#1D9E75;font-weight:600">✓ Concluída</span>':''}
+          </div>
+        </div>
+        <div class="ld-actions">
+          <button class="icon-btn" onclick="editLessonTitle('${secId}',${n})" title="Editar título">✏️</button>
+          <button class="icon-btn" onclick="toggleDone('${secId}',${n})">${isDone?'↩ Desmarcar':'✓ Concluir'}</button>
+          <button class="icon-btn" onclick="openExport('${secId}',${n})" title="Exportar" style="background:#f0f7ff;color:#185FA5;font-weight:700">📤 Exportar</button>
+        </div>
+      </div>
+
+      <div class="notes-area">
+        <div class="notes-hdr">
+          <h3>Anotações desta aula (${notes.length})</h3>
+        </div>
+        <div class="note-type-btns" id="nt-btns">
+          <button class="ntb sel-tip" data-type="tip" onclick="setNoteType(this,'${key}')">💡 Dica</button>
+          <button class="ntb" data-type="doubt" onclick="setNoteType(this,'${key}')">❓ Dúvida</button>
+          <button class="ntb" data-type="important" onclick="setNoteType(this,'${key}')">⭐ Importante</button>
+          <button class="ntb" data-type="concept" onclick="setNoteType(this,'${key}')">📖 Conceito</button>
+        </div>
+        <div class="note-input-area">
+          <input type="text" id="note-title-inp" placeholder="Título da anotação..." />
+          <textarea id="note-body-inp" placeholder="Escreva sua dica, dúvida ou conceito..."></textarea>
+          <button class="btn-add-note" onclick="addNote('${key}')">+ Adicionar anotação</button>
+        </div>
+        <div class="notes-list" id="notes-list-${key}">
+          ${renderNotesHTML(key)}
+        </div>
+      </div>
+    </div>`;
+
+  // restore note type selection
+  const savedType = window._noteType || 'tip';
+  document.querySelectorAll('#nt-btns .ntb').forEach(b => {
+    b.className = 'ntb';
+    if (b.dataset.type === savedType) b.classList.add('sel-' + savedType);
+  });
+}
+
+function editLessonTitle(secId, n) {
+  const key = lk(secId, n);
+  const sec = SECTIONS.find(s => s.id === secId);
+  const lesson = sec.lessons.find(l => l.n === n);
+  const currentTitle = state.customTitles[key] || lesson.t;
+  const display = document.getElementById('ld-title-display');
+  display.outerHTML = `<input class="edit-title-input" id="ld-title-edit" value="${currentTitle}" 
+    onblur="saveLessonTitle('${secId}',${n},this.value)" 
+    onkeydown="if(event.key==='Enter')saveLessonTitle('${secId}',${n},this.value)" />`;
+  setTimeout(()=>{const el=document.getElementById('ld-title-edit');if(el){el.focus();el.select();}},10);
+}
+
+function saveLessonTitle(secId, n, val) {
+  const key = lk(secId, n);
+  const sec = SECTIONS.find(s => s.id === secId);
+  const lesson = sec.lessons.find(l => l.n === n);
+  val = val.trim();
+  if (val && val !== lesson.t) state.customTitles[key] = val;
+  else delete state.customTitles[key];
+  saveState();
+  renderLessonDetail(secId, n);
+  renderSidebar();
+}
+
+// ============================================================
+// NOTES
+// ============================================================
+window._noteType = 'tip';
+
+const noteTypes = {
+  tip: {label:'Dica', cls:'nb-tip'},
+  doubt: {label:'Dúvida', cls:'nb-doubt'},
+  important: {label:'Importante', cls:'nb-important'},
+  concept: {label:'Conceito', cls:'nb-concept'},
+};
+
+function setNoteType(btn, key) {
+  const type = btn.dataset.type;
+  window._noteType = type;
+  document.querySelectorAll('#nt-btns .ntb').forEach(b => {
+    b.className = 'ntb';
+  });
+  btn.classList.add('sel-' + type);
+}
+
+function addNote(key) {
+  const titleEl = document.getElementById('note-title-inp');
+  const bodyEl = document.getElementById('note-body-inp');
+  const title = titleEl ? titleEl.value.trim() : '';
+  const body = bodyEl ? bodyEl.value.trim() : '';
+  if (!title && !body) return;
+  if (!state.notes[key]) state.notes[key] = [];
+  state.notes[key].unshift({
+    id: Date.now(),
+    type: window._noteType || 'tip',
+    title: title || '(sem título)',
+    body,
+    date: new Date().toLocaleDateString('pt-BR'),
+  });
+  if (titleEl) titleEl.value = '';
+  if (bodyEl) bodyEl.value = '';
+  saveState();
+  updateTopStats();
+  const list = document.getElementById('notes-list-' + key);
+  if (list) list.innerHTML = renderNotesHTML(key);
+  renderGlobalNotes();
+}
+
+function renderNotesHTML(key) {
+  const notes = state.notes[key] || [];
+  if (!notes.length) return '<div class="empty">Nenhuma anotação nesta aula.</div>';
+  return notes.map(n => {
+    const nt = noteTypes[n.type] || noteTypes.tip;
+    return `<div class="note-card" id="nc-${n.id}">
+      <div class="note-card-hdr">
+        <span class="note-badge ${nt.cls}">${nt.label}</span>
+        <span class="note-card-title">${n.title}</span>
+        <div class="note-actions">
+          <button class="icon-btn" onclick="startEditNote('${key}',${n.id})">✏️</button>
+          <button class="icon-btn del" onclick="deleteNote('${key}',${n.id})">✕</button>
+        </div>
+      </div>
+      ${n.body ? `<div class="note-card-body">${n.body}</div>` : ''}
+      <div style="font-size:10px;color:#bbb;margin-top:6px">${n.date}</div>
+    </div>`;
+  }).join('');
+}
+
+function startEditNote(key, id) {
+  const notes = state.notes[key] || [];
+  const note = notes.find(n => n.id === id);
+  if (!note) return;
+  const nt = noteTypes[note.type] || noteTypes.tip;
+  const card = document.getElementById('nc-' + id);
+  if (!card) return;
+  card.innerHTML = `
+    <div class="note-card-hdr">
+      <span class="note-badge ${nt.cls}">${nt.label}</span>
+      <select id="edit-type-${id}" style="font-size:11px;padding:3px 6px;border:1px solid #ddd;border-radius:6px;background:#fff">
+        <option value="tip" ${note.type==='tip'?'selected':''}>Dica</option>
+        <option value="doubt" ${note.type==='doubt'?'selected':''}>Dúvida</option>
+        <option value="important" ${note.type==='important'?'selected':''}>Importante</option>
+        <option value="concept" ${note.type==='concept'?'selected':''}>Conceito</option>
+      </select>
+    </div>
+    <div class="note-edit-area">
+      <input type="text" id="edit-title-${id}" value="${note.title}" placeholder="Título..." />
+      <textarea id="edit-body-${id}" placeholder="Conteúdo...">${note.body}</textarea>
+      <div class="edit-actions">
+        <button class="btn-save" onclick="saveEditNote('${key}',${id})">Salvar</button>
+        <button class="btn-cancel" onclick="cancelEditNote('${key}')">Cancelar</button>
+      </div>
+    </div>`;
+}
+
+function saveEditNote(key, id) {
+  const notes = state.notes[key] || [];
+  const note = notes.find(n => n.id === id);
+  if (!note) return;
+  const t = document.getElementById('edit-title-' + id);
+  const b = document.getElementById('edit-body-' + id);
+  const tp = document.getElementById('edit-type-' + id);
+  if (t) note.title = t.value.trim() || '(sem título)';
+  if (b) note.body = b.value.trim();
+  if (tp) note.type = tp.value;
+  saveState();
+  const list = document.getElementById('notes-list-' + key);
+  if (list) list.innerHTML = renderNotesHTML(key);
+  renderGlobalNotes();
+}
+
+function cancelEditNote(key) {
+  const list = document.getElementById('notes-list-' + key);
+  if (list) list.innerHTML = renderNotesHTML(key);
+}
+
+function deleteNote(key, id) {
+  if (!state.notes[key]) return;
+  state.notes[key] = state.notes[key].filter(n => n.id !== id);
+  saveState();
+  updateTopStats();
+  const list = document.getElementById('notes-list-' + key);
+  if (list) list.innerHTML = renderNotesHTML(key);
+  renderGlobalNotes();
+}
+
+// ============================================================
+// GLOBAL NOTES TAB
+// ============================================================
+let globalNoteFilter = 'all';
+
+function renderGlobalNotes() {
+  const area = document.getElementById('global-notes-area');
+  if (!area) return;
+
+  // collect all notes
+  let allNotes = [];
+  SECTIONS.forEach(sec => {
+    sec.lessons.forEach(l => {
+      const key = lk(sec.id, l.n);
+      const notes = state.notes[key] || [];
+      notes.forEach(n => {
+        allNotes.push({...n, secTitle: sec.title, lessonN: l.n, lessonTitle: state.customTitles[key] || l.t, key, secId: sec.id});
+      });
+    });
+  });
+
+  const filtered = globalNoteFilter === 'all' ? allNotes : allNotes.filter(n => n.type === globalNoteFilter);
+
+  area.innerHTML = `
+    <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px">
+      ${['all','tip','doubt','important','concept'].map(type => {
+        const labels = {all:'Todas',tip:'Dicas',doubt:'Dúvidas',important:'Importantes',concept:'Conceitos'};
+        return `<button class="ntb ${globalNoteFilter===type?'sel-'+(type==='all'?'concept':type):''}" 
+          style="${globalNoteFilter===type&&type==='all'?'background:#f0eeea;color:#1a1a18;border-color:#888':''}"
+          onclick="setGlobalFilter('${type}')">${labels[type]}</button>`;
+      }).join('')}
+    </div>
+    ${filtered.length === 0 ? '<div class="empty">Nenhuma anotação encontrada.</div>' :
+      filtered.map(n => {
+        const nt = noteTypes[n.type] || noteTypes.tip;
+        return `<div class="note-card" style="margin-bottom:8px">
+          <div class="note-card-hdr">
+            <span class="note-badge ${nt.cls}">${nt.label}</span>
+            <span class="note-card-title">${n.title}</span>
+            <div class="note-actions">
+              <button class="icon-btn del" onclick="deleteNote('${n.key}',${n.id});renderGlobalNotes()">✕</button>
+            </div>
+          </div>
+          ${n.body ? `<div class="note-card-body">${n.body}</div>` : ''}
+          <div style="font-size:10px;color:#bbb;margin-top:6px">
+            Aula ${n.lessonN} · ${n.lessonTitle} · ${n.date}
+            <button class="icon-btn" style="margin-left:6px" onclick="openLesson('${n.secId}',${n.lessonN})">→ Ver aula</button>
+          </div>
+        </div>`;
+      }).join('')}`;
+}
+
+function setGlobalFilter(type) {
+  globalNoteFilter = type;
+  renderGlobalNotes();
+}
+
+// ============================================================
+// OVERVIEW
+// ============================================================
+function renderOverview() {
+  const grid = document.getElementById('overview-grid');
+  if (!grid) return;
+  // Section progress card
+  let progHTML = SECTIONS.slice(0,10).map(sec => {
+    const done = sec.lessons.filter(l => state.done[lk(sec.id, l.n)]).length;
+    const total = sec.lessons.length;
+    const pct = Math.round(done/total*100);
+    return `<div class="prog-item">
+      <div class="prog-label" title="${sec.title}">S${sec.num} ${sec.title}</div>
+      <div class="prog-track"><div class="prog-fill" style="width:${pct}%"></div></div>
+      <div class="prog-pct">${pct}%</div>
+    </div>`;
+  }).join('');
+
+  let progHTML2 = SECTIONS.slice(10).map(sec => {
+    const done = sec.lessons.filter(l => state.done[lk(sec.id, l.n)]).length;
+    const total = sec.lessons.length;
+    const pct = Math.round(done/total*100);
+    return `<div class="prog-item">
+      <div class="prog-label" title="${sec.title}">S${sec.num} ${sec.title}</div>
+      <div class="prog-track"><div class="prog-fill" style="width:${pct}%"></div></div>
+      <div class="prog-pct">${pct}%</div>
+    </div>`;
+  }).join('');
+
+  grid.innerHTML = `
+    <div class="ov-card">
+      <h3>Progresso por seção (S1–S10)</h3>
+      <div class="progress-list">${progHTML}</div>
+    </div>
+    <div class="ov-card">
+      <h3>Progresso por seção (S11–S20)</h3>
+      <div class="progress-list">${progHTML2}</div>
+    </div>`;
+}
+
+// ============================================================
+// DIARIO
+// ============================================================
+function populateLogSelect() {
+  const sel = document.getElementById('log-sec');
+  if (!sel) return;
+  sel.innerHTML = '<option value="">Selecione a seção...</option>' +
+    SECTIONS.map(s => `<option value="${s.id}">S${s.num}: ${s.title}</option>`).join('');
+}
+
+function addLog() {
+  const date = document.getElementById('log-date').value;
+  const hours = document.getElementById('log-hours').value;
+  const sec = document.getElementById('log-sec').value;
+  const desc = document.getElementById('log-desc').value.trim();
+  if (!date || !hours) return;
+  state.logs.unshift({id: Date.now(), date, hours: parseFloat(hours), sec, desc});
+  document.getElementById('log-hours').value = '';
+  document.getElementById('log-desc').value = '';
+  saveState();
+  updateTopStats();
+  renderLogList();
+}
+
+function renderLogList() {
+  const list = document.getElementById('log-list');
+  if (!list) return;
+  if (!state.logs.length) { list.innerHTML = '<div class="empty">Nenhuma sessão registrada ainda.</div>'; return; }
+  const months = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+  const secMap = {};
+  SECTIONS.forEach(s => secMap[s.id] = s);
+  list.innerHTML = state.logs.map(l => {
+    const [y,m,d] = l.date.split('-');
+    const sec = l.sec && secMap[l.sec];
+    return `<div class="log-card">
+      <div class="log-date-blk">
+        <div class="log-day">${d}</div>
+        <div class="log-month">${months[parseInt(m)-1]}</div>
+      </div>
+      <div class="log-sep"></div>
+      <div class="log-body">
+        <div class="log-title-txt">${sec ? 'S'+sec.num+': '+sec.title : 'Estudo geral'}</div>
+        ${l.desc ? `<div class="log-desc-txt">${l.desc}</div>` : ''}
+      </div>
+      <div class="log-hours-blk">
+        <div class="log-h">${l.hours}h</div>
+        <div class="log-hl">estudadas</div>
+      </div>
+      <button class="icon-btn del" onclick="deleteLog(${l.id})" style="margin-top:2px">✕</button>
+    </div>`;
+  }).join('');
+}
+
+function deleteLog(id) {
+  state.logs = state.logs.filter(l => l.id !== id);
+  saveState();
+  updateTopStats();
+  renderLogList();
+}
+
+// ============================================================
+// TABS & SEARCH
+// ============================================================
+function setContentTab(tab) {
+  document.querySelectorAll('.ctab').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.ctab-btn').forEach(el => el.classList.remove('active'));
+  document.getElementById('ctab-' + tab).classList.add('active');
+  event && event.target && event.target.classList && event.target.classList.add('active');
+  // find and activate the right button
+  document.querySelectorAll('.ctab-btn').forEach(btn => {
+    if (btn.getAttribute('onclick') && btn.getAttribute('onclick').includes("'"+tab+"'")) {
+      btn.classList.add('active');
+    }
+  });
+  if (tab === 'notas') renderGlobalNotes();
+  if (tab === 'diario') renderLogList();
+  if (tab === 'visao') renderOverview();
+}
+
+function setSideTab(tab) {
+  document.querySelectorAll('.stab').forEach(b => b.classList.remove('active'));
+  event.target.classList.add('active');
+  document.getElementById('side-secoes').style.display = tab === 'secoes' ? '' : 'none';
+  document.getElementById('side-busca').style.display = tab === 'busca' ? '' : 'none';
+}
+
+function searchLessons(q) {
+  const container = document.getElementById('search-results');
+  if (!q || q.length < 2) { container.innerHTML = '<div class="empty">Digite para buscar...</div>'; return; }
+  q = q.toLowerCase();
+  let results = [];
+  SECTIONS.forEach(sec => {
+    sec.lessons.forEach(l => {
+      const key = lk(sec.id, l.n);
+      const title = state.customTitles[key] || l.t;
+      if (title.toLowerCase().includes(q) || String(l.n).includes(q)) {
+        results.push({sec, l, key, title});
+      }
+    });
+  });
+  if (!results.length) { container.innerHTML = '<div class="empty">Nenhuma aula encontrada.</div>'; return; }
+  container.innerHTML = results.map(r => {
+    const isDone = !!state.done[r.key];
+    return `<div class="lesson-row" onclick="openLesson('${r.sec.id}',${r.l.n})">
+      <div class="lesson-check ${isDone?'done':''}"></div>
+      <div class="lesson-num">${r.l.n}</div>
+      <div class="lesson-title ${isDone?'done':''}">${r.title}</div>
+      <div class="lesson-dur">${r.l.d}</div>
+    </div>`;
+  }).join('');
+}
+
+
+// ============================================================
+// EXPORT
+// ============================================================
+let exportContext = {tab: 'aula', secId: null, lessonN: null, exportSecId: null};
+
+function openExport(secId, n) {
+  exportContext.secId = secId;
+  exportContext.lessonN = n;
+  exportContext.tab = 'aula';
+  const sec = SECTIONS.find(s => s.id === secId);
+  const lesson = sec.lessons.find(l => l.n === n);
+  const key = lk(secId, n);
+  const title = state.customTitles[key] || lesson.t;
+  document.getElementById('export-modal-subtitle').textContent = `Aula ${n}: ${title}`;
+  setExportTab('aula');
+  buildSecScopeButtons(secId);
+  document.getElementById('export-modal').classList.add('open');
+  refreshPreview();
+}
+
+function openExportGeral() {
+  exportContext.tab = 'geral';
+  document.getElementById('export-modal-subtitle').textContent = 'Compartilhe seu progresso';
+  setExportTab('geral');
+  buildSecScopeButtons(SECTIONS[0].id);
+  document.getElementById('export-modal').classList.add('open');
+  refreshPreview();
+}
+
+function closeExport() {
+  document.getElementById('export-modal').classList.remove('open');
+}
+
+function setExportTab(tab) {
+  exportContext.tab = tab;
+  document.querySelectorAll('.mtab').forEach((b,i) => {
+    b.classList.toggle('active', ['aula','secao','geral'][i] === tab);
+  });
+  ['aula','secao','geral'].forEach(t => {
+    document.getElementById('etab-' + t).style.display = t === tab ? '' : 'none';
+  });
+  refreshPreview();
+}
+
+function buildSecScopeButtons(defaultSecId) {
+  exportContext.exportSecId = defaultSecId;
+  const container = document.getElementById('sec-scope-sel');
+  container.innerHTML = SECTIONS.map(s => `
+    <button class="scope-btn ${s.id === defaultSecId ? 'active' : ''}" 
+      onclick="selectExportSec('${s.id}',this)">S${s.num}</button>`).join('');
+}
+
+function selectExportSec(secId, btn) {
+  exportContext.exportSecId = secId;
+  document.querySelectorAll('.scope-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  refreshPreview();
+}
+
+// ---- TEXT BUILDERS ----
+const noteEmoji = {tip:'💡',doubt:'❓',important:'⭐',concept:'📖'};
+const noteLabel = {tip:'Dica',doubt:'Dúvida',important:'Importante',concept:'Conceito'};
+
+function buildAulaText() {
+  const {secId, lessonN} = exportContext;
+  if (!secId || !lessonN) return '(Nenhuma aula selecionada)';
+  const sec = SECTIONS.find(s => s.id === secId);
+  const lesson = sec.lessons.find(l => l.n === lessonN);
+  const key = lk(secId, lessonN);
+  const isDone = !!state.done[key];
+  const title = state.customTitles[key] || lesson.t;
+  const notes = state.notes[key] || [];
+  const withStatus = document.getElementById('chk-status')?.checked;
+  const withNotes  = document.getElementById('chk-notes')?.checked;
+
+  let txt = '';
+  txt += `☕ *Java COMPLETO — Tracker de Estudos*\n`;
+  txt += `━━━━━━━━━━━━━━━━━━━━\n`;
+  txt += `📚 Seção ${sec.num}: ${sec.title}\n`;
+  txt += `🎬 Aula ${lesson.n}: ${title}\n`;
+  if (withStatus) {
+    txt += `⏱ Duração: ${lesson.d}\n`;
+    txt += `${isDone ? '✅ Status: Concluída' : '⏳ Status: Pendente'}\n`;
+  }
+  if (withNotes) {
+    if (notes.length) {
+      txt += `\n📝 *Anotações (${notes.length})*\n`;
+      txt += `──────────────────────\n`;
+      notes.forEach(n => {
+        txt += `${noteEmoji[n.type]} *${noteLabel[n.type]}* — ${n.title}\n`;
+        if (n.body) txt += `${n.body}\n`;
+        txt += `\n`;
+      });
+    } else {
+      txt += `\n📝 Sem anotações nesta aula.\n`;
+    }
+  }
+  txt += `━━━━━━━━━━━━━━━━━━━━\n`;
+  txt += `🔗 Java COMPLETO — Nelio Alves (Udemy)`;
+  return txt;
+}
+
+function buildSecaoText() {
+  const secId = exportContext.exportSecId || exportContext.secId || SECTIONS[0].id;
+  const sec = SECTIONS.find(s => s.id === secId);
+  if (!sec) return '';
+  const done = sec.lessons.filter(l => state.done[lk(sec.id, l.n)]).length;
+  const total = sec.lessons.length;
+  const pct = Math.round(done/total*100);
+  const withProgress = document.getElementById('chk-sec-progress')?.checked;
+  const withLessons  = document.getElementById('chk-sec-lessons')?.checked;
+  const withNotes    = document.getElementById('chk-sec-notes')?.checked;
+
+  let txt = '';
+  txt += `☕ *Java COMPLETO — Tracker de Estudos*\n`;
+  txt += `━━━━━━━━━━━━━━━━━━━━\n`;
+  txt += `📚 *Seção ${sec.num}: ${sec.title}*\n`;
+  txt += `⏱ Carga horária: ${sec.dur}\n`;
+  if (withProgress) {
+    txt += `\n📊 *Progresso*\n`;
+    txt += `${done}/${total} aulas concluídas (${pct}%)\n`;
+    const bar = Math.round(pct/10);
+    txt += `[${'█'.repeat(bar)}${'░'.repeat(10-bar)}] ${pct}%\n`;
+  }
+  if (withLessons) {
+    txt += `\n📋 *Aulas*\n`;
+    txt += `──────────────────────\n`;
+    sec.lessons.forEach(l => {
+      const key = lk(sec.id, l.n);
+      const isDone = !!state.done[key];
+      const title = state.customTitles[key] || l.t;
+      txt += `${isDone?'✅':'⬜'} ${l.n}. ${title} (${l.d})\n`;
+    });
+  }
+  if (withNotes) {
+    let hasAny = false;
+    sec.lessons.forEach(l => {
+      const key = lk(sec.id, l.n);
+      const notes = state.notes[key] || [];
+      if (notes.length) hasAny = true;
+    });
+    if (hasAny) {
+      txt += `\n📝 *Anotações da Seção*\n`;
+      txt += `──────────────────────\n`;
+      sec.lessons.forEach(l => {
+        const key = lk(sec.id, l.n);
+        const notes = state.notes[key] || [];
+        if (notes.length) {
+          const title = state.customTitles[key] || l.t;
+          txt += `\n🎬 Aula ${l.n}: ${title}\n`;
+          notes.forEach(n => {
+            txt += `  ${noteEmoji[n.type]} ${noteLabel[n.type]}: ${n.title}\n`;
+            if (n.body) txt += `  ${n.body}\n`;
+          });
+        }
+      });
+    } else {
+      txt += `\n📝 Sem anotações nesta seção ainda.\n`;
+    }
+  }
+  txt += `━━━━━━━━━━━━━━━━━━━━\n`;
+  txt += `🔗 Java COMPLETO — Nelio Alves (Udemy)`;
+  return txt;
+}
+
+function buildGeralText() {
+  const {totalDone, pct, secsDone, notesCount, hours, sessions} = calcStats();
+  const withStats = document.getElementById('chk-geral-stats')?.checked;
+  const withSecs  = document.getElementById('chk-geral-secs')?.checked;
+  const withNotes = document.getElementById('chk-geral-notes')?.checked;
+
+  let txt = '';
+  txt += `☕ *Java COMPLETO — Progresso de Estudos*\n`;
+  txt += `━━━━━━━━━━━━━━━━━━━━\n`;
+  txt += `👨‍💻 Nelio Alves · Udemy\n`;
+  if (withStats) {
+    txt += `\n📈 *Estatísticas Gerais*\n`;
+    txt += `──────────────────────\n`;
+    const bar = Math.round(pct/10);
+    txt += `Progresso total: [${'█'.repeat(bar)}${'░'.repeat(10-bar)}] ${pct}%\n`;
+    txt += `✅ Aulas concluídas: ${totalDone}/263\n`;
+    txt += `📚 Seções concluídas: ${secsDone}/20\n`;
+    txt += `⏱ Horas estudadas: ${hours.toFixed(1)}h\n`;
+    txt += `📓 Sessões registradas: ${sessions}\n`;
+    txt += `📝 Anotações criadas: ${notesCount}\n`;
+  }
+  if (withSecs) {
+    txt += `\n📚 *Progresso por Seção*\n`;
+    txt += `──────────────────────\n`;
+    SECTIONS.forEach(sec => {
+      const done = sec.lessons.filter(l => state.done[lk(sec.id, l.n)]).length;
+      const total = sec.lessons.length;
+      const p = Math.round(done/total*100);
+      const icon = p===100?'✅':p>0?'🔄':'⬜';
+      txt += `${icon} S${sec.num}: ${sec.title} — ${done}/${total} (${p}%)\n`;
+    });
+  }
+  if (withNotes) {
+    let allNotes = [];
+    SECTIONS.forEach(sec => {
+      sec.lessons.forEach(l => {
+        const key = lk(sec.id, l.n);
+        (state.notes[key]||[]).forEach(n => allNotes.push({...n, secNum:sec.num, lessonN:l.n}));
+      });
+    });
+    if (allNotes.length) {
+      txt += `\n📝 *Anotações (${allNotes.length})*\n`;
+      txt += `──────────────────────\n`;
+      allNotes.slice(0,20).forEach(n => {
+        txt += `${noteEmoji[n.type]} [S${n.secNum}/A${n.lessonN}] ${n.title}\n`;
+        if (n.body) txt += `   ${n.body.substring(0,80)}${n.body.length>80?'...':''}\n`;
+      });
+      if (allNotes.length > 20) txt += `... e mais ${allNotes.length-20} anotações.\n`;
+    }
+  }
+  txt += `━━━━━━━━━━━━━━━━━━━━\n`;
+  txt += `🔗 Java COMPLETO — Nelio Alves (Udemy)\n`;
+  txt += `📅 ${new Date().toLocaleDateString('pt-BR')}`;
+  return txt;
+}
+
+function getCurrentText() {
+  const tab = exportContext.tab;
+  if (tab === 'aula') return buildAulaText();
+  if (tab === 'secao') return buildSecaoText();
+  return buildGeralText();
+}
+
+function refreshPreview() {
+  const tab = exportContext.tab;
+  const previewId = 'export-preview-' + tab;
+  const el = document.getElementById(previewId);
+  if (el) el.textContent = getCurrentText();
+}
+
+function exportWhatsApp() {
+  const text = getCurrentText();
+  const url = 'https://wa.me/?text=' + encodeURIComponent(text);
+  window.open(url, '_blank');
+}
+
+function exportEmail() {
+  const tab = exportContext.tab;
+  let subject = '☕ Java COMPLETO — ';
+  if (tab === 'aula') {
+    const sec = SECTIONS.find(s => s.id === exportContext.secId);
+    const lesson = sec?.lessons.find(l => l.n === exportContext.lessonN);
+    subject += `Aula ${exportContext.lessonN}: ${lesson?.t||''}`;
+  } else if (tab === 'secao') {
+    const sec = SECTIONS.find(s => s.id === (exportContext.exportSecId||exportContext.secId));
+    subject += `Seção ${sec?.num}: ${sec?.title||''}`;
+  } else {
+    subject += 'Progresso de Estudos';
+  }
+  const body = getCurrentText();
+  const url = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+  window.location.href = url;
+}
+
+function copyToClipboard() {
+  const text = getCurrentText();
+  navigator.clipboard.writeText(text).then(() => {
+    const btn = document.getElementById('btn-copy-txt');
+    btn.textContent = '✅ Copiado!';
+    btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = '📋 Copiar texto'; btn.classList.remove('copied'); }, 2000);
+  }).catch(() => {
+    // fallback
+    const ta = document.createElement('textarea');
+    ta.value = text; ta.style.position='fixed'; ta.style.opacity='0';
+    document.body.appendChild(ta); ta.select(); document.execCommand('copy');
+    document.body.removeChild(ta);
+    const btn = document.getElementById('btn-copy-txt');
+    btn.textContent = '✅ Copiado!'; btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = '📋 Copiar texto'; btn.classList.remove('copied'); }, 2000);
+  });
+}
+
+// Close modal on ESC
+document.addEventListener('keydown', e => { if(e.key==='Escape') closeExport(); });
+
+// ============================================================
+// MOBILE JS
+// ============================================================
+const isMobile = () => window.innerWidth <= 700;
+let mCurrentScreen = 'secoes';
+let mPrevScreen = 'secoes';
+let mNoteFilter = 'all';
+
+function mInit() {
+  const ml = document.getElementById('mobile-layer');
+  if (!ml) return;
+  ml.style.display = 'flex';
+  ml.style.flexDirection = 'column';
+  mRenderSections();
+  mUpdateStats();
+  mRenderNotes();
+  mRenderLog();
+  mPopulateLogSelect();
+  const today = new Date().toISOString().split('T')[0];
+  const mld = document.getElementById('m-log-date');
+  if (mld) mld.value = today;
+}
+
+function mSetScreen(name) {
+  if (name !== 'aula') mPrevScreen = (mCurrentScreen !== 'aula') ? mCurrentScreen : mPrevScreen;
+  mCurrentScreen = name;
+  document.querySelectorAll('.bnav-btn').forEach(b => b.classList.remove('active'));
+  const ab = document.getElementById('bnav-' + name);
+  if (ab) ab.classList.add('active');
+  else { const sb = document.getElementById('bnav-secoes'); if (sb) sb.classList.add('active'); }
+  document.querySelectorAll('.m-screen').forEach(s => { s.style.display = 'none'; s.classList.remove('active'); });
+  const target = document.getElementById('m-' + name);
+  if (target) { target.style.display = 'flex'; target.style.flexDirection = 'column'; target.classList.add('active'); }
+  if (name === 'stats') mUpdateStats();
+  if (name === 'notas') mRenderNotes();
+  if (name === 'diario') mRenderLog();
+}
+
+function mGoBack() { mSetScreen(mPrevScreen || 'secoes'); }
+
+function mRenderSections() {
+  const container = document.getElementById('m-sections-list');
+  if (!container) return;
+  let html = '';
+  SECTIONS.forEach(sec => {
+    const done = sec.lessons.filter(l => state.done[lk(sec.id, l.n)]).length;
+    const total = sec.lessons.length;
+    const pct = Math.round(done / total * 100);
+    const isOpen = sec._mopen || false;
+    html += `<div class="m-sec-card">
+      <div class="m-sec-hdr" onclick="mToggleSec('${sec.id}')">
+        <div class="m-sec-icon" style="background:${sec.color}22;color:${sec.color}">${sec.num}</div>
+        <div class="m-sec-info">
+          <div class="m-sec-title">${sec.title}</div>
+          <div class="m-sec-sub">${done}/${total} aulas · ${sec.dur}</div>
+        </div>
+        <div class="m-sec-arrow ${isOpen?'open':''}">▶</div>
+      </div>
+      <div class="m-sec-bar"><div class="m-sec-bar-fill" style="width:${pct}%"></div></div>
+      <div class="m-sec-lessons ${isOpen?'open':''}">`;
+    sec.lessons.forEach(l => {
+      const key = lk(sec.id, l.n);
+      const isDone = !!state.done[key];
+      const title = state.customTitles[key] || l.t;
+      html += `<div class="m-lesson-row" onclick="mOpenLesson('${sec.id}',${l.n})">
+        <div class="m-lesson-chk ${isDone?'done':''}" onclick="event.stopPropagation();mToggleDone('${sec.id}',${l.n})">${isDone?'✓':''}</div>
+        <div class="m-lesson-num">${l.n}</div>
+        <div class="m-lesson-title ${isDone?'done':''}">${title}</div>
+        <div class="m-lesson-dur">${l.d}</div>
+      </div>`;
+    });
+    html += `</div></div>`;
+  });
+  container.innerHTML = html;
+}
+
+function mToggleSec(secId) {
+  const sec = SECTIONS.find(s => s.id === secId);
+  if (sec) sec._mopen = !sec._mopen;
+  mRenderSections();
+}
+
+function mToggleDone(secId, n) {
+  const key = lk(secId, n);
+  state.done[key] = !state.done[key];
+  saveState(); mRenderSections(); mUpdateStats(); updateTopStats(); renderOverview();
+  if (mCurrentScreen === 'aula' && exportContext.secId === secId && exportContext.lessonN === n) mRenderAulaBody(secId, n);
+}
+
+function mOpenLesson(secId, n) {
+  exportContext.secId = secId; exportContext.lessonN = n;
+  mPrevScreen = (mCurrentScreen !== 'aula') ? mCurrentScreen : mPrevScreen;
+  const sec = SECTIONS.find(s => s.id === secId);
+  const lesson = sec.lessons.find(l => l.n === n);
+  const key = lk(secId, n);
+  const title = state.customTitles[key] || lesson.t;
+  const sl = document.getElementById('m-aula-sec-label'); if (sl) sl.textContent = `Seção ${sec.num} · ${sec.title}`;
+  const tl = document.getElementById('m-aula-top-title'); if (tl) tl.textContent = title;
+  mSetScreen('aula');
+  mRenderAulaBody(secId, n);
+}
+
+function mRenderAulaBody(secId, n) {
+  const sec = SECTIONS.find(s => s.id === secId);
+  const lesson = sec.lessons.find(l => l.n === n);
+  const key = lk(secId, n);
+  const isDone = !!state.done[key];
+  const title = state.customTitles[key] || lesson.t;
+  const notes = state.notes[key] || [];
+  const body = document.getElementById('m-aula-body');
+  if (!body) return;
+  const tl = document.getElementById('m-aula-top-title'); if (tl) tl.textContent = title;
+  const curType = window._noteType || 'tip';
+  const typeLabels = {tip:'💡 Dica',doubt:'❓ Dúvida',important:'⭐ Importante',concept:'📖 Conceito'};
+  const typeSelCls = {tip:'sel-tip',doubt:'sel-doubt',important:'sel-important',concept:'sel-concept'};
+  body.innerHTML = `
+    <div style="margin:12px 12px 0;background:#fff;border:1px solid #e8e6e0;border-radius:14px;padding:16px">
+      <div style="font-size:15px;font-weight:700;color:#1a1a18;line-height:1.4;margin-bottom:8px">${title}</div>
+      <div style="display:flex;gap:10px;font-size:12px;color:#aaa;margin-bottom:14px;flex-wrap:wrap">
+        <span>Aula ${lesson.n}</span><span>⏱ ${lesson.d}</span>
+        ${isDone?'<span style="color:#1D9E75;font-weight:700">✅ Concluída</span>':'<span>⏳ Pendente</span>'}
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+        <button style="padding:11px 8px;border-radius:10px;border:none;cursor:pointer;font-size:13px;font-weight:700;background:${isDone?'#f0eeea':'#1D9E75'};color:${isDone?'#1a1a18':'#fff'}" onclick="mToggleDone('${secId}',${n})">
+          ${isDone?'↩ Desmarcar':'✓ Concluir'}
+        </button>
+        <button style="padding:11px 8px;border-radius:10px;border:none;cursor:pointer;font-size:13px;font-weight:700;background:#f5f4f0;color:#666" onclick="mEditTitle('${secId}',${n})">✏️ Editar</button>
+      </div>
+    </div>
+    <div style="margin:12px 12px 80px">
+      <div style="font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;color:#888;margin-bottom:10px">Anotações desta aula (${notes.length})</div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px" id="m-nt-btns">
+        ${Object.keys(typeLabels).map(type=>`<button class="ntb ${curType===type?typeSelCls[type]:''}" data-type="${type}" onclick="mSetNoteType(this,'${key}')">${typeLabels[type]}</button>`).join('')}
+      </div>
+      <input type="text" id="m-note-title-inp" placeholder="Título da anotação..."
+        style="display:block;width:100%;font-size:14px;padding:11px 13px;border:1px solid #e8e6e0;border-radius:10px;background:#faf9f7;color:#1a1a18;font-family:inherit;outline:none;margin-bottom:8px;-webkit-appearance:none"/>
+      <textarea id="m-note-body-inp" placeholder="Escreva sua dica, dúvida ou conceito..."
+        style="display:block;width:100%;font-size:14px;padding:11px 13px;border:1px solid #e8e6e0;border-radius:10px;background:#faf9f7;color:#1a1a18;font-family:inherit;outline:none;resize:none;height:90px;line-height:1.6;margin-bottom:8px;-webkit-appearance:none"></textarea>
+      <button onclick="mAddNote('${key}')"
+        style="display:block;width:100%;padding:13px;border:none;border-radius:10px;background:#1a1a18;color:#fff;font-size:14px;font-weight:700;cursor:pointer;margin-bottom:14px">+ Adicionar anotação</button>
+      <div id="m-notes-aula-${key}">${mRenderNotesForKey(key)}</div>
+    </div>`;
+}
+
+function mRenderNotesForKey(key) {
+  const notes = state.notes[key] || [];
+  if (!notes.length) return '<div style="text-align:center;padding:20px;color:#bbb;font-size:13px">Nenhuma anotação nesta aula.</div>';
+  return notes.map(n => {
+    const nt = noteTypes[n.type] || noteTypes.tip;
+    return `<div class="note-card" id="mnc-${n.id}" style="margin-bottom:8px">
+      <div class="note-card-hdr">
+        <span class="note-badge ${nt.cls}">${nt.label}</span>
+        <span class="note-card-title">${n.title}</span>
+        <div class="note-actions">
+          <button class="icon-btn" onclick="mStartEditNote('${key}',${n.id})">✏️</button>
+          <button class="icon-btn del" onclick="mDeleteNote('${key}',${n.id})">✕</button>
+        </div>
+      </div>
+      ${n.body?`<div class="note-card-body">${n.body}</div>`:''}
+      <div style="font-size:10px;color:#bbb;margin-top:6px">${n.date}</div>
+    </div>`;
+  }).join('');
+}
+
+function mSetNoteType(btn, key) {
+  window._noteType = btn.dataset.type;
+  document.querySelectorAll('#m-nt-btns .ntb').forEach(b => b.className = 'ntb');
+  btn.classList.add('sel-' + btn.dataset.type);
+}
+
+function mAddNote(key) {
+  const ti = document.getElementById('m-note-title-inp');
+  const bi = document.getElementById('m-note-body-inp');
+  const title = ti?.value.trim(); const body = bi?.value.trim();
+  if (!title && !body) return;
+  if (!state.notes[key]) state.notes[key] = [];
+  state.notes[key].unshift({id:Date.now(),type:window._noteType||'tip',title:title||'(sem título)',body,date:new Date().toLocaleDateString('pt-BR')});
+  if (ti) ti.value = ''; if (bi) bi.value = '';
+  saveState(); updateTopStats(); mUpdateStats();
+  const [sId, nStr] = key.split('_');
+  mRenderAulaBody(sId, parseInt(nStr));
+}
+
+function mStartEditNote(key, id) {
+  const note = (state.notes[key]||[]).find(n=>n.id===id);
+  if (!note) return;
+  const nt = noteTypes[note.type]||noteTypes.tip;
+  const card = document.getElementById('mnc-'+id);
+  if (!card) return;
+  card.innerHTML = `
+    <div class="note-card-hdr"><span class="note-badge ${nt.cls}">${nt.label}</span>
+      <select id="m-et-${id}" style="font-size:12px;padding:4px 8px;border:1px solid #ddd;border-radius:6px;background:#fff">
+        <option value="tip" ${note.type==='tip'?'selected':''}>💡 Dica</option>
+        <option value="doubt" ${note.type==='doubt'?'selected':''}>❓ Dúvida</option>
+        <option value="important" ${note.type==='important'?'selected':''}>⭐ Importante</option>
+        <option value="concept" ${note.type==='concept'?'selected':''}>📖 Conceito</option>
+      </select>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:6px;margin-top:8px">
+      <input type="text" id="m-et-ti-${id}" value="${note.title}" style="font-size:13px;padding:9px 11px;border:1.5px solid #185FA5;border-radius:8px;background:#fff;color:#1a1a18;font-family:inherit;outline:none"/>
+      <textarea id="m-et-bo-${id}" style="font-size:13px;padding:9px 11px;border:1.5px solid #185FA5;border-radius:8px;background:#fff;color:#1a1a18;font-family:inherit;outline:none;resize:none;height:70px;line-height:1.5">${note.body||''}</textarea>
+      <div style="display:flex;gap:8px">
+        <button onclick="mSaveEditNote('${key}',${id})" class="btn-save" style="flex:1;padding:10px">Salvar</button>
+        <button onclick="mCancelEditNote('${key}',${id})" class="btn-cancel" style="flex:1;padding:10px">Cancelar</button>
+      </div>
+    </div>`;
+}
+
+function mSaveEditNote(key, id) {
+  const note = (state.notes[key]||[]).find(n=>n.id===id);
+  if (!note) return;
+  const t=document.getElementById('m-et-ti-'+id); const b=document.getElementById('m-et-bo-'+id); const tp=document.getElementById('m-et-'+id);
+  if(t) note.title=t.value.trim()||'(sem título)'; if(b) note.body=b.value.trim(); if(tp) note.type=tp.value;
+  saveState();
+  const nl = document.getElementById('m-notes-aula-'+key); if(nl) nl.innerHTML=mRenderNotesForKey(key);
+}
+
+function mCancelEditNote(key, id) {
+  const nl = document.getElementById('m-notes-aula-'+key); if(nl) nl.innerHTML=mRenderNotesForKey(key);
+}
+
+function mDeleteNote(key, id) {
+  if (!state.notes[key]) return;
+  state.notes[key] = state.notes[key].filter(n=>n.id!==id);
+  saveState(); updateTopStats(); mUpdateStats();
+  const nl = document.getElementById('m-notes-aula-'+key); if(nl) nl.innerHTML=mRenderNotesForKey(key);
+  mRenderNotes();
+}
+
+function mEditTitle(secId, n) {
+  const key = lk(secId, n);
+  const sec = SECTIONS.find(s=>s.id===secId);
+  const lesson = sec.lessons.find(l=>l.n===n);
+  const current = state.customTitles[key] || lesson.t;
+  const newTitle = prompt('Editar título da aula:', current);
+  if (newTitle !== null) {
+    const val = newTitle.trim();
+    if (val && val !== lesson.t) state.customTitles[key] = val;
+    else delete state.customTitles[key];
+    saveState(); mRenderAulaBody(secId, n); mRenderSections(); renderSidebar();
+  }
+}
+
+function mUpdateStats() {
+  const {totalDone,pct,secsDone,notesCount,hours,sessions} = calcStats();
+  const set=(id,v)=>{const el=document.getElementById(id);if(el)el.textContent=v;};
+  set('ms-pct',pct+'%'); set('ms-aulas',totalDone+'/263'); set('ms-secs',secsDone+'/20');
+  set('ms-notes',notesCount); set('ms-hours',hours.toFixed(1)+'h'); set('ms-sessions',sessions);
+  const pl = document.getElementById('m-prog-list');
+  if (pl) pl.innerHTML = SECTIONS.map(sec => {
+    const done=sec.lessons.filter(l=>state.done[lk(sec.id,l.n)]).length;
+    const p=Math.round(done/sec.lessons.length*100);
+    return `<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+      <div style="font-size:11px;color:#555;width:90px;flex-shrink:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">S${sec.num} ${sec.title}</div>
+      <div style="flex:1;height:5px;background:#f0eeea;border-radius:3px"><div style="height:100%;background:#1D9E75;border-radius:3px;width:${p}%"></div></div>
+      <div style="font-size:10px;color:#aaa;min-width:26px;text-align:right">${p}%</div>
+    </div>`;
+  }).join('');
+}
+
+function mRenderNotes() {
+  const container = document.getElementById('m-notes-list');
+  if (!container) return;
+  let all = [];
+  SECTIONS.forEach(sec => { sec.lessons.forEach(l => {
+    const key = lk(sec.id,l.n);
+    (state.notes[key]||[]).forEach(n=>all.push({...n,key,secId:sec.id,lessonN:l.n,lessonTitle:state.customTitles[key]||l.t}));
+  });});
+  const filtered = mNoteFilter==='all' ? all : all.filter(n=>n.type===mNoteFilter);
+  if (!filtered.length) { container.innerHTML='<div class="empty">Nenhuma anotação ainda.</div>'; return; }
+  container.innerHTML = filtered.map(n => {
+    const nt=noteTypes[n.type]||noteTypes.tip;
+    return `<div class="note-card" style="margin-bottom:8px">
+      <div class="note-card-hdr">
+        <span class="note-badge ${nt.cls}">${nt.label}</span>
+        <span class="note-card-title">${n.title}</span>
+        <button class="icon-btn del" onclick="mDeleteNote('${n.key}',${n.id});mRenderNotes()">✕</button>
+      </div>
+      ${n.body?`<div class="note-card-body">${n.body}</div>`:''}
+      <div style="font-size:10px;color:#bbb;margin-top:6px;display:flex;align-items:center;gap:8px">
+        <span>Aula ${n.lessonN} · ${n.date}</span>
+        <button onclick="mOpenLesson('${n.secId}',${n.lessonN})" class="icon-btn" style="font-size:11px">→ Ver aula</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function mFilterNotes(type, btn) {
+  mNoteFilter = type;
+  document.querySelectorAll('#m-note-filters .ntb').forEach(b=>{ b.className='ntb'; b.style.background=''; b.style.color=''; b.style.borderColor=''; });
+  btn.style.background='#f0eeea'; btn.style.color='#1a1a18'; btn.style.borderColor='#888';
+  mRenderNotes();
+}
+
+function mPopulateLogSelect() {
+  const sel = document.getElementById('m-log-sec');
+  if (!sel) return;
+  sel.innerHTML = '<option value="">Selecione...</option>' + SECTIONS.map(s=>`<option value="${s.id}">S${s.num}: ${s.title}</option>`).join('');
+}
+
+function mAddLog() {
+  const date=document.getElementById('m-log-date')?.value;
+  const hours=document.getElementById('m-log-hours')?.value;
+  const sec=document.getElementById('m-log-sec')?.value;
+  const desc=document.getElementById('m-log-desc')?.value.trim();
+  if (!date||!hours) return;
+  state.logs.unshift({id:Date.now(),date,hours:parseFloat(hours),sec,desc});
+  const mh=document.getElementById('m-log-hours'); if(mh) mh.value='';
+  const md=document.getElementById('m-log-desc'); if(md) md.value='';
+  saveState(); updateTopStats(); mUpdateStats(); mRenderLog(); renderLogList();
+}
+
+function mRenderLog() {
+  const container = document.getElementById('m-log-list');
+  if (!container) return;
+  if (!state.logs.length) { container.innerHTML='<div class="empty">Nenhuma sessão registrada ainda.</div>'; return; }
+  const months=['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+  const secMap={}; SECTIONS.forEach(s=>secMap[s.id]=s);
+  container.innerHTML = state.logs.map(l => {
+    const [y,m,d]=l.date.split('-'); const sec=l.sec&&secMap[l.sec];
+    return `<div class="log-card" style="margin-bottom:8px">
+      <div class="log-date-blk"><div class="log-day">${d}</div><div class="log-month">${months[parseInt(m)-1]}</div></div>
+      <div class="log-sep"></div>
+      <div class="log-body">
+        <div class="log-title-txt">${sec?'S'+sec.num+': '+sec.title:'Estudo geral'}</div>
+        ${l.desc?`<div class="log-desc-txt">${l.desc}</div>`:''}
+      </div>
+      <div class="log-hours-blk"><div class="log-h">${l.hours}h</div></div>
+      <button class="icon-btn del" onclick="mDeleteLog(${l.id})">✕</button>
+    </div>`;
+  }).join('');
+}
+
+function mDeleteLog(id) {
+  state.logs=state.logs.filter(l=>l.id!==id);
+  saveState(); updateTopStats(); mUpdateStats(); mRenderLog(); renderLogList();
+}
+
+function mSearchLessons(q) {
+  const container=document.getElementById('m-search-results'); if(!container) return;
+  if (!q||q.length<2) { container.innerHTML='<div class="empty">Digite pelo menos 2 caracteres...</div>'; return; }
+  q=q.toLowerCase();
+  let results=[];
+  SECTIONS.forEach(sec=>{ sec.lessons.forEach(l=>{
+    const key=lk(sec.id,l.n); const title=state.customTitles[key]||l.t;
+    if(title.toLowerCase().includes(q)||String(l.n).includes(q)) results.push({sec,l,key,title});
+  });});
+  if (!results.length) { container.innerHTML='<div class="empty">Nenhuma aula encontrada.</div>'; return; }
+  container.innerHTML = results.map(r=>{
+    const isDone=!!state.done[r.key];
+    return `<div style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:#fff;border:1px solid #e8e6e0;border-radius:10px;margin-bottom:8px;cursor:pointer" onclick="mOpenLesson('${r.sec.id}',${r.l.n})">
+      <div style="width:18px;height:18px;border-radius:5px;border:2px solid ${isDone?'#1D9E75':'#ccc'};background:${isDone?'#1D9E75':'transparent'};display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;color:#fff;flex-shrink:0">${isDone?'✓':''}</div>
+      <div style="flex:1;min-width:0">
+        <div style="font-size:13px;color:${isDone?'#bbb':'#1a1a18'};${isDone?'text-decoration:line-through':''};line-height:1.4">${r.title}</div>
+        <div style="font-size:11px;color:#aaa;margin-top:2px">Aula ${r.l.n} · S${r.sec.num} · ${r.l.d}</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function mOpenExport() { openExport(exportContext.secId, exportContext.lessonN); }
+
+window.addEventListener('resize', () => {
+  const ml=document.getElementById('mobile-layer');
+  if (ml) ml.style.display = isMobile() ? 'flex' : 'none';
+});
+
+// ============================================================
+// INIT
+// ============================================================
+function init() {
+  loadState();
+  const today = new Date().toISOString().split('T')[0];
+  renderSidebar();
+  updateTopStats();
+  renderOverview();
+  renderGlobalNotes();
+  renderLogList();
+  populateLogSelect();
+  document.getElementById('log-date').value = today;
+  const ml = document.getElementById('mobile-layer');
+  if (isMobile()) {
+    if (ml) ml.style.display = 'flex';
+    mInit();
+  } else {
+    if (ml) ml.style.display = 'none';
+  }
+}
+
+init();
+</script>
+</body>
+</html>
