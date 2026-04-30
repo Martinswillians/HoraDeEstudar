@@ -7,290 +7,379 @@
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f5f4f0;color:#1a1a18;min-height:100vh}
-a{color:inherit;text-decoration:none}
-
-/* LAYOUT */
-.app{display:flex;flex-direction:column;min-height:100vh}
-.topbar{background:#1a1a18;color:#f5f4f0;padding:14px 24px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;position:sticky;top:0;z-index:100}
-.topbar h1{font-size:15px;font-weight:600;letter-spacing:-.2px}
-.topbar p{font-size:12px;color:#888;margin-top:1px}
-.top-badges{display:flex;gap:8px;flex-wrap:wrap}
-.badge{font-size:11px;font-weight:600;padding:4px 12px;border-radius:20px;letter-spacing:.2px}
+/* ── TOPBAR ── */
+.topbar{background:#1a1a18;color:#f5f4f0;padding:12px 20px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;position:sticky;top:0;z-index:100}
+.topbar h1{font-size:14px;font-weight:600}
+.topbar p{font-size:11px;color:#888;margin-top:1px}
+.top-badges{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.badge{font-size:11px;font-weight:600;padding:4px 11px;border-radius:20px}
 .badge-green{background:#1D9E75;color:#fff}
 .badge-blue{background:#185FA5;color:#fff}
 .badge-amber{background:#BA7517;color:#fff}
-
-.main{display:flex;flex:1;gap:0}
-
-/* SIDEBAR */
-.sidebar{width:300px;min-width:260px;background:#fff;border-right:1px solid #e8e6e0;overflow-y:auto;height:calc(100vh - 56px);position:sticky;top:56px;flex-shrink:0}
+.btn-export-top{font-size:11px;font-weight:700;padding:4px 13px;border-radius:20px;border:none;background:#fff;color:#1a1a18;cursor:pointer}
+/* ── DESKTOP LAYOUT ── */
+.desktop-wrap{display:flex;flex:1}
+.sidebar{width:290px;min-width:260px;background:#fff;border-right:1px solid #e8e6e0;overflow-y:auto;height:calc(100vh - 54px);position:sticky;top:54px;flex-shrink:0}
 .sidebar-tabs{display:flex;border-bottom:1px solid #e8e6e0}
-.stab{flex:1;padding:10px;font-size:12px;font-weight:600;text-align:center;cursor:pointer;color:#888;border-bottom:2px solid transparent;background:none;border-left:none;border-right:none;border-top:none;letter-spacing:.3px;text-transform:uppercase;transition:all .15s}
+.stab{flex:1;padding:9px 6px;font-size:11px;font-weight:700;text-align:center;cursor:pointer;color:#888;border-bottom:2px solid transparent;background:none;border-left:none;border-right:none;border-top:none;text-transform:uppercase;letter-spacing:.3px;transition:all .15s}
 .stab.active{color:#1a1a18;border-bottom-color:#1a1a18}
-
-.section-group{border-bottom:1px solid #f0eeea}
-.section-hdr{display:flex;align-items:center;gap:10px;padding:12px 16px;cursor:pointer;user-select:none;transition:background .1s}
-.section-hdr:hover{background:#faf9f7}
-.section-hdr.open{background:#faf9f7}
-.sec-num{font-size:10px;font-weight:700;width:22px;height:22px;border-radius:6px;display:flex;align-items:center;justify-content:center;flex-shrink:0;background:#f0eeea;color:#666}
-.sec-title{flex:1;font-size:12px;font-weight:600;color:#1a1a18;line-height:1.35}
-.sec-prog{font-size:10px;color:#888;white-space:nowrap}
+.sec-group{border-bottom:1px solid #f0eeea}
+.sec-hdr{display:flex;align-items:center;gap:8px;padding:10px 14px;cursor:pointer;user-select:none;transition:background .1s}
+.sec-hdr:hover,.sec-hdr.open{background:#faf9f7}
+.sec-num{font-size:10px;font-weight:800;width:22px;height:22px;border-radius:6px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.sec-title{flex:1;font-size:12px;font-weight:600;color:#1a1a18;line-height:1.3}
+.sec-meta{font-size:10px;color:#888;white-space:nowrap}
 .sec-arrow{font-size:10px;color:#bbb;transition:transform .2s}
 .sec-arrow.open{transform:rotate(90deg)}
-.sec-progress-bar{height:2px;background:#f0eeea;margin:0 16px 0}
-.sec-progress-fill{height:100%;background:#1D9E75;transition:width .3s;border-radius:1px}
-
-.lessons-list{display:none;padding:4px 0 8px}
-.lessons-list.open{display:block}
-.lesson-row{display:flex;align-items:flex-start;gap:8px;padding:6px 16px 6px 14px;cursor:pointer;transition:background .1s;border-left:2px solid transparent}
+.sec-bar{height:2px;background:#f0eeea;margin:0 14px}
+.sec-bar-fill{height:100%;background:#1D9E75;transition:width .3s;border-radius:1px}
+.lessons-wrap{display:none;padding:2px 0 6px}
+.lessons-wrap.open{display:block}
+.lesson-row{display:flex;align-items:center;gap:8px;padding:7px 14px 7px 10px;cursor:pointer;border-left:2px solid transparent;transition:background .1s}
 .lesson-row:hover{background:#faf9f7}
 .lesson-row.active-lesson{background:#f0f7ff;border-left-color:#185FA5}
-.lesson-check{width:14px;height:14px;border:1.5px solid #ccc;border-radius:3px;flex-shrink:0;margin-top:2px;display:flex;align-items:center;justify-content:center;transition:all .15s;cursor:pointer}
-.lesson-check.done{background:#1D9E75;border-color:#1D9E75}
-.lesson-check.done::after{content:'✓';font-size:8px;font-weight:800;color:#fff}
-.lesson-num{font-size:10px;color:#aaa;min-width:22px;margin-top:2px;flex-shrink:0}
-.lesson-title{font-size:12px;color:#333;line-height:1.4;flex:1}
-.lesson-title.done{color:#aaa;text-decoration:line-through}
-.lesson-dur{font-size:10px;color:#bbb;flex-shrink:0;margin-top:2px}
-
-/* CONTENT AREA */
-.content{flex:1;overflow-y:auto;padding:24px;height:calc(100vh - 56px)}
-
-.welcome-card{background:#fff;border:1px solid #e8e6e0;border-radius:12px;padding:32px;text-align:center;color:#888;margin-bottom:20px}
-.welcome-card h2{font-size:16px;color:#1a1a18;margin-bottom:8px}
-.welcome-card p{font-size:13px;line-height:1.6}
-
-/* STATS ROW */
-.stats-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:10px;margin-bottom:20px}
-.stat-c{background:#fff;border:1px solid #e8e6e0;border-radius:10px;padding:14px 16px;text-align:center}
+.lesson-chk{width:14px;height:14px;border:1.5px solid #ccc;border-radius:3px;flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all .15s}
+.lesson-chk.done{background:#1D9E75;border-color:#1D9E75}
+.lesson-chk.done::after{content:'✓';font-size:8px;font-weight:800;color:#fff}
+.lesson-num{font-size:10px;color:#aaa;min-width:20px;flex-shrink:0}
+.lesson-title{flex:1;font-size:12px;color:#333;line-height:1.35}
+.lesson-title.done{color:#bbb;text-decoration:line-through}
+.lesson-dur{font-size:10px;color:#bbb;flex-shrink:0}
+.search-wrap{padding:10px 14px;border-bottom:1px solid #f0eeea;position:sticky;top:0;background:#fff;z-index:5}
+.search-wrap input{width:100%;font-size:12px;padding:7px 10px;border:1px solid #e8e6e0;border-radius:7px;background:#faf9f7;color:#1a1a18;font-family:inherit;outline:none}
+.search-wrap input:focus{border-color:#185FA5}
+/* ── DESKTOP CONTENT ── */
+.content{flex:1;overflow-y:auto;padding:20px;height:calc(100vh - 54px)}
+.stats-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(100px,1fr));gap:8px;margin-bottom:16px}
+.stat-c{background:#fff;border:1px solid #e8e6e0;border-radius:10px;padding:12px 14px;text-align:center}
 .stat-n{font-size:20px;font-weight:700;color:#1a1a18}
-.stat-l{font-size:11px;color:#888;margin-top:2px}
-
-/* LESSON DETAIL */
-.lesson-detail{background:#fff;border:1px solid #e8e6e0;border-radius:12px;padding:24px;margin-bottom:16px}
-.ld-header{display:flex;align-items:flex-start;gap:14px;margin-bottom:20px;flex-wrap:wrap}
-.ld-check-big{width:32px;height:32px;border:2px solid #ddd;border-radius:8px;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;transition:all .2s;font-size:16px}
-.ld-check-big.done{background:#1D9E75;border-color:#1D9E75;color:#fff}
+.stat-l{font-size:11px;color:#888;margin-top:1px}
+.ctabs{display:flex;border-bottom:1px solid #e8e6e0;margin-bottom:18px}
+.ctab-btn{font-size:12px;font-weight:600;padding:9px 16px;border:none;background:none;cursor:pointer;color:#888;border-bottom:2px solid transparent;margin-bottom:-1px;transition:all .15s}
+.ctab-btn.active{color:#1a1a18;border-bottom-color:#1a1a18}
+.ctab{display:none}
+.ctab.active{display:block}
+/* ── LESSON DETAIL ── */
+.lesson-detail{background:#fff;border:1px solid #e8e6e0;border-radius:12px;padding:22px;margin-bottom:14px}
+.ld-hdr{display:flex;align-items:flex-start;gap:12px;margin-bottom:18px;flex-wrap:wrap}
+.ld-chk{width:30px;height:30px;border:2px solid #ddd;border-radius:8px;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;font-size:15px;transition:all .2s}
+.ld-chk.done{background:#1D9E75;border-color:#1D9E75;color:#fff}
 .ld-info{flex:1}
-.ld-sec{font-size:11px;color:#888;font-weight:600;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px}
-.ld-title{font-size:17px;font-weight:700;color:#1a1a18;line-height:1.3;margin-bottom:6px}
-.ld-meta{display:flex;gap:12px;font-size:12px;color:#aaa}
-.ld-actions{display:flex;gap:8px;margin-left:auto;align-items:flex-start;flex-wrap:wrap}
-
-/* EDITABLE TITLE */
-.edit-title-input{font-size:17px;font-weight:700;color:#1a1a18;border:none;border-bottom:2px solid #185FA5;background:none;width:100%;outline:none;padding-bottom:2px}
-
-/* NOTES SECTION */
-.notes-area{margin-top:4px}
-.notes-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
-.notes-hdr h3{font-size:13px;font-weight:700;color:#1a1a18;text-transform:uppercase;letter-spacing:.5px}
-
-.note-type-btns{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}
-.ntb{font-size:11px;padding:4px 12px;border-radius:20px;border:1.5px solid #e8e6e0;background:none;cursor:pointer;color:#888;font-weight:600;transition:all .15s}
+.ld-sec-label{font-size:10px;color:#888;font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:3px}
+.ld-title{font-size:16px;font-weight:700;color:#1a1a18;line-height:1.3;margin-bottom:5px}
+.ld-meta{display:flex;gap:10px;font-size:12px;color:#aaa;flex-wrap:wrap}
+.ld-actions{display:flex;gap:6px;margin-left:auto;flex-wrap:wrap}
+.icon-btn{background:none;border:1px solid #e8e6e0;cursor:pointer;font-size:12px;color:#888;padding:4px 10px;border-radius:6px;font-weight:600;transition:all .15s}
+.icon-btn:hover{color:#1a1a18;border-color:#aaa}
+/* ── SUB TABS (Notas/Código) ── */
+.sub-tabs{display:flex;gap:0;border-bottom:1px solid #e8e6e0;margin-bottom:14px}
+.sub-tab-btn{font-size:12px;font-weight:600;padding:8px 14px;border:none;background:none;cursor:pointer;color:#888;border-bottom:2px solid transparent;margin-bottom:-1px;transition:all .15s}
+.sub-tab-btn.active{color:#1a1a18;border-bottom-color:#185FA5}
+/* ── NOTES ── */
+.ntb{font-size:11px;padding:4px 11px;border-radius:20px;border:1.5px solid #e8e6e0;background:none;cursor:pointer;color:#888;font-weight:600;transition:all .15s}
 .ntb.sel-tip{background:#EAF3DE;color:#27500A;border-color:#639922}
 .ntb.sel-doubt{background:#FAEEDA;color:#633806;border-color:#BA7517}
 .ntb.sel-important{background:#EEEDFE;color:#3C3489;border-color:#534AB7}
 .ntb.sel-concept{background:#E6F1FB;color:#0C447C;border-color:#185FA5}
-
-.note-input-area{display:flex;flex-direction:column;gap:8px}
-.note-input-area input,.note-input-area textarea{font-size:13px;padding:9px 12px;border:1px solid #e8e6e0;border-radius:8px;background:#faf9f7;color:#1a1a18;font-family:inherit;transition:border .15s;outline:none}
-.note-input-area input:focus,.note-input-area textarea:focus{border-color:#185FA5;background:#fff}
-.note-input-area textarea{resize:vertical;min-height:80px;line-height:1.6}
-.btn-add-note{font-size:12px;font-weight:700;padding:9px 20px;background:#1a1a18;color:#fff;border:none;border-radius:8px;cursor:pointer;align-self:flex-start;transition:opacity .15s;letter-spacing:.2px}
-.btn-add-note:hover{opacity:.8}
-
-.notes-list{display:flex;flex-direction:column;gap:8px;margin-top:14px}
-.note-card{background:#faf9f7;border:1px solid #e8e6e0;border-radius:10px;padding:12px 14px}
-.note-card-hdr{display:flex;align-items:center;gap:8px;margin-bottom:6px}
-.note-badge{font-size:10px;font-weight:700;padding:2px 9px;border-radius:20px;flex-shrink:0}
+.note-inp-area{display:flex;flex-direction:column;gap:7px;margin-bottom:12px}
+.note-inp-area input,.note-inp-area textarea{font-size:13px;padding:8px 11px;border:1px solid #e8e6e0;border-radius:8px;background:#faf9f7;color:#1a1a18;font-family:inherit;outline:none;transition:border .15s}
+.note-inp-area input:focus,.note-inp-area textarea:focus{border-color:#185FA5;background:#fff}
+.note-inp-area textarea{resize:vertical;min-height:75px;line-height:1.6}
+.btn-add-note{font-size:12px;font-weight:700;padding:8px 18px;background:#1a1a18;color:#fff;border:none;border-radius:8px;cursor:pointer;align-self:flex-start}
+.note-card{background:#faf9f7;border:1px solid #e8e6e0;border-radius:9px;padding:11px 13px;margin-bottom:7px}
+.note-card-hdr{display:flex;align-items:center;gap:7px;margin-bottom:5px}
+.note-badge{font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;flex-shrink:0}
 .nb-tip{background:#EAF3DE;color:#27500A}
 .nb-doubt{background:#FAEEDA;color:#633806}
 .nb-important{background:#EEEDFE;color:#3C3489}
 .nb-concept{background:#E6F1FB;color:#0C447C}
 .note-card-title{font-size:12px;font-weight:600;color:#1a1a18;flex:1}
 .note-card-body{font-size:12px;color:#666;line-height:1.6;white-space:pre-wrap}
-.note-actions{display:flex;gap:4px;margin-left:auto}
-.icon-btn{background:none;border:none;cursor:pointer;font-size:12px;color:#bbb;padding:2px 5px;border-radius:4px;transition:all .15s}
-.icon-btn:hover{color:#1a1a18;background:#f0eeea}
-.icon-btn.del:hover{color:#A32D2D}
-
-/* EDITING NOTE */
-.note-edit-area{display:flex;flex-direction:column;gap:6px;margin-top:6px}
-.note-edit-area input,.note-edit-area textarea{font-size:12px;padding:7px 10px;border:1px solid #185FA5;border-radius:6px;background:#fff;color:#1a1a18;font-family:inherit;outline:none}
-.note-edit-area textarea{resize:vertical;min-height:60px;line-height:1.5}
-.edit-actions{display:flex;gap:6px}
-.btn-save{font-size:11px;font-weight:700;padding:6px 14px;background:#185FA5;color:#fff;border:none;border-radius:6px;cursor:pointer}
-.btn-cancel{font-size:11px;font-weight:600;padding:6px 14px;background:none;border:1px solid #ddd;border-radius:6px;cursor:pointer;color:#888}
-
-/* DIARIO */
-.diario-form{background:#fff;border:1px solid #e8e6e0;border-radius:12px;padding:20px;margin-bottom:16px}
-.diario-form h3{font-size:13px;font-weight:700;color:#1a1a18;margin-bottom:14px;text-transform:uppercase;letter-spacing:.5px}
-.form-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:10px}
-.form-field{display:flex;flex-direction:column;gap:4px}
-.form-field label{font-size:11px;font-weight:600;color:#888;text-transform:uppercase;letter-spacing:.3px}
-.form-field input,.form-field select,.form-field textarea{font-size:13px;padding:8px 11px;border:1px solid #e8e6e0;border-radius:8px;background:#faf9f7;color:#1a1a18;font-family:inherit;outline:none;transition:border .15s}
-.form-field input:focus,.form-field select:focus,.form-field textarea:focus{border-color:#185FA5;background:#fff}
+.note-actions{display:flex;gap:3px;margin-left:auto}
+.del-btn{background:none;border:none;cursor:pointer;font-size:11px;color:#bbb;padding:2px 5px;border-radius:4px}
+.del-btn:hover{color:#A32D2D}
+/* ── CODE ── */
+.lang-btns{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px}
+.lang-btn{font-size:11px;padding:3px 11px;border-radius:20px;border:1.5px solid #e8e6e0;background:none;cursor:pointer;color:#888;font-weight:600;transition:all .15s}
+.lang-btn.sel{background:#1a1a18;color:#fff;border-color:#1a1a18}
+.code-editor{width:100%;font-size:12px;padding:11px 13px;border:1px solid #e8e6e0;border-radius:8px;background:#1a1a18;color:#e8e8e8;font-family:'Courier New',Consolas,monospace;outline:none;resize:vertical;min-height:130px;line-height:1.7;tab-size:2}
+.code-editor:focus{border-color:#534AB7}
+.btn-add-code{font-size:12px;font-weight:700;padding:8px 18px;background:#534AB7;color:#fff;border:none;border-radius:8px;cursor:pointer;align-self:flex-start}
+.code-block{background:#1a1a18;border-radius:10px;overflow:hidden;margin-bottom:10px;border:1px solid #333}
+.code-block-hdr{display:flex;align-items:center;justify-content:space-between;padding:8px 13px;background:#111;border-bottom:1px solid #333}
+.code-block-meta{display:flex;align-items:center;gap:8px;flex:1;min-width:0}
+.code-block-lesson{font-size:10px;color:#666}
+.code-block-title{font-size:12px;color:#ccc;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.code-block-actions{display:flex;gap:3px;flex-shrink:0}
+.code-icon-btn{background:none;border:none;cursor:pointer;font-size:11px;color:#666;padding:3px 7px;border-radius:4px;transition:all .15s}
+.code-icon-btn:hover{color:#fff;background:#333}
+.code-pre{margin:0;padding:13px 15px;font-family:'Courier New',Consolas,monospace;font-size:12px;line-height:1.7;color:#e8e8e8;overflow-x:auto;white-space:pre;tab-size:2}
+.code-inp-area{display:flex;flex-direction:column;gap:7px;margin-bottom:12px}
+.code-inp-area input{font-size:13px;padding:8px 11px;border:1px solid #e8e6e0;border-radius:8px;background:#faf9f7;color:#1a1a18;font-family:inherit;outline:none}
+.code-inp-area input:focus{border-color:#534AB7;background:#fff}
+.code-empty{text-align:center;padding:28px 14px;color:#bbb;font-size:12px;background:#f9f9f9;border-radius:9px;border:1px dashed #e0dedc}
+/* ── DIARIO ── */
+.log-form{background:#fff;border:1px solid #e8e6e0;border-radius:12px;padding:18px;margin-bottom:14px}
+.log-form h3{font-size:12px;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:.5px;margin-bottom:12px}
+.form-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:8px}
+.form-field{display:flex;flex-direction:column;gap:3px}
+.form-field label{font-size:11px;font-weight:600;color:#888;text-transform:uppercase}
+.form-field input,.form-field select,.form-field textarea{font-size:13px;padding:7px 10px;border:1px solid #e8e6e0;border-radius:8px;background:#faf9f7;color:#1a1a18;font-family:inherit;outline:none}
 .form-field.full{grid-column:1/-1}
-.form-field textarea{resize:vertical;min-height:70px;line-height:1.5}
-.btn-log{font-size:12px;font-weight:700;padding:9px 24px;background:#1a1a18;color:#fff;border:none;border-radius:8px;cursor:pointer;transition:opacity .15s}
-.btn-log:hover{opacity:.8}
-
-.log-entries{display:flex;flex-direction:column;gap:8px}
-.log-card{background:#fff;border:1px solid #e8e6e0;border-radius:10px;padding:14px 16px;display:flex;align-items:flex-start;gap:14px}
-.log-date-blk{text-align:center;min-width:44px}
-.log-day{font-size:20px;font-weight:800;color:#1a1a18;line-height:1}
-.log-month{font-size:10px;color:#888;text-transform:uppercase;font-weight:600}
+.form-field textarea{resize:vertical;min-height:65px;line-height:1.5}
+.btn-log{font-size:12px;font-weight:700;padding:8px 20px;background:#1a1a18;color:#fff;border:none;border-radius:8px;cursor:pointer}
+.log-card{background:#fff;border:1px solid #e8e6e0;border-radius:10px;padding:12px 14px;display:flex;align-items:flex-start;gap:12px;margin-bottom:7px}
+.log-date-blk{text-align:center;min-width:38px}
+.log-day{font-size:18px;font-weight:800;color:#1a1a18;line-height:1}
+.log-month{font-size:9px;color:#888;text-transform:uppercase;font-weight:600}
 .log-sep{width:1px;background:#f0eeea;align-self:stretch;flex-shrink:0}
-.log-body{flex:1}
+.log-body{flex:1;min-width:0}
 .log-title-txt{font-size:13px;font-weight:600;color:#1a1a18}
-.log-desc-txt{font-size:12px;color:#888;margin-top:3px;line-height:1.5}
-.log-hours-blk{text-align:right;flex-shrink:0}
-.log-h{font-size:16px;font-weight:700;color:#185FA5}
-.log-hl{font-size:10px;color:#aaa}
-
-/* OVERVIEW TAB */
-.overview-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px}
-.ov-card{background:#fff;border:1px solid #e8e6e0;border-radius:10px;padding:16px}
-.ov-card h3{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#888;margin-bottom:12px}
-.progress-list{display:flex;flex-direction:column;gap:8px}
-.prog-item{display:flex;align-items:center;gap:10px}
-.prog-label{font-size:11px;color:#555;width:140px;flex-shrink:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.log-desc-txt{font-size:12px;color:#888;margin-top:2px;line-height:1.5}
+.log-h{font-size:14px;font-weight:700;color:#185FA5}
+.log-hl{font-size:9px;color:#aaa}
+/* ── OVERVIEW ── */
+.ov-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:18px}
+.ov-card{background:#fff;border:1px solid #e8e6e0;border-radius:10px;padding:14px}
+.ov-card h3{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#888;margin-bottom:11px}
+.prog-item{display:flex;align-items:center;gap:8px;margin-bottom:7px}
+.prog-label{font-size:11px;color:#555;width:130px;flex-shrink:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .prog-track{flex:1;height:4px;background:#f0eeea;border-radius:2px}
 .prog-fill{height:100%;border-radius:2px;background:#1D9E75;transition:width .3s}
-.prog-pct{font-size:10px;color:#aaa;min-width:28px;text-align:right}
-
-/* EMPTY */
-.empty{text-align:center;padding:32px 16px;color:#bbb;font-size:13px}
-
-/* TABS CONTENT */
-.ctab{display:none}
-.ctab.active{display:block}
-.content-tabs{display:flex;gap:0;border-bottom:1px solid #e8e6e0;margin-bottom:20px}
-.ctab-btn{font-size:12px;font-weight:600;padding:10px 18px;border:none;background:none;cursor:pointer;color:#888;border-bottom:2px solid transparent;margin-bottom:-1px;transition:all .15s;letter-spacing:.2px}
-.ctab-btn.active{color:#1a1a18;border-bottom-color:#1a1a18}
-
-/* SEARCH */
-.search-box{padding:10px 16px;border-bottom:1px solid #f0eeea;position:sticky;top:0;background:#fff;z-index:10}
-.search-box input{width:100%;font-size:12px;padding:7px 10px;border:1px solid #e8e6e0;border-radius:7px;background:#faf9f7;color:#1a1a18;font-family:inherit;outline:none}
-.search-box input:focus{border-color:#185FA5;background:#fff}
-
-/* RESPONSIVE */
-@media(max-width:700px){
-  .main{flex-direction:column}
-  .sidebar{width:100%;height:auto;position:relative;top:0;max-height:380px}
-  .content{height:auto}
-  .form-grid{grid-template-columns:1fr}
-  .overview-grid{grid-template-columns:1fr}
-}
-
-/* SCROLLBAR */
-::-webkit-scrollbar{width:5px}
-::-webkit-scrollbar-track{background:transparent}
+.prog-pct{font-size:10px;color:#aaa;min-width:26px;text-align:right}
+/* ── EXPORT MODAL ── */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:999;align-items:center;justify-content:center;padding:14px}
+.modal-overlay.open{display:flex}
+.modal{background:#fff;border-radius:14px;width:100%;max-width:580px;max-height:90vh;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.25)}
+.modal-hdr{padding:18px 22px 14px;border-bottom:1px solid #f0eeea;display:flex;align-items:center;justify-content:space-between}
+.modal-hdr h2{font-size:14px;font-weight:700;color:#1a1a18}
+.modal-close{background:none;border:none;font-size:18px;cursor:pointer;color:#bbb;padding:3px 7px;border-radius:5px}
+.modal-mtabs{display:flex;padding:0 22px;border-bottom:1px solid #f0eeea}
+.mmtab{font-size:12px;font-weight:600;padding:9px 13px;border:none;background:none;cursor:pointer;color:#888;border-bottom:2px solid transparent;margin-bottom:-1px;transition:all .15s}
+.mmtab.active{color:#1a1a18;border-bottom-color:#1a1a18}
+.modal-body{padding:18px 22px;overflow-y:auto;flex:1}
+.modal-footer{padding:14px 22px;border-top:1px solid #f0eeea;display:flex;gap:8px;flex-wrap:wrap;background:#faf9f7}
+.exp-opt{display:flex;align-items:center;gap:10px;padding:9px 12px;border:1.5px solid #e8e6e0;border-radius:9px;cursor:pointer;margin-bottom:7px;transition:all .15s}
+.exp-opt:hover{border-color:#185FA5;background:#f0f7ff}
+.exp-opt input{accent-color:#185FA5}
+.exp-preview{background:#f5f4f0;border:1px solid #e8e6e0;border-radius:9px;padding:13px;font-size:11px;line-height:1.8;color:#333;white-space:pre-wrap;max-height:280px;overflow-y:auto;font-family:'Courier New',monospace}
+.btn-exp{font-size:12px;font-weight:700;padding:9px 18px;border:none;border-radius:9px;cursor:pointer;display:flex;align-items:center;gap:6px}
+.btn-exp-wpp{background:#25D366;color:#fff}
+.btn-exp-email{background:#EA4335;color:#fff}
+.btn-exp-copy{background:#1a1a18;color:#fff}
+.btn-exp-copy.copied{background:#1D9E75}
+/* ── MISC ── */
+.empty{text-align:center;padding:28px 14px;color:#bbb;font-size:13px}
+::-webkit-scrollbar{width:4px}
 ::-webkit-scrollbar-thumb{background:#ddd;border-radius:10px}
+
+/* ══════════════════════════════════════════
+   MOBILE  (≤ 700px)
+══════════════════════════════════════════ */
+@media(max-width:700px){
+  .topbar{padding:10px 13px}
+  .topbar h1{font-size:13px}
+  .topbar p{display:none}
+  .badge{font-size:10px;padding:3px 8px}
+  .desktop-wrap{display:none}
+  .bottom-nav{
+    display:flex;position:fixed;bottom:0;left:0;right:0;
+    background:#fff;border-top:1px solid #e8e6e0;
+    min-height:58px;z-index:200;
+    padding-bottom:env(safe-area-inset-bottom,0px);
+  }
+  .bnav-btn{
+    flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
+    gap:2px;background:none;border:none;cursor:pointer;
+    color:#aaa;font-size:9px;font-weight:600;letter-spacing:.2px;padding:6px 2px 8px;
+  }
+  .bnav-btn.active{color:#185FA5}
+  .bnav-icon{font-size:18px;line-height:1}
+}
+@media(min-width:701px){
+  .bottom-nav{display:none}
+  #mobile-layer{display:none!important}
+}
 </style>
 </head>
 <body>
-<div class="app">
-  <div class="topbar">
-    <div>
-      <h1>☕ Java COMPLETO — Tracker de Estudos</h1>
-      <p>Nelio Alves · Udemy · POO + Projetos · 263 aulas</p>
-    </div>
-    <div class="top-badges">
-      <span class="badge badge-green" id="hdr-pct">0% concluído</span>
-      <span class="badge badge-blue" id="hdr-aulas">0/263 aulas</span>
-      <span class="badge badge-amber" id="hdr-hours">0h estudadas</span>
-    </div>
+
+<!-- TOPBAR -->
+<div class="topbar">
+  <div>
+    <h1>☕ Java COMPLETO — Tracker de Estudos</h1>
+    <p>Nelio Alves · Udemy · POO + Projetos · 263 aulas</p>
   </div>
+  <div class="top-badges">
+    <span class="badge badge-green" id="hdr-pct">0%</span>
+    <span class="badge badge-blue" id="hdr-aulas">0/263 aulas</span>
+    <span class="badge badge-amber" id="hdr-hours">0h</span>
+    <button class="btn-export-top" onclick="openExportGeral()">📤 Exportar</button>
+  </div>
+</div>
 
-  <div class="main">
-    <!-- SIDEBAR -->
-    <div class="sidebar">
-      <div class="sidebar-tabs">
-        <button class="stab active" onclick="setSideTab('secoes')">Seções</button>
-        <button class="stab" onclick="setSideTab('busca')">Buscar</button>
+<!-- EXPORT MODAL -->
+<div class="modal-overlay" id="export-modal" onclick="if(event.target===this)closeExport()">
+  <div class="modal">
+    <div class="modal-hdr">
+      <div><h2>📤 Exportar Conteúdo</h2><p id="exp-subtitle" style="font-size:11px;color:#888;margin-top:2px"></p></div>
+      <button class="modal-close" onclick="closeExport()">✕</button>
+    </div>
+    <div class="modal-mtabs">
+      <button class="mmtab active" onclick="setExpTab('aula')">Aula Atual</button>
+      <button class="mmtab" onclick="setExpTab('secao')">Seção</button>
+      <button class="mmtab" onclick="setExpTab('geral')">Geral</button>
+    </div>
+    <div class="modal-body">
+      <div id="etab-aula">
+        <label class="exp-opt"><input type="checkbox" id="chk-status" checked onchange="refreshPreview()"/><span><b>✅ Status da aula</b><br><small style="color:#888">Concluída/Pendente, duração</small></span></label>
+        <label class="exp-opt"><input type="checkbox" id="chk-notes" onchange="refreshPreview()"/><span><b>📝 Anotações</b><br><small style="color:#888">Dicas, dúvidas, conceitos</small></span></label>
+        <div class="exp-preview" id="prev-aula"></div>
       </div>
-      <div id="side-secoes">
-        <div id="sections-nav"></div>
+      <div id="etab-secao" style="display:none">
+        <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px" id="sec-scope-btns"></div>
+        <label class="exp-opt"><input type="checkbox" id="chk-sec-prog" checked onchange="refreshPreview()"/><span><b>📊 Progresso</b></span></label>
+        <label class="exp-opt"><input type="checkbox" id="chk-sec-lessons" onchange="refreshPreview()"/><span><b>📋 Lista de aulas</b></span></label>
+        <label class="exp-opt"><input type="checkbox" id="chk-sec-notes" onchange="refreshPreview()"/><span><b>📝 Anotações</b></span></label>
+        <div class="exp-preview" id="prev-secao"></div>
       </div>
-      <div id="side-busca" style="display:none">
-        <div class="search-box"><input type="text" placeholder="Buscar aula..." oninput="searchLessons(this.value)" /></div>
-        <div id="search-results"></div>
+      <div id="etab-geral" style="display:none">
+        <label class="exp-opt"><input type="checkbox" id="chk-g-stats" checked onchange="refreshPreview()"/><span><b>📈 Estatísticas</b></span></label>
+        <label class="exp-opt"><input type="checkbox" id="chk-g-secs" checked onchange="refreshPreview()"/><span><b>📚 Progresso por seção</b></span></label>
+        <label class="exp-opt"><input type="checkbox" id="chk-g-notes" onchange="refreshPreview()"/><span><b>📝 Anotações</b></span></label>
+        <div class="exp-preview" id="prev-geral"></div>
       </div>
     </div>
-
-    <!-- CONTENT -->
-    <div class="content" id="main-content">
-      <div class="stats-row">
-        <div class="stat-c"><div class="stat-n" id="st-pct">0%</div><div class="stat-l">Progresso</div></div>
-        <div class="stat-c"><div class="stat-n" id="st-aulas">0/263</div><div class="stat-l">Aulas</div></div>
-        <div class="stat-c"><div class="stat-n" id="st-secs">0/20</div><div class="stat-l">Seções</div></div>
-        <div class="stat-c"><div class="stat-n" id="st-notes">0</div><div class="stat-l">Anotações</div></div>
-        <div class="stat-c"><div class="stat-n" id="st-hours">0h</div><div class="stat-l">Horas</div></div>
-        <div class="stat-c"><div class="stat-n" id="st-sessions">0</div><div class="stat-l">Sessões</div></div>
-      </div>
-
-      <div class="content-tabs">
-        <button class="ctab-btn active" onclick="setContentTab('visao')">Visão Geral</button>
-        <button class="ctab-btn" onclick="setContentTab('aula')">Aula Atual</button>
-        <button class="ctab-btn" onclick="setContentTab('notas')">Anotações</button>
-        <button class="ctab-btn" onclick="setContentTab('diario')">Diário</button>
-      </div>
-
-      <!-- VISAO GERAL -->
-      <div id="ctab-visao" class="ctab active">
-        <div class="overview-grid" id="overview-grid"></div>
-      </div>
-
-      <!-- AULA ATUAL -->
-      <div id="ctab-aula" class="ctab">
-        <div id="lesson-detail-area">
-          <div class="welcome-card">
-            <h2>Selecione uma aula</h2>
-            <p>Clique em qualquer aula na barra lateral para ver detalhes, marcar como concluída e adicionar anotações.</p>
-          </div>
-        </div>
-      </div>
-
-      <!-- NOTAS GLOBAIS -->
-      <div id="ctab-notas" class="ctab">
-        <div id="global-notes-area"></div>
-      </div>
-
-      <!-- DIARIO -->
-      <div id="ctab-diario" class="ctab">
-        <div class="diario-form">
-          <h3>Registrar Sessão de Estudo</h3>
-          <div class="form-grid">
-            <div class="form-field">
-              <label>Data</label>
-              <input type="date" id="log-date" />
-            </div>
-            <div class="form-field">
-              <label>Horas estudadas</label>
-              <input type="number" id="log-hours" min="0.5" max="12" step="0.5" placeholder="Ex: 1.5" />
-            </div>
-            <div class="form-field">
-              <label>Seção</label>
-              <select id="log-sec"><option value="">Selecione...</option></select>
-            </div>
-            <div class="form-field full">
-              <label>O que você estudou?</label>
-              <textarea id="log-desc" placeholder="Descreva o que foi estudado, dificuldades, insights..."></textarea>
-            </div>
-          </div>
-          <button class="btn-log" onclick="addLog()">Registrar sessão</button>
-        </div>
-        <div class="log-entries" id="log-list"></div>
-      </div>
+    <div class="modal-footer">
+      <button class="btn-exp btn-exp-wpp" onclick="exportWpp()">📱 WhatsApp</button>
+      <button class="btn-exp btn-exp-email" onclick="exportEmail()">📧 E-mail</button>
+      <button class="btn-exp btn-exp-copy" id="btn-copy-exp" onclick="exportCopy()">📋 Copiar</button>
     </div>
   </div>
 </div>
 
+<!-- ═══ DESKTOP LAYOUT ═══ -->
+<div class="desktop-wrap">
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <div class="sidebar-tabs">
+      <button class="stab active" onclick="setSideTab('secoes',this)">Seções</button>
+      <button class="stab" onclick="setSideTab('busca',this)">Buscar</button>
+    </div>
+    <div id="side-secoes">
+      <div id="d-sections-nav"></div>
+    </div>
+    <div id="side-busca" style="display:none">
+      <div class="search-wrap"><input type="text" placeholder="Buscar aula..." oninput="dSearch(this.value)"/></div>
+      <div id="d-search-results" style="padding:6px 0"></div>
+    </div>
+  </div>
+
+  <!-- Content -->
+  <div class="content">
+    <div class="stats-row">
+      <div class="stat-c"><div class="stat-n" id="st-pct">0%</div><div class="stat-l">Progresso</div></div>
+      <div class="stat-c"><div class="stat-n" id="st-aulas">0/263</div><div class="stat-l">Aulas</div></div>
+      <div class="stat-c"><div class="stat-n" id="st-secs">0/20</div><div class="stat-l">Seções</div></div>
+      <div class="stat-c"><div class="stat-n" id="st-notes">0</div><div class="stat-l">Notas</div></div>
+      <div class="stat-c"><div class="stat-n" id="st-codes">0</div><div class="stat-l">Códigos</div></div>
+      <div class="stat-c"><div class="stat-n" id="st-hours">0h</div><div class="stat-l">Horas</div></div>
+    </div>
+    <div class="ctabs">
+      <button class="ctab-btn active" onclick="setCtab('visao',this)">Visão Geral</button>
+      <button class="ctab-btn" onclick="setCtab('aula',this)">Aula Atual</button>
+      <button class="ctab-btn" onclick="setCtab('notas',this)">Anotações</button>
+      <button class="ctab-btn" onclick="setCtab('codigo',this)">💻 Código</button>
+      <button class="ctab-btn" onclick="setCtab('diario',this)">Diário</button>
+    </div>
+    <div id="ctab-visao" class="ctab active"><div class="ov-grid" id="d-overview"></div></div>
+    <div id="ctab-aula" class="ctab">
+      <div id="d-lesson-area">
+        <div class="empty" style="background:#fff;border:1px solid #e8e6e0;border-radius:12px;padding:40px">
+          Selecione uma aula na barra lateral para começar.
+        </div>
+      </div>
+    </div>
+    <div id="ctab-notas" class="ctab"><div id="d-global-notes"></div></div>
+    <div id="ctab-codigo" class="ctab"><div id="d-global-code"></div></div>
+    <div id="ctab-diario" class="ctab">
+      <div class="log-form">
+        <h3>Registrar Sessão</h3>
+        <div class="form-grid">
+          <div class="form-field"><label>Data</label><input type="date" id="d-log-date"/></div>
+          <div class="form-field"><label>Horas</label><input type="number" id="d-log-hours" min="0.5" max="12" step="0.5" placeholder="1.5"/></div>
+          <div class="form-field"><label>Seção</label><select id="d-log-sec"><option value="">Selecione...</option></select></div>
+          <div class="form-field full"><label>Anotação</label><textarea id="d-log-desc" placeholder="O que você estudou?"></textarea></div>
+        </div>
+        <button class="btn-log" onclick="addLog()">Registrar ↗</button>
+      </div>
+      <div id="d-log-list"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ MOBILE ═══ -->
+<nav class="bottom-nav">
+  <button class="bnav-btn active" id="bnav-secoes" onclick="mNav('secoes')"><span class="bnav-icon">📚</span>Seções</button>
+  <button class="bnav-btn" id="bnav-busca" onclick="mNav('busca')"><span class="bnav-icon">🔍</span>Buscar</button>
+  <button class="bnav-btn" id="bnav-stats" onclick="mNav('stats')"><span class="bnav-icon">📊</span>Progresso</button>
+  <button class="bnav-btn" id="bnav-codigo" onclick="mNav('codigo')"><span class="bnav-icon">💻</span>Código</button>
+  <button class="bnav-btn" id="bnav-diario" onclick="mNav('diario')"><span class="bnav-icon">📓</span>Diário</button>
+</nav>
+
+<div id="mobile-layer" style="display:none;position:fixed;left:0;right:0;top:0;bottom:0;z-index:50;background:#f5f4f0;overflow:hidden">
+  <!-- Each screen fills 100% height of the layer -->
+  <div id="ms-secoes" class="m-screen" style="height:100%;overflow-y:auto;padding:10px 12px 12px;display:block"><div id="m-sec-list"></div></div>
+  <div id="ms-busca" class="m-screen" style="height:100%;display:none;flex-direction:column">
+    <div style="padding:10px 12px;background:#f5f4f0;position:sticky;top:0;z-index:5">
+      <input type="text" id="m-search-inp" placeholder="Buscar aula..." oninput="mSearch(this.value)"
+        style="width:100%;font-size:14px;padding:10px 13px;border:1px solid #e8e6e0;border-radius:10px;background:#fff;color:#1a1a18;font-family:inherit;outline:none"/>
+    </div>
+    <div style="flex:1;overflow-y:auto;padding:0 12px 12px" id="m-search-results"><div class="empty">Digite para buscar...</div></div>
+  </div>
+  <div id="ms-aula" class="m-screen" style="height:100%;display:none;flex-direction:column">
+    <div style="display:flex;align-items:center;gap:10px;padding:11px 13px;background:#fff;border-bottom:1px solid #e8e6e0;position:sticky;top:0;z-index:5">
+      <button onclick="mBack()" style="width:32px;height:32px;border-radius:8px;border:1px solid #e8e6e0;background:none;font-size:16px;cursor:pointer;flex-shrink:0">←</button>
+      <div style="flex:1;min-width:0">
+        <div id="m-aula-sec" style="font-size:10px;color:#888;font-weight:700;text-transform:uppercase;letter-spacing:.4px"></div>
+        <div id="m-aula-ttl" style="font-size:13px;font-weight:700;color:#1a1a18;white-space:nowrap;overflow:hidden;text-overflow:ellipsis"></div>
+      </div>
+      <button onclick="mExportLesson()" style="background:none;border:none;font-size:20px;cursor:pointer;padding:4px">📤</button>
+    </div>
+    <div style="flex:1;overflow-y:auto" id="m-aula-body"></div>
+  </div>
+  <div id="ms-stats" class="m-screen" style="height:100%;overflow-y:auto;padding:12px;display:none">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:13px">
+      <div class="stat-c"><div class="stat-n" id="ms-pct">0%</div><div class="stat-l">Progresso</div></div>
+      <div class="stat-c"><div class="stat-n" id="ms-aulas">0/263</div><div class="stat-l">Aulas</div></div>
+      <div class="stat-c"><div class="stat-n" id="ms-secs">0/20</div><div class="stat-l">Seções</div></div>
+      <div class="stat-c"><div class="stat-n" id="ms-notes">0</div><div class="stat-l">Notas</div></div>
+      <div class="stat-c"><div class="stat-n" id="ms-hours">0h</div><div class="stat-l">Horas</div></div>
+      <div class="stat-c"><div class="stat-n" id="ms-sessions">0</div><div class="stat-l">Sessões</div></div>
+    </div>
+    <div style="background:#fff;border:1px solid #e8e6e0;border-radius:11px;padding:13px">
+      <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#888;margin-bottom:11px">Progresso por Seção</div>
+      <div id="m-prog-list"></div>
+    </div>
+    <button onclick="openExportGeral()" style="width:100%;margin-top:12px;padding:12px;border:none;border-radius:10px;background:#1a1a18;color:#fff;font-size:13px;font-weight:700;cursor:pointer">📤 Exportar Progresso</button>
+  </div>
+  <div id="ms-codigo" class="m-screen" style="height:100%;overflow-y:auto;padding:12px;display:none"><div id="m-code-list"></div></div>
+  <div id="ms-diario" class="m-screen" style="height:100%;overflow-y:auto;padding:12px;display:none">
+    <div class="log-form" style="margin-bottom:12px">
+      <h3>Registrar Sessão</h3>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">
+        <div class="form-field"><label>Data</label><input type="date" id="m-log-date"/></div>
+        <div class="form-field"><label>Horas</label><input type="number" id="m-log-hours" min="0.5" max="12" step="0.5" placeholder="1.5"/></div>
+      </div>
+      <div class="form-field" style="margin-bottom:8px"><label>Seção</label><select id="m-log-sec"><option value="">Selecione...</option></select></div>
+      <div class="form-field" style="margin-bottom:10px"><label>Anotação</label><textarea id="m-log-desc" style="min-height:65px;resize:none;line-height:1.5" placeholder="O que você estudou?"></textarea></div>
+      <button class="btn-log" style="width:100%;padding:11px" onclick="mAddLog()">Registrar ↗</button>
+    </div>
+    <div id="m-log-list"></div>
+  </div>
+</div>
+
 <script>
-// ============================================================
-// DATA — All 263 lessons from the course
-// ============================================================
 const SECTIONS = [
   {id:'s1',num:1,title:'Apresentação do curso',dur:'19m',color:'#185FA5',lessons:[
     {n:1,t:'Conteúdo programático - o que você vai aprender?',d:'5m'},
@@ -596,559 +685,907 @@ const SECTIONS = [
   ]},
 ];
 
-// ============================================================
-// STATE
-// ============================================================
-const TOTAL_LESSONS = SECTIONS.reduce((s,sec)=>s+sec.lessons.length,0);
+// ── CONSTANTS & STATE ──────────────────────────────────────
+const TOTAL = SECTIONS.reduce((s,sec)=>s+sec.lessons.length,0);
+const LANG_COLORS = {java:'#f89820',sql:'#336791',xml:'#e44d26',bash:'#4eaa25',json:'#cbcb41'};
+const NOTE_TYPES = {
+  tip:       {label:'Dica',      cls:'nb-tip'},
+  doubt:     {label:'Dúvida',    cls:'nb-doubt'},
+  important: {label:'Importante',cls:'nb-important'},
+  concept:   {label:'Conceito',  cls:'nb-concept'},
+};
+const NOTE_EMOJI = {tip:'💡',doubt:'❓',important:'⭐',concept:'📖'};
 
 let state = {
-  done: {},         // lessonKey -> bool
-  notes: {},        // lessonKey -> [{id,type,title,body,date}]
-  logs: [],         // [{id,date,hours,sec,desc}]
-  customTitles: {}, // lessonKey -> string (edited titles)
+  done:{}, notes:{}, codes:{}, logs:[], customTitles:{},
 };
+let activeKey = null;
+let curNoteType = 'tip';
+let curLang = 'java';
+let curLessonTab = 'notas'; // 'notas' | 'codigo'
+let expCtx = {tab:'aula', secId:null, lessonN:null, expSecId:null};
+let globalCodeFilter = 'all';
 
-function lk(secId, n) { return secId + '_' + n; }
-
-function saveState() {
-  try { localStorage.setItem('jt2_state', JSON.stringify(state)); } catch(e){}
+function lk(secId, n){ return secId+'_'+n; }
+function save(){ try{localStorage.setItem('jt3',JSON.stringify(state));}catch(e){} }
+function load(){
+  try{
+    const d=localStorage.getItem('jt3');
+    if(d){ const p=JSON.parse(d); state=Object.assign({done:{},notes:{},codes:{},logs:[],customTitles:{}},p); }
+  }catch(e){}
 }
 
-function loadState() {
-  try {
-    const d = localStorage.getItem('jt2_state');
-    if (d) {
-      const parsed = JSON.parse(d);
-      state = Object.assign(state, parsed);
-      // ensure sub-objects
-      if (!state.done) state.done = {};
-      if (!state.notes) state.notes = {};
-      if (!state.logs) state.logs = [];
-      if (!state.customTitles) state.customTitles = {};
-    }
-  } catch(e){}
+// ── STATS ───────────────────────────────────────────────────
+function calcStats(){
+  let totalDone=0,notesCount=0,codesCount=0;
+  SECTIONS.forEach(sec=>sec.lessons.forEach(l=>{
+    const k=lk(sec.id,l.n);
+    if(state.done[k]) totalDone++;
+    notesCount+=(state.notes[k]||[]).length;
+    codesCount+=(state.codes[k]||[]).length;
+  }));
+  const pct=Math.round(totalDone/TOTAL*100);
+  const secsDone=SECTIONS.filter(sec=>sec.lessons.every(l=>state.done[lk(sec.id,l.n)])).length;
+  const hours=state.logs.reduce((s,l)=>s+(parseFloat(l.hours)||0),0);
+  return {totalDone,pct,secsDone,notesCount,codesCount,hours,sessions:state.logs.length};
 }
 
-function calcStats() {
-  let totalDone = 0;
-  SECTIONS.forEach(sec => {
-    sec.lessons.forEach(l => {
-      if (state.done[lk(sec.id, l.n)]) totalDone++;
-    });
-  });
-  const pct = Math.round(totalDone / TOTAL_LESSONS * 100);
-  const secsDone = SECTIONS.filter(sec => sec.lessons.every(l => state.done[lk(sec.id, l.n)])).length;
-  const notesCount = Object.values(state.notes).reduce((s,arr)=>s+(arr?arr.length:0),0);
-  const hours = state.logs.reduce((s,l)=>s+(parseFloat(l.hours)||0),0);
-  return {totalDone, pct, secsDone, notesCount, hours, sessions: state.logs.length};
+function updateStats(){
+  const {totalDone,pct,secsDone,notesCount,codesCount,hours,sessions}=calcStats();
+  const s=(id,v)=>{const el=document.getElementById(id);if(el)el.textContent=v;};
+  s('hdr-pct',pct+'%'); s('hdr-aulas',totalDone+'/263'); s('hdr-hours',hours.toFixed(1)+'h');
+  s('st-pct',pct+'%'); s('st-aulas',totalDone+'/263'); s('st-secs',secsDone+'/20');
+  s('st-notes',notesCount); s('st-codes',codesCount); s('st-hours',hours.toFixed(1)+'h');
+  s('ms-pct',pct+'%'); s('ms-aulas',totalDone+'/263'); s('ms-secs',secsDone+'/20');
+  s('ms-notes',notesCount); s('ms-hours',hours.toFixed(1)+'h'); s('ms-sessions',sessions);
 }
 
-function updateTopStats() {
-  const {totalDone, pct, secsDone, notesCount, hours, sessions} = calcStats();
-  document.getElementById('hdr-pct').textContent = pct + '% concluído';
-  document.getElementById('hdr-aulas').textContent = totalDone + '/' + TOTAL_LESSONS + ' aulas';
-  document.getElementById('hdr-hours').textContent = hours.toFixed(1) + 'h estudadas';
-  document.getElementById('st-pct').textContent = pct + '%';
-  document.getElementById('st-aulas').textContent = totalDone + '/' + TOTAL_LESSONS;
-  document.getElementById('st-secs').textContent = secsDone + '/20';
-  document.getElementById('st-notes').textContent = notesCount;
-  document.getElementById('st-hours').textContent = hours.toFixed(1) + 'h';
-  document.getElementById('st-sessions').textContent = sessions;
+// ── UTILS ───────────────────────────────────────────────────
+function escHtml(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function syntaxHL(code,lang){
+  if(lang!=='java') return escHtml(code);
+  return escHtml(code)
+    .replace(/\/\/.*/g,m=>`<span style="color:#6b7280;font-style:italic">${m}</span>`)
+    .replace(/\/\*[\s\S]*?\*\//g,m=>`<span style="color:#6b7280;font-style:italic">${m}</span>`)
+    .replace(/"([^"]*)"/g,m=>`<span style="color:#86efac">${m}</span>`)
+    .replace(/\b(public|private|protected|class|interface|extends|implements|new|return|void|static|final|abstract|if|else|for|while|do|switch|case|break|continue|try|catch|finally|throw|throws|import|package|this|super|null|true|false|instanceof|enum|record|var|int|long|double|float|boolean|char|byte|short|String)\b/g,m=>`<span style="color:#c084fc">${m}</span>`)
+    .replace(/\b(\d+\.?\d*[fLdF]?)\b/g,m=>`<span style="color:#fbbf24">${m}</span>`)
+    .replace(/@\w+/g,m=>`<span style="color:#fb923c">${m}</span>`);
 }
 
-// ============================================================
-// SIDEBAR
-// ============================================================
-let activeLessonKey = null;
-
-function renderSidebar() {
-  const container = document.getElementById('sections-nav');
-  let html = '';
-  SECTIONS.forEach(sec => {
-    const done = sec.lessons.filter(l => state.done[lk(sec.id, l.n)]).length;
-    const total = sec.lessons.length;
-    const pct = Math.round(done/total*100);
-    const isOpen = sec._open || false;
-    html += `<div class="section-group">
-      <div class="section-hdr ${isOpen?'open':''}" onclick="toggleSection('${sec.id}')">
+// ── DESKTOP SIDEBAR ─────────────────────────────────────────
+function dRenderSidebar(){
+  const c=document.getElementById('d-sections-nav');
+  if(!c) return;
+  let html='';
+  SECTIONS.forEach(sec=>{
+    const done=sec.lessons.filter(l=>state.done[lk(sec.id,l.n)]).length;
+    const pct=Math.round(done/sec.lessons.length*100);
+    const isOpen=sec._dopen||false;
+    html+=`<div class="sec-group">
+      <div class="sec-hdr ${isOpen?'open':''}" onclick="dToggleSec('${sec.id}')">
         <div class="sec-num" style="background:${sec.color}22;color:${sec.color}">${sec.num}</div>
-        <div>
-          <div class="sec-title">${sec.title}</div>
-          <div class="sec-prog">${done}/${total} · ${sec.dur}</div>
-        </div>
+        <div class="sec-title">${sec.title}</div>
+        <div class="sec-meta">${done}/${sec.lessons.length}</div>
         <div class="sec-arrow ${isOpen?'open':''}">▶</div>
       </div>
-      <div class="sec-progress-bar"><div class="sec-progress-fill" style="width:${pct}%"></div></div>
-      <div class="lessons-list ${isOpen?'open':'' }" id="lessons-${sec.id}">`;
-    sec.lessons.forEach(l => {
-      const key = lk(sec.id, l.n);
-      const isDone = !!state.done[key];
-      const title = state.customTitles[key] || l.t;
-      const isActive = activeLessonKey === key;
-      html += `<div class="lesson-row ${isActive?'active-lesson':''}" onclick="openLesson('${sec.id}',${l.n})">
-        <div class="lesson-check ${isDone?'done':''}" onclick="event.stopPropagation();toggleDone('${sec.id}',${l.n})"></div>
+      <div class="sec-bar"><div class="sec-bar-fill" style="width:${pct}%"></div></div>
+      <div class="lessons-wrap ${isOpen?'open':''}">`;
+    sec.lessons.forEach(l=>{
+      const k=lk(sec.id,l.n); const isDone=!!state.done[k];
+      const title=state.customTitles[k]||l.t;
+      html+=`<div class="lesson-row ${activeKey===k?'active-lesson':''}" onclick="dOpenLesson('${sec.id}',${l.n})">
+        <div class="lesson-chk ${isDone?'done':''}" onclick="event.stopPropagation();toggleDone('${sec.id}',${l.n})"></div>
         <div class="lesson-num">${l.n}</div>
         <div class="lesson-title ${isDone?'done':''}">${title}</div>
         <div class="lesson-dur">${l.d}</div>
       </div>`;
     });
-    html += `</div></div>`;
+    html+=`</div></div>`;
   });
-  container.innerHTML = html;
+  c.innerHTML=html;
 }
+function dToggleSec(id){ const s=SECTIONS.find(x=>x.id===id); if(s)s._dopen=!s._dopen; dRenderSidebar(); }
 
-function toggleSection(secId) {
-  const sec = SECTIONS.find(s => s.id === secId);
-  if (sec) sec._open = !sec._open;
-  renderSidebar();
+function setSideTab(tab,btn){
+  document.querySelectorAll('.stab').forEach(b=>b.classList.remove('active')); btn.classList.add('active');
+  document.getElementById('side-secoes').style.display=tab==='secoes'?'':'none';
+  document.getElementById('side-busca').style.display=tab==='busca'?'':'none';
 }
-
-function toggleDone(secId, n) {
-  const key = lk(secId, n);
-  state.done[key] = !state.done[key];
-  saveState();
-  renderSidebar();
-  updateTopStats();
-  renderOverview();
-  if (activeLessonKey === key) renderLessonDetail(secId, n);
-}
-
-// ============================================================
-// LESSON DETAIL
-// ============================================================
-function openLesson(secId, n) {
-  activeLessonKey = lk(secId, n);
-  setContentTab('aula');
-  renderSidebar();
-  renderLessonDetail(secId, n);
-}
-
-function renderLessonDetail(secId, n) {
-  const sec = SECTIONS.find(s => s.id === secId);
-  const lesson = sec.lessons.find(l => l.n === n);
-  const key = lk(secId, n);
-  const isDone = !!state.done[key];
-  const title = state.customTitles[key] || lesson.t;
-  const notes = state.notes[key] || [];
-
-  const area = document.getElementById('lesson-detail-area');
-  area.innerHTML = `
-    <div class="lesson-detail">
-      <div class="ld-header">
-        <div class="ld-check-big ${isDone?'done':''}" onclick="toggleDone('${secId}',${n})">${isDone?'✓':''}</div>
-        <div class="ld-info">
-          <div class="ld-sec">Seção ${sec.num} · ${sec.title}</div>
-          <div class="ld-title" id="ld-title-display">${title}</div>
-          <div class="ld-meta">
-            <span>Aula ${n}</span>
-            <span>${lesson.d}</span>
-            ${isDone?'<span style="color:#1D9E75;font-weight:600">✓ Concluída</span>':''}
-          </div>
-        </div>
-        <div class="ld-actions">
-          <button class="icon-btn" onclick="editLessonTitle('${secId}',${n})" title="Editar título">✏️</button>
-          <button class="icon-btn" onclick="toggleDone('${secId}',${n})">${isDone?'↩ Desmarcar':'✓ Concluir'}</button>
-        </div>
-      </div>
-
-      <div class="notes-area">
-        <div class="notes-hdr">
-          <h3>Anotações desta aula (${notes.length})</h3>
-        </div>
-        <div class="note-type-btns" id="nt-btns">
-          <button class="ntb sel-tip" data-type="tip" onclick="setNoteType(this,'${key}')">💡 Dica</button>
-          <button class="ntb" data-type="doubt" onclick="setNoteType(this,'${key}')">❓ Dúvida</button>
-          <button class="ntb" data-type="important" onclick="setNoteType(this,'${key}')">⭐ Importante</button>
-          <button class="ntb" data-type="concept" onclick="setNoteType(this,'${key}')">📖 Conceito</button>
-        </div>
-        <div class="note-input-area">
-          <input type="text" id="note-title-inp" placeholder="Título da anotação..." />
-          <textarea id="note-body-inp" placeholder="Escreva sua dica, dúvida ou conceito..."></textarea>
-          <button class="btn-add-note" onclick="addNote('${key}')">+ Adicionar anotação</button>
-        </div>
-        <div class="notes-list" id="notes-list-${key}">
-          ${renderNotesHTML(key)}
-        </div>
-      </div>
-    </div>`;
-
-  // restore note type selection
-  const savedType = window._noteType || 'tip';
-  document.querySelectorAll('#nt-btns .ntb').forEach(b => {
-    b.className = 'ntb';
-    if (b.dataset.type === savedType) b.classList.add('sel-' + savedType);
-  });
-}
-
-function editLessonTitle(secId, n) {
-  const key = lk(secId, n);
-  const sec = SECTIONS.find(s => s.id === secId);
-  const lesson = sec.lessons.find(l => l.n === n);
-  const currentTitle = state.customTitles[key] || lesson.t;
-  const display = document.getElementById('ld-title-display');
-  display.outerHTML = `<input class="edit-title-input" id="ld-title-edit" value="${currentTitle}" 
-    onblur="saveLessonTitle('${secId}',${n},this.value)" 
-    onkeydown="if(event.key==='Enter')saveLessonTitle('${secId}',${n},this.value)" />`;
-  setTimeout(()=>{const el=document.getElementById('ld-title-edit');if(el){el.focus();el.select();}},10);
-}
-
-function saveLessonTitle(secId, n, val) {
-  const key = lk(secId, n);
-  const sec = SECTIONS.find(s => s.id === secId);
-  const lesson = sec.lessons.find(l => l.n === n);
-  val = val.trim();
-  if (val && val !== lesson.t) state.customTitles[key] = val;
-  else delete state.customTitles[key];
-  saveState();
-  renderLessonDetail(secId, n);
-  renderSidebar();
-}
-
-// ============================================================
-// NOTES
-// ============================================================
-window._noteType = 'tip';
-
-const noteTypes = {
-  tip: {label:'Dica', cls:'nb-tip'},
-  doubt: {label:'Dúvida', cls:'nb-doubt'},
-  important: {label:'Importante', cls:'nb-important'},
-  concept: {label:'Conceito', cls:'nb-concept'},
-};
-
-function setNoteType(btn, key) {
-  const type = btn.dataset.type;
-  window._noteType = type;
-  document.querySelectorAll('#nt-btns .ntb').forEach(b => {
-    b.className = 'ntb';
-  });
-  btn.classList.add('sel-' + type);
-}
-
-function addNote(key) {
-  const titleEl = document.getElementById('note-title-inp');
-  const bodyEl = document.getElementById('note-body-inp');
-  const title = titleEl ? titleEl.value.trim() : '';
-  const body = bodyEl ? bodyEl.value.trim() : '';
-  if (!title && !body) return;
-  if (!state.notes[key]) state.notes[key] = [];
-  state.notes[key].unshift({
-    id: Date.now(),
-    type: window._noteType || 'tip',
-    title: title || '(sem título)',
-    body,
-    date: new Date().toLocaleDateString('pt-BR'),
-  });
-  if (titleEl) titleEl.value = '';
-  if (bodyEl) bodyEl.value = '';
-  saveState();
-  updateTopStats();
-  const list = document.getElementById('notes-list-' + key);
-  if (list) list.innerHTML = renderNotesHTML(key);
-  renderGlobalNotes();
-}
-
-function renderNotesHTML(key) {
-  const notes = state.notes[key] || [];
-  if (!notes.length) return '<div class="empty">Nenhuma anotação nesta aula.</div>';
-  return notes.map(n => {
-    const nt = noteTypes[n.type] || noteTypes.tip;
-    return `<div class="note-card" id="nc-${n.id}">
-      <div class="note-card-hdr">
-        <span class="note-badge ${nt.cls}">${nt.label}</span>
-        <span class="note-card-title">${n.title}</span>
-        <div class="note-actions">
-          <button class="icon-btn" onclick="startEditNote('${key}',${n.id})">✏️</button>
-          <button class="icon-btn del" onclick="deleteNote('${key}',${n.id})">✕</button>
-        </div>
-      </div>
-      ${n.body ? `<div class="note-card-body">${n.body}</div>` : ''}
-      <div style="font-size:10px;color:#bbb;margin-top:6px">${n.date}</div>
-    </div>`;
-  }).join('');
-}
-
-function startEditNote(key, id) {
-  const notes = state.notes[key] || [];
-  const note = notes.find(n => n.id === id);
-  if (!note) return;
-  const nt = noteTypes[note.type] || noteTypes.tip;
-  const card = document.getElementById('nc-' + id);
-  if (!card) return;
-  card.innerHTML = `
-    <div class="note-card-hdr">
-      <span class="note-badge ${nt.cls}">${nt.label}</span>
-      <select id="edit-type-${id}" style="font-size:11px;padding:3px 6px;border:1px solid #ddd;border-radius:6px;background:#fff">
-        <option value="tip" ${note.type==='tip'?'selected':''}>Dica</option>
-        <option value="doubt" ${note.type==='doubt'?'selected':''}>Dúvida</option>
-        <option value="important" ${note.type==='important'?'selected':''}>Importante</option>
-        <option value="concept" ${note.type==='concept'?'selected':''}>Conceito</option>
-      </select>
-    </div>
-    <div class="note-edit-area">
-      <input type="text" id="edit-title-${id}" value="${note.title}" placeholder="Título..." />
-      <textarea id="edit-body-${id}" placeholder="Conteúdo...">${note.body}</textarea>
-      <div class="edit-actions">
-        <button class="btn-save" onclick="saveEditNote('${key}',${id})">Salvar</button>
-        <button class="btn-cancel" onclick="cancelEditNote('${key}')">Cancelar</button>
-      </div>
-    </div>`;
-}
-
-function saveEditNote(key, id) {
-  const notes = state.notes[key] || [];
-  const note = notes.find(n => n.id === id);
-  if (!note) return;
-  const t = document.getElementById('edit-title-' + id);
-  const b = document.getElementById('edit-body-' + id);
-  const tp = document.getElementById('edit-type-' + id);
-  if (t) note.title = t.value.trim() || '(sem título)';
-  if (b) note.body = b.value.trim();
-  if (tp) note.type = tp.value;
-  saveState();
-  const list = document.getElementById('notes-list-' + key);
-  if (list) list.innerHTML = renderNotesHTML(key);
-  renderGlobalNotes();
-}
-
-function cancelEditNote(key) {
-  const list = document.getElementById('notes-list-' + key);
-  if (list) list.innerHTML = renderNotesHTML(key);
-}
-
-function deleteNote(key, id) {
-  if (!state.notes[key]) return;
-  state.notes[key] = state.notes[key].filter(n => n.id !== id);
-  saveState();
-  updateTopStats();
-  const list = document.getElementById('notes-list-' + key);
-  if (list) list.innerHTML = renderNotesHTML(key);
-  renderGlobalNotes();
-}
-
-// ============================================================
-// GLOBAL NOTES TAB
-// ============================================================
-let globalNoteFilter = 'all';
-
-function renderGlobalNotes() {
-  const area = document.getElementById('global-notes-area');
-  if (!area) return;
-
-  // collect all notes
-  let allNotes = [];
-  SECTIONS.forEach(sec => {
-    sec.lessons.forEach(l => {
-      const key = lk(sec.id, l.n);
-      const notes = state.notes[key] || [];
-      notes.forEach(n => {
-        allNotes.push({...n, secTitle: sec.title, lessonN: l.n, lessonTitle: state.customTitles[key] || l.t, key, secId: sec.id});
-      });
-    });
-  });
-
-  const filtered = globalNoteFilter === 'all' ? allNotes : allNotes.filter(n => n.type === globalNoteFilter);
-
-  area.innerHTML = `
-    <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px">
-      ${['all','tip','doubt','important','concept'].map(type => {
-        const labels = {all:'Todas',tip:'Dicas',doubt:'Dúvidas',important:'Importantes',concept:'Conceitos'};
-        return `<button class="ntb ${globalNoteFilter===type?'sel-'+(type==='all'?'concept':type):''}" 
-          style="${globalNoteFilter===type&&type==='all'?'background:#f0eeea;color:#1a1a18;border-color:#888':''}"
-          onclick="setGlobalFilter('${type}')">${labels[type]}</button>`;
-      }).join('')}
-    </div>
-    ${filtered.length === 0 ? '<div class="empty">Nenhuma anotação encontrada.</div>' :
-      filtered.map(n => {
-        const nt = noteTypes[n.type] || noteTypes.tip;
-        return `<div class="note-card" style="margin-bottom:8px">
-          <div class="note-card-hdr">
-            <span class="note-badge ${nt.cls}">${nt.label}</span>
-            <span class="note-card-title">${n.title}</span>
-            <div class="note-actions">
-              <button class="icon-btn del" onclick="deleteNote('${n.key}',${n.id});renderGlobalNotes()">✕</button>
-            </div>
-          </div>
-          ${n.body ? `<div class="note-card-body">${n.body}</div>` : ''}
-          <div style="font-size:10px;color:#bbb;margin-top:6px">
-            Aula ${n.lessonN} · ${n.lessonTitle} · ${n.date}
-            <button class="icon-btn" style="margin-left:6px" onclick="openLesson('${n.secId}',${n.lessonN})">→ Ver aula</button>
-          </div>
-        </div>`;
-      }).join('')}`;
-}
-
-function setGlobalFilter(type) {
-  globalNoteFilter = type;
-  renderGlobalNotes();
-}
-
-// ============================================================
-// OVERVIEW
-// ============================================================
-function renderOverview() {
-  const grid = document.getElementById('overview-grid');
-  if (!grid) return;
-  // Section progress card
-  let progHTML = SECTIONS.slice(0,10).map(sec => {
-    const done = sec.lessons.filter(l => state.done[lk(sec.id, l.n)]).length;
-    const total = sec.lessons.length;
-    const pct = Math.round(done/total*100);
-    return `<div class="prog-item">
-      <div class="prog-label" title="${sec.title}">S${sec.num} ${sec.title}</div>
-      <div class="prog-track"><div class="prog-fill" style="width:${pct}%"></div></div>
-      <div class="prog-pct">${pct}%</div>
-    </div>`;
-  }).join('');
-
-  let progHTML2 = SECTIONS.slice(10).map(sec => {
-    const done = sec.lessons.filter(l => state.done[lk(sec.id, l.n)]).length;
-    const total = sec.lessons.length;
-    const pct = Math.round(done/total*100);
-    return `<div class="prog-item">
-      <div class="prog-label" title="${sec.title}">S${sec.num} ${sec.title}</div>
-      <div class="prog-track"><div class="prog-fill" style="width:${pct}%"></div></div>
-      <div class="prog-pct">${pct}%</div>
-    </div>`;
-  }).join('');
-
-  grid.innerHTML = `
-    <div class="ov-card">
-      <h3>Progresso por seção (S1–S10)</h3>
-      <div class="progress-list">${progHTML}</div>
-    </div>
-    <div class="ov-card">
-      <h3>Progresso por seção (S11–S20)</h3>
-      <div class="progress-list">${progHTML2}</div>
-    </div>`;
-}
-
-// ============================================================
-// DIARIO
-// ============================================================
-function populateLogSelect() {
-  const sel = document.getElementById('log-sec');
-  if (!sel) return;
-  sel.innerHTML = '<option value="">Selecione a seção...</option>' +
-    SECTIONS.map(s => `<option value="${s.id}">S${s.num}: ${s.title}</option>`).join('');
-}
-
-function addLog() {
-  const date = document.getElementById('log-date').value;
-  const hours = document.getElementById('log-hours').value;
-  const sec = document.getElementById('log-sec').value;
-  const desc = document.getElementById('log-desc').value.trim();
-  if (!date || !hours) return;
-  state.logs.unshift({id: Date.now(), date, hours: parseFloat(hours), sec, desc});
-  document.getElementById('log-hours').value = '';
-  document.getElementById('log-desc').value = '';
-  saveState();
-  updateTopStats();
-  renderLogList();
-}
-
-function renderLogList() {
-  const list = document.getElementById('log-list');
-  if (!list) return;
-  if (!state.logs.length) { list.innerHTML = '<div class="empty">Nenhuma sessão registrada ainda.</div>'; return; }
-  const months = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
-  const secMap = {};
-  SECTIONS.forEach(s => secMap[s.id] = s);
-  list.innerHTML = state.logs.map(l => {
-    const [y,m,d] = l.date.split('-');
-    const sec = l.sec && secMap[l.sec];
-    return `<div class="log-card">
-      <div class="log-date-blk">
-        <div class="log-day">${d}</div>
-        <div class="log-month">${months[parseInt(m)-1]}</div>
-      </div>
-      <div class="log-sep"></div>
-      <div class="log-body">
-        <div class="log-title-txt">${sec ? 'S'+sec.num+': '+sec.title : 'Estudo geral'}</div>
-        ${l.desc ? `<div class="log-desc-txt">${l.desc}</div>` : ''}
-      </div>
-      <div class="log-hours-blk">
-        <div class="log-h">${l.hours}h</div>
-        <div class="log-hl">estudadas</div>
-      </div>
-      <button class="icon-btn del" onclick="deleteLog(${l.id})" style="margin-top:2px">✕</button>
-    </div>`;
-  }).join('');
-}
-
-function deleteLog(id) {
-  state.logs = state.logs.filter(l => l.id !== id);
-  saveState();
-  updateTopStats();
-  renderLogList();
-}
-
-// ============================================================
-// TABS & SEARCH
-// ============================================================
-function setContentTab(tab) {
-  document.querySelectorAll('.ctab').forEach(el => el.classList.remove('active'));
-  document.querySelectorAll('.ctab-btn').forEach(el => el.classList.remove('active'));
-  document.getElementById('ctab-' + tab).classList.add('active');
-  event && event.target && event.target.classList && event.target.classList.add('active');
-  // find and activate the right button
-  document.querySelectorAll('.ctab-btn').forEach(btn => {
-    if (btn.getAttribute('onclick') && btn.getAttribute('onclick').includes("'"+tab+"'")) {
-      btn.classList.add('active');
-    }
-  });
-  if (tab === 'notas') renderGlobalNotes();
-  if (tab === 'diario') renderLogList();
-  if (tab === 'visao') renderOverview();
-}
-
-function setSideTab(tab) {
-  document.querySelectorAll('.stab').forEach(b => b.classList.remove('active'));
-  event.target.classList.add('active');
-  document.getElementById('side-secoes').style.display = tab === 'secoes' ? '' : 'none';
-  document.getElementById('side-busca').style.display = tab === 'busca' ? '' : 'none';
-}
-
-function searchLessons(q) {
-  const container = document.getElementById('search-results');
-  if (!q || q.length < 2) { container.innerHTML = '<div class="empty">Digite para buscar...</div>'; return; }
-  q = q.toLowerCase();
-  let results = [];
-  SECTIONS.forEach(sec => {
-    sec.lessons.forEach(l => {
-      const key = lk(sec.id, l.n);
-      const title = state.customTitles[key] || l.t;
-      if (title.toLowerCase().includes(q) || String(l.n).includes(q)) {
-        results.push({sec, l, key, title});
-      }
-    });
-  });
-  if (!results.length) { container.innerHTML = '<div class="empty">Nenhuma aula encontrada.</div>'; return; }
-  container.innerHTML = results.map(r => {
-    const isDone = !!state.done[r.key];
-    return `<div class="lesson-row" onclick="openLesson('${r.sec.id}',${r.l.n})">
-      <div class="lesson-check ${isDone?'done':''}"></div>
+function dSearch(q){
+  const c=document.getElementById('d-search-results'); if(!c) return;
+  if(!q||q.length<2){c.innerHTML='<div class="empty">Digite para buscar...</div>';return;}
+  q=q.toLowerCase();
+  let res=[];
+  SECTIONS.forEach(sec=>sec.lessons.forEach(l=>{
+    const k=lk(sec.id,l.n); const t=state.customTitles[k]||l.t;
+    if(t.toLowerCase().includes(q)||String(l.n).includes(q)) res.push({sec,l,k,t});
+  }));
+  if(!res.length){c.innerHTML='<div class="empty">Nada encontrado.</div>';return;}
+  c.innerHTML=res.map(r=>{
+    const isDone=!!state.done[r.k];
+    return `<div class="lesson-row ${activeKey===r.k?'active-lesson':''}" onclick="dOpenLesson('${r.sec.id}',${r.l.n})">
+      <div class="lesson-chk ${isDone?'done':''}"></div>
       <div class="lesson-num">${r.l.n}</div>
-      <div class="lesson-title ${isDone?'done':''}">${r.title}</div>
+      <div class="lesson-title ${isDone?'done':''}">${r.t}</div>
       <div class="lesson-dur">${r.l.d}</div>
     </div>`;
   }).join('');
 }
 
-// ============================================================
-// INIT
-// ============================================================
-function init() {
-  loadState();
-  renderSidebar();
-  updateTopStats();
-  renderOverview();
-  renderGlobalNotes();
-  renderLogList();
-  populateLogSelect();
-  // set today's date
-  document.getElementById('log-date').value = new Date().toISOString().split('T')[0];
+// ── TOGGLE DONE ─────────────────────────────────────────────
+function toggleDone(secId,n){
+  const k=lk(secId,n); state.done[k]=!state.done[k]; save();
+  dRenderSidebar(); updateStats(); dRenderOverview();
+  if(activeKey===k) dRenderLesson(secId,n);
+  mRenderSections(); mUpdateProgList();
 }
+
+// ── DESKTOP LESSON DETAIL ────────────────────────────────────
+function dOpenLesson(secId,n){
+  activeKey=lk(secId,n);
+  expCtx.secId=secId; expCtx.lessonN=n;
+  setCtab('aula', document.querySelector('.ctab-btn:nth-child(2)'));
+  dRenderSidebar();
+  dRenderLesson(secId,n);
+}
+
+function dRenderLesson(secId,n){
+  const sec=SECTIONS.find(s=>s.id===secId);
+  const lesson=sec.lessons.find(l=>l.n===n);
+  const k=lk(secId,n);
+  const isDone=!!state.done[k];
+  const title=state.customTitles[k]||lesson.t;
+  const notes=state.notes[k]||[];
+  const codes=state.codes[k]||[];
+  const area=document.getElementById('d-lesson-area');
+  area.innerHTML=`
+    <div class="lesson-detail">
+      <div class="ld-hdr">
+        <div class="ld-chk ${isDone?'done':''}" onclick="toggleDone('${secId}',${n})">${isDone?'✓':''}</div>
+        <div class="ld-info">
+          <div class="ld-sec-label">Seção ${sec.num} · ${sec.title}</div>
+          <div class="ld-title">${title}</div>
+          <div class="ld-meta"><span>Aula ${n}</span><span>${lesson.d}</span>${isDone?'<span style="color:#1D9E75;font-weight:600">✓ Concluída</span>':''}</div>
+        </div>
+        <div class="ld-actions">
+          <button class="icon-btn" onclick="dEditTitle(secId,n)">✏️ Editar</button>
+          <button class="icon-btn" onclick="toggleDone('${secId}',${n})">${isDone?'↩ Desmarcar':'✓ Concluir'}</button>
+          <button class="icon-btn" style="background:#f0f7ff;color:#185FA5;border-color:#c8ddf2" onclick="openExport(secId,n)">📤 Exportar</button>
+        </div>
+      </div>
+      <div class="sub-tabs">
+        <button class="sub-tab-btn ${curLessonTab==='notas'?'active':''}" onclick="setLessonTab('notas',secId,n)">📝 Anotações (${notes.length})</button>
+        <button class="sub-tab-btn ${curLessonTab==='codigo'?'active':''}" onclick="setLessonTab('codigo',secId,n)">💻 Código (${codes.length})</button>
+      </div>
+      <div id="lpanel-notas" style="display:${curLessonTab==='notas'?'block':'none'}">
+        <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:9px" id="d-nt-btns">
+          ${['tip','doubt','important','concept'].map(t=>`<button class="ntb ${curNoteType===t?'sel-'+t:''}" data-type="${t}" onclick="setNoteType(this)">${NOTE_EMOJI[t]} ${NOTE_TYPES[t].label}</button>`).join('')}
+        </div>
+        <div class="note-inp-area">
+          <input type="text" id="d-note-title" placeholder="Título da anotação..."/>
+          <textarea id="d-note-body" placeholder="Escreva sua dica, dúvida ou conceito..."></textarea>
+          <button class="btn-add-note" onclick="addNote('${k}',secId,n)">+ Adicionar anotação</button>
+        </div>
+        <div id="d-notes-${k}">${renderNotesHTML(k)}</div>
+      </div>
+      <div id="lpanel-codigo" style="display:${curLessonTab==='codigo'?'block':'none'}">
+        <div class="lang-btns" id="d-lang-btns">
+          ${['java','sql','xml','bash','json'].map(l=>`<button class="lang-btn ${curLang===l?'sel':''}" data-lang="${l}" onclick="setLang(this)">${l.toUpperCase()}</button>`).join('')}
+        </div>
+        <div class="code-inp-area">
+          <input type="text" id="d-code-title" placeholder="Título do trecho (ex: Classe Produto, método main...)"/>
+          <textarea class="code-editor" id="d-code-body" placeholder="// Escreva ou cole seu código aqui..."></textarea>
+          <button class="btn-add-code" onclick="addCode('${k}',secId,n)">+ Salvar código</button>
+        </div>
+        <div id="d-codes-${k}">${renderCodesHTML(k,secId,n)}</div>
+      </div>
+    </div>`;
+}
+
+function setLessonTab(tab,secId,n){
+  curLessonTab=tab;
+  document.getElementById('lpanel-notas').style.display=tab==='notas'?'block':'none';
+  document.getElementById('lpanel-codigo').style.display=tab==='codigo'?'block':'none';
+  document.querySelectorAll('.sub-tab-btn').forEach((b,i)=>b.classList.toggle('active',['notas','codigo'][i]===tab));
+}
+function setNoteType(btn){ curNoteType=btn.dataset.type; document.querySelectorAll('#d-nt-btns .ntb').forEach(b=>{b.className='ntb';if(b.dataset.type===curNoteType)b.classList.add('sel-'+curNoteType);}); }
+function setLang(btn){ curLang=btn.dataset.lang; document.querySelectorAll('#d-lang-btns .lang-btn').forEach(b=>{b.className='lang-btn';if(b.dataset.lang===curLang)b.classList.add('sel');}); }
+function dEditTitle(secId,n){
+  const k=lk(secId,n); const sec=SECTIONS.find(s=>s.id===secId); const lesson=sec.lessons.find(l=>l.n===n);
+  const cur=state.customTitles[k]||lesson.t;
+  const v=prompt('Editar título:',cur);
+  if(v!==null){ const t=v.trim(); if(t&&t!==lesson.t) state.customTitles[k]=t; else delete state.customTitles[k]; save(); dRenderSidebar(); dRenderLesson(secId,n); mRenderSections(); }
+}
+
+// ── NOTES ────────────────────────────────────────────────────
+function addNote(k,secId,n){
+  const ti=document.getElementById('d-note-title'); const bi=document.getElementById('d-note-body');
+  const title=ti?.value.trim(); const body=bi?.value.trim();
+  if(!title&&!body) return;
+  if(!state.notes[k]) state.notes[k]=[];
+  state.notes[k].unshift({id:Date.now(),type:curNoteType,title:title||'(sem título)',body,date:new Date().toLocaleDateString('pt-BR')});
+  if(ti)ti.value=''; if(bi)bi.value='';
+  save(); updateStats(); dRenderLesson(secId,n); setLessonTab('notas',secId,n); dRenderGlobalNotes();
+}
+function renderNotesHTML(k){
+  const notes=state.notes[k]||[];
+  if(!notes.length) return '<div class="empty" style="padding:16px">Nenhuma anotação.</div>';
+  return notes.map(n=>{const nt=NOTE_TYPES[n.type]||NOTE_TYPES.tip;return`<div class="note-card" id="nc-${n.id}">
+    <div class="note-card-hdr">
+      <span class="note-badge ${nt.cls}">${nt.label}</span>
+      <span class="note-card-title">${escHtml(n.title)}</span>
+      <div class="note-actions">
+        <button class="del-btn" onclick="editNote('${k}',${n.id})">✏️</button>
+        <button class="del-btn" onclick="deleteNote('${k}',${n.id})">✕</button>
+      </div>
+    </div>
+    ${n.body?`<div class="note-card-body">${escHtml(n.body)}</div>`:''}
+    <div style="font-size:10px;color:#bbb;margin-top:5px">${n.date}</div>
+  </div>`}).join('');
+}
+function deleteNote(k,id){
+  if(!state.notes[k]) return; state.notes[k]=state.notes[k].filter(n=>n.id!==id); save(); updateStats();
+  const c=document.getElementById('d-notes-'+k); if(c) c.innerHTML=renderNotesHTML(k);
+  const mc=document.getElementById('m-notes-'+k); if(mc) mc.innerHTML=renderNotesHTML(k);
+  dRenderGlobalNotes();
+}
+function editNote(k,id){
+  const note=(state.notes[k]||[]).find(n=>n.id===id); if(!note) return;
+  const card=document.getElementById('nc-'+id); if(!card) return;
+  const nt=NOTE_TYPES[note.type]||NOTE_TYPES.tip;
+  card.innerHTML=`<div class="note-card-hdr">
+    <span class="note-badge ${nt.cls}">${nt.label}</span>
+    <select id="en-type-${id}" style="font-size:11px;padding:3px 7px;border:1px solid #ddd;border-radius:6px">
+      ${Object.entries(NOTE_TYPES).map(([v,t])=>`<option value="${v}" ${note.type===v?'selected':''}>${t.label}</option>`).join('')}
+    </select>
+  </div>
+  <div style="display:flex;flex-direction:column;gap:5px;margin-top:7px">
+    <input id="en-title-${id}" value="${escHtml(note.title)}" style="font-size:12px;padding:7px 9px;border:1.5px solid #185FA5;border-radius:7px;background:#fff;color:#1a1a18;font-family:inherit;outline:none"/>
+    <textarea id="en-body-${id}" style="font-size:12px;padding:7px 9px;border:1.5px solid #185FA5;border-radius:7px;background:#fff;color:#1a1a18;font-family:inherit;outline:none;resize:vertical;min-height:60px;line-height:1.5">${escHtml(note.body||'')}</textarea>
+    <div style="display:flex;gap:7px">
+      <button onclick="saveNote('${k}',${id})" style="flex:1;padding:8px;background:#185FA5;color:#fff;border:none;border-radius:7px;font-weight:700;cursor:pointer">Salvar</button>
+      <button onclick="cancelNote('${k}',${id})" style="flex:1;padding:8px;border:1px solid #ddd;border-radius:7px;cursor:pointer;background:#fff">Cancelar</button>
+    </div>
+  </div>`;
+}
+function saveNote(k,id){
+  const note=(state.notes[k]||[]).find(n=>n.id===id); if(!note) return;
+  const t=document.getElementById('en-title-'+id); const b=document.getElementById('en-body-'+id); const tp=document.getElementById('en-type-'+id);
+  if(t) note.title=t.value.trim()||'(sem título)'; if(b) note.body=b.value.trim(); if(tp) note.type=tp.value;
+  save(); const c=document.getElementById('d-notes-'+k); if(c) c.innerHTML=renderNotesHTML(k); dRenderGlobalNotes();
+}
+function cancelNote(k,id){ const c=document.getElementById('d-notes-'+k); if(c) c.innerHTML=renderNotesHTML(k); }
+
+// ── GLOBAL NOTES ─────────────────────────────────────────────
+let gNoteFilter='all';
+function dRenderGlobalNotes(){
+  const area=document.getElementById('d-global-notes'); if(!area) return;
+  let all=[];
+  SECTIONS.forEach(sec=>sec.lessons.forEach(l=>{
+    const k=lk(sec.id,l.n);
+    (state.notes[k]||[]).forEach(n=>all.push({...n,k,secId:sec.id,secNum:sec.num,lessonN:l.n,lessonTitle:state.customTitles[k]||l.t}));
+  }));
+  const filtered=gNoteFilter==='all'?all:all.filter(n=>n.type===gNoteFilter);
+  area.innerHTML=`<div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px">
+    ${['all','tip','doubt','important','concept'].map(t=>{
+      const labels={all:'Todas',tip:'💡 Dicas',doubt:'❓ Dúvidas',important:'⭐ Imp.',concept:'📖 Conc.'};
+      return `<button class="ntb ${gNoteFilter===t&&t!=='all'?'sel-'+t:''}" style="${gNoteFilter===t&&t==='all'?'background:#f0eeea;color:#1a1a18;border-color:#888':''}" onclick="setGNoteFilter('${t}')">${labels[t]}</button>`;
+    }).join('')}
+  </div>
+  ${filtered.length?filtered.map(n=>{const nt=NOTE_TYPES[n.type]||NOTE_TYPES.tip;return`<div class="note-card" style="margin-bottom:8px">
+    <div class="note-card-hdr">
+      <span class="note-badge ${nt.cls}">${nt.label}</span>
+      <span class="note-card-title">${escHtml(n.title)}</span>
+      <button class="del-btn" onclick="deleteNote('${n.k}',${n.id})">✕</button>
+    </div>
+    ${n.body?`<div class="note-card-body">${escHtml(n.body)}</div>`:''}
+    <div style="font-size:10px;color:#bbb;margin-top:5px;display:flex;align-items:center;gap:8px">
+      <span>Aula ${n.lessonN} · S${n.secNum} · ${n.date}</span>
+      <button onclick="dOpenLesson('${n.secId}',${n.lessonN})" class="del-btn" style="font-size:11px">→ Ver aula</button>
+    </div>
+  </div>`}).join(''):'<div class="empty">Nenhuma anotação ainda.</div>'}`;
+}
+function setGNoteFilter(t){ gNoteFilter=t; dRenderGlobalNotes(); }
+
+// ── CODE ─────────────────────────────────────────────────────
+function addCode(k,secId,n){
+  const ti=document.getElementById('d-code-title'); const bi=document.getElementById('d-code-body');
+  const body=bi?.value.trim(); if(!body) return;
+  const sec=SECTIONS.find(s=>s.id===secId); const lesson=sec.lessons.find(l=>l.n===n);
+  if(!state.codes[k]) state.codes[k]=[];
+  state.codes[k].push({
+    id:Date.now(),lang:curLang,
+    title:ti?.value.trim()||`Aula ${n} - trecho ${state.codes[k].length+1}`,
+    body, date:new Date().toLocaleDateString('pt-BR'),
+    secId,lessonN:n,secTitle:sec.title,lessonTitle:state.customTitles[k]||lesson.t
+  });
+  if(ti)ti.value=''; if(bi)bi.value='';
+  save(); updateStats(); dRenderLesson(secId,n); setLessonTab('codigo',secId,n); dRenderGlobalCode(); mRenderCode();
+}
+function renderCodesHTML(k,secId,n){
+  const codes=state.codes[k]||[];
+  if(!codes.length) return `<div class="code-empty">Nenhum código salvo. Adicione acima!</div>`;
+  return codes.map(c=>`
+    <div class="code-block" id="cb-${c.id}">
+      <div class="code-block-hdr">
+        <div class="code-block-meta">
+          <span style="font-size:10px;font-weight:800;padding:2px 8px;border-radius:10px;background:${LANG_COLORS[c.lang]||'#666'}22;color:${LANG_COLORS[c.lang]||'#aaa'}">${c.lang.toUpperCase()}</span>
+          <span class="code-block-title">${escHtml(c.title)}</span>
+        </div>
+        <div class="code-block-actions">
+          <button class="code-icon-btn" onclick="copyCodeBlock('cb-${c.id}')">📋</button>
+          <button class="code-icon-btn" onclick="editCode('${k}',${c.id},secId,n)">✏️</button>
+          <button class="code-icon-btn" onclick="deleteCode('${k}',${c.id},secId,n)" style="color:#f87171">✕</button>
+        </div>
+      </div>
+      <pre class="code-pre">${syntaxHL(c.body,c.lang)}</pre>
+    </div>`).join('');
+}
+function deleteCode(k,id,secId,n){
+  if(!state.codes[k]) return; state.codes[k]=state.codes[k].filter(c=>c.id!==id); save(); updateStats();
+  dRenderLesson(secId,n); setLessonTab('codigo',secId,n); dRenderGlobalCode(); mRenderCode();
+}
+function editCode(k,id,secId,n){
+  const c=(state.codes[k]||[]).find(x=>x.id===id); if(!c) return;
+  const block=document.getElementById('cb-'+id); if(!block) return;
+  block.innerHTML=`
+    <div class="code-block-hdr">
+      <span style="font-size:10px;font-weight:800;padding:2px 8px;border-radius:10px;background:${LANG_COLORS[c.lang]||'#666'}22;color:${LANG_COLORS[c.lang]||'#aaa'}">${c.lang.toUpperCase()}</span>
+      <div class="code-block-actions">
+        <button class="code-icon-btn" onclick="saveCode('${k}',${id},secId,n)">💾 Salvar</button>
+        <button class="code-icon-btn" onclick="cancelCode('${k}',secId,n)">✕</button>
+      </div>
+    </div>
+    <div style="padding:10px 13px;display:flex;flex-direction:column;gap:6px;background:#111">
+      <input id="ec-title-${id}" value="${escHtml(c.title)}" style="font-size:12px;padding:7px 10px;border:1.5px solid #534AB7;border-radius:6px;background:#1a1a18;color:#e8e8e8;font-family:inherit;outline:none"/>
+      <textarea id="ec-body-${id}" style="font-size:12px;padding:9px 11px;border:1.5px solid #534AB7;border-radius:6px;background:#1a1a18;color:#e8e8e8;font-family:'Courier New',monospace;outline:none;resize:vertical;min-height:100px;line-height:1.7">${escHtml(c.body)}</textarea>
+    </div>`;
+}
+function saveCode(k,id,secId,n){
+  const c=(state.codes[k]||[]).find(x=>x.id===id); if(!c) return;
+  const t=document.getElementById('ec-title-'+id); const b=document.getElementById('ec-body-'+id);
+  if(t) c.title=t.value.trim()||c.title; if(b) c.body=b.value;
+  save(); dRenderLesson(secId,n); setLessonTab('codigo',secId,n); dRenderGlobalCode(); mRenderCode();
+}
+function cancelCode(k,secId,n){ dRenderLesson(secId,n); setLessonTab('codigo',secId,n); }
+
+function copyCodeBlock(blockId){
+  const pre=document.querySelector('#'+blockId+' .code-pre'); if(!pre) return;
+  navigator.clipboard.writeText(pre.innerText).catch(()=>{});
+}
+
+function getAllCodes(){
+  let all=[];
+  SECTIONS.forEach(sec=>sec.lessons.forEach(l=>{
+    const k=lk(sec.id,l.n);
+    (state.codes[k]||[]).forEach(c=>all.push({...c,k,secId:sec.id,secNum:sec.num,secTitle:sec.title,lessonN:l.n,lessonTitle:state.customTitles[k]||l.t}));
+  }));
+  return all;
+}
+
+function dRenderGlobalCode(){
+  const area=document.getElementById('d-global-code'); if(!area) return;
+  const all=getAllCodes();
+  const secsWithCode=SECTIONS.filter(sec=>sec.lessons.some(l=>(state.codes[lk(sec.id,l.n)]||[]).length>0));
+  const filtered=globalCodeFilter==='all'?all:all.filter(c=>c.secId===globalCodeFilter);
+  const curGLang=window._gclang||'java';
+  const mergedBlocks=filtered.filter(c=>(c.lang||'java')===curGLang);
+  const mergedCode=mergedBlocks.map(c=>`// ── Aula ${c.lessonN}: ${c.lessonTitle}\n// ${c.title}\n${c.body}`).join('\n\n');
+  const langs=[...new Set(all.map(c=>c.lang||'java'))];
+
+  area.innerHTML=`
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px">
+      ${[{l:'Trechos',v:all.length,c:'#1a1a18'},{l:'Seções',v:secsWithCode.length,c:'#534AB7'},{l:'Linguagens',v:langs.length,c:'#f89820'},{l:'Linhas',v:all.reduce((s,c)=>s+c.body.split('\n').length,0),c:'#1D9E75'}].map(x=>`
+        <div class="stat-c" style="min-width:80px"><div class="stat-n" style="color:${x.c}">${x.v}</div><div class="stat-l">${x.l}</div></div>`).join('')}
+    </div>
+    ${secsWithCode.length?`<div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:13px">
+      <button class="lang-btn ${globalCodeFilter==='all'?'sel':''}" onclick="setGCodeFilter('all')">Todas seções</button>
+      ${secsWithCode.map(s=>`<button class="lang-btn ${globalCodeFilter===s.id?'sel':''}" onclick="setGCodeFilter('${s.id}')">S${s.num}</button>`).join('')}
+    </div>`:''}
+    ${all.length===0?`<div class="code-empty" style="padding:40px">Nenhum código ainda.<br>Acesse uma aula → aba <strong>💻 Código</strong></div>`:`
+    <div style="background:#fff;border:1px solid #e8e6e0;border-radius:12px;overflow:hidden;margin-bottom:18px">
+      <div style="padding:13px 17px;border-bottom:1px solid #e8e6e0;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">
+        <div>
+          <div style="font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;color:#1a1a18">💻 Código Completo</div>
+          <div style="font-size:11px;color:#888;margin-top:2px">${mergedBlocks.length} trechos · ${mergedCode.split('\n').length} linhas</div>
+        </div>
+        <div style="display:flex;gap:7px;flex-wrap:wrap;align-items:center">
+          ${langs.map(l=>`<button class="lang-btn ${curGLang===l?'sel':''}" onclick="setGLang('${l}')">${l.toUpperCase()}</button>`).join('')}
+          <button class="btn-add-code" id="btn-copy-full" onclick="copyFullCode()" style="padding:6px 14px">📋 Copiar</button>
+          <button class="btn-log" onclick="downloadCode()" style="padding:6px 14px">⬇ .java</button>
+        </div>
+      </div>
+      ${mergedBlocks.length?`<pre class="code-pre" id="full-code-pre" style="max-height:400px;overflow-y:auto">${syntaxHL(mergedCode,'java')}</pre>`:`<div class="code-empty" style="margin:14px">Nenhum trecho ${curGLang.toUpperCase()} neste filtro.</div>`}
+    </div>
+    <div style="font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;color:#888;margin-bottom:10px">Trechos Individuais</div>
+    ${filtered.length?filtered.map(c=>`
+      <div class="code-block" id="gcb-${c.id}" style="margin-bottom:11px">
+        <div class="code-block-hdr">
+          <div class="code-block-meta">
+            <span style="font-size:10px;font-weight:800;padding:2px 8px;border-radius:10px;background:${LANG_COLORS[c.lang]||'#666'}22;color:${LANG_COLORS[c.lang]||'#aaa'}">${c.lang.toUpperCase()}</span>
+            <span class="code-block-lesson">Aula ${c.lessonN}</span>
+            <span class="code-block-title">${escHtml(c.title)}</span>
+          </div>
+          <div class="code-block-actions">
+            <button class="code-icon-btn" onclick="copyCodeBlock('gcb-${c.id}')">📋</button>
+            <button class="code-icon-btn" onclick="dOpenLesson('${c.secId}',${c.lessonN})">→</button>
+            <button class="code-icon-btn" onclick="deleteGCode('${c.k}',${c.id})" style="color:#f87171">✕</button>
+          </div>
+        </div>
+        <pre class="code-pre">${syntaxHL(c.body,c.lang)}</pre>
+      </div>`).join(''):`<div class="code-empty">Nenhum trecho neste filtro.</div>`}
+    `}`;
+}
+function setGCodeFilter(f){ globalCodeFilter=f; dRenderGlobalCode(); }
+function setGLang(l){ window._gclang=l; dRenderGlobalCode(); }
+function copyFullCode(){
+  const pre=document.getElementById('full-code-pre'); if(!pre) return;
+  navigator.clipboard.writeText(pre.innerText).then(()=>{
+    const b=document.getElementById('btn-copy-full'); if(b){b.textContent='✅';setTimeout(()=>b.textContent='📋 Copiar',1800);}
+  });
+}
+function downloadCode(){
+  const all=getAllCodes(); const f=globalCodeFilter==='all'?all:all.filter(c=>c.secId===globalCodeFilter);
+  const l=window._gclang||'java'; const blocks=f.filter(c=>(c.lang||'java')===l);
+  const content=blocks.map(c=>`// ── Aula ${c.lessonN}: ${c.lessonTitle}\n// ${c.title}\n${c.body}`).join('\n\n');
+  const ext={sql:'sql',json:'json',xml:'xml',bash:'sh'}[l]||'java';
+  const blob=new Blob([content],{type:'text/plain'});
+  const url=URL.createObjectURL(blob); const a=document.createElement('a');
+  a.href=url; a.download=`java-completo.${ext}`; document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url);
+}
+function deleteGCode(k,id){
+  if(!state.codes[k]) return; state.codes[k]=state.codes[k].filter(c=>c.id!==id); save(); updateStats(); dRenderGlobalCode(); mRenderCode();
+  if(activeKey===k){ const [sid,ns]=k.split('_'); dRenderLesson(sid,parseInt(ns)); setLessonTab('codigo',sid,parseInt(ns)); }
+}
+
+// ── DIÁRIO ───────────────────────────────────────────────────
+function populateLogSelects(){
+  const opts='<option value="">Selecione...</option>'+SECTIONS.map(s=>`<option value="${s.id}">S${s.num}: ${s.title}</option>`).join('');
+  ['d-log-sec','m-log-sec'].forEach(id=>{const el=document.getElementById(id);if(el)el.innerHTML=opts;});
+}
+function addLog(){
+  const date=document.getElementById('d-log-date')?.value;
+  const hours=document.getElementById('d-log-hours')?.value;
+  const sec=document.getElementById('d-log-sec')?.value;
+  const desc=document.getElementById('d-log-desc')?.value.trim();
+  if(!date||!hours) return;
+  state.logs.unshift({id:Date.now(),date,hours:parseFloat(hours),sec,desc});
+  document.getElementById('d-log-hours').value=''; document.getElementById('d-log-desc').value='';
+  save(); updateStats(); renderLogList();
+}
+function mAddLog(){
+  const date=document.getElementById('m-log-date')?.value;
+  const hours=document.getElementById('m-log-hours')?.value;
+  const sec=document.getElementById('m-log-sec')?.value;
+  const desc=document.getElementById('m-log-desc')?.value.trim();
+  if(!date||!hours) return;
+  state.logs.unshift({id:Date.now(),date,hours:parseFloat(hours),sec,desc});
+  document.getElementById('m-log-hours').value=''; document.getElementById('m-log-desc').value='';
+  save(); updateStats(); renderLogList(); mRenderLog();
+}
+function renderLogList(){
+  const target=document.getElementById('d-log-list'); if(!target) return;
+  if(!state.logs.length){target.innerHTML='<div class="empty">Nenhuma sessão ainda.</div>';return;}
+  const months=['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+  const sm={}; SECTIONS.forEach(s=>sm[s.id]=s);
+  target.innerHTML=state.logs.map(l=>{
+    const [y,m,d]=l.date.split('-'); const sec=l.sec&&sm[l.sec];
+    return `<div class="log-card">
+      <div class="log-date-blk"><div class="log-day">${d}</div><div class="log-month">${months[parseInt(m)-1]}</div></div>
+      <div class="log-sep"></div>
+      <div class="log-body">
+        <div class="log-title-txt">${sec?'S'+sec.num+': '+sec.title:'Estudo geral'}</div>
+        ${l.desc?`<div class="log-desc-txt">${l.desc}</div>`:''}
+      </div>
+      <div style="text-align:right;flex-shrink:0"><div class="log-h">${l.hours}h</div><div class="log-hl">estudadas</div></div>
+      <button class="del-btn" onclick="deleteLog(${l.id})" style="font-size:13px">✕</button>
+    </div>`;
+  }).join('');
+}
+function deleteLog(id){ state.logs=state.logs.filter(l=>l.id!==id); save(); updateStats(); renderLogList(); mRenderLog(); }
+
+// ── OVERVIEW ─────────────────────────────────────────────────
+function dRenderOverview(){
+  const g=document.getElementById('d-overview'); if(!g) return;
+  const half=Math.ceil(SECTIONS.length/2);
+  const makeList=secs=>secs.map(sec=>{
+    const done=sec.lessons.filter(l=>state.done[lk(sec.id,l.n)]).length;
+    const p=Math.round(done/sec.lessons.length*100);
+    return `<div class="prog-item">
+      <div class="prog-label">S${sec.num} ${sec.title}</div>
+      <div class="prog-track"><div class="prog-fill" style="width:${p}%"></div></div>
+      <div class="prog-pct">${p}%</div>
+    </div>`;
+  }).join('');
+  g.innerHTML=`
+    <div class="ov-card"><h3>Seções 1–10</h3>${makeList(SECTIONS.slice(0,10))}</div>
+    <div class="ov-card"><h3>Seções 11–20</h3>${makeList(SECTIONS.slice(10))}</div>`;
+}
+
+// ── DESKTOP TABS ─────────────────────────────────────────────
+function setCtab(name,btn){
+  document.querySelectorAll('.ctab').forEach(el=>el.classList.remove('active'));
+  document.querySelectorAll('.ctab-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('ctab-'+name).classList.add('active');
+  if(btn) btn.classList.add('active');
+  else document.querySelectorAll('.ctab-btn').forEach(b=>{if(b.getAttribute('onclick')&&b.getAttribute('onclick').includes("'"+name+"'"))b.classList.add('active');});
+  if(name==='notas') dRenderGlobalNotes();
+  if(name==='codigo') dRenderGlobalCode();
+  if(name==='diario') renderLogList();
+  if(name==='visao') dRenderOverview();
+}
+
+// ── EXPORT ───────────────────────────────────────────────────
+let curExpTab='aula';
+function openExport(secId,n){
+  expCtx.secId=secId; expCtx.lessonN=n; expCtx.tab='aula';
+  const sec=SECTIONS.find(s=>s.id===secId); const lesson=sec.lessons.find(l=>l.n===n);
+  const k=lk(secId,n);
+  document.getElementById('exp-subtitle').textContent=`Aula ${n}: ${state.customTitles[k]||lesson.t}`;
+  setExpTab('aula');
+  buildSecBtns(secId);
+  document.getElementById('export-modal').classList.add('open');
+}
+function openExportGeral(){ expCtx.tab='geral'; document.getElementById('exp-subtitle').textContent='Progresso geral'; setExpTab('geral'); buildSecBtns(SECTIONS[0].id); document.getElementById('export-modal').classList.add('open'); }
+function closeExport(){ document.getElementById('export-modal').classList.remove('open'); }
+function setExpTab(tab){
+  curExpTab=tab;
+  document.querySelectorAll('.mmtab').forEach((b,i)=>b.classList.toggle('active',['aula','secao','geral'][i]===tab));
+  ['aula','secao','geral'].forEach(t=>document.getElementById('etab-'+t).style.display=t===tab?'block':'none');
+  refreshPreview();
+}
+function buildSecBtns(def){
+  expCtx.expSecId=def;
+  document.getElementById('sec-scope-btns').innerHTML=SECTIONS.map(s=>`<button class="lang-btn ${s.id===def?'sel':''}" onclick="setExpSec('${s.id}',this)">S${s.num}</button>`).join('');
+}
+function setExpSec(id,btn){ expCtx.expSecId=id; document.querySelectorAll('#sec-scope-btns .lang-btn').forEach(b=>b.classList.remove('sel')); btn.classList.add('sel'); refreshPreview(); }
+const NE={tip:'💡',doubt:'❓',important:'⭐',concept:'📖'};
+const NL={tip:'Dica',doubt:'Dúvida',important:'Importante',concept:'Conceito'};
+function buildExpText(){
+  if(curExpTab==='aula'){
+    const {secId,lessonN}=expCtx; if(!secId||!lessonN) return '(Selecione uma aula)';
+    const sec=SECTIONS.find(s=>s.id===secId); const lesson=sec.lessons.find(l=>l.n===lessonN);
+    const k=lk(secId,lessonN); const isDone=!!state.done[k];
+    const title=state.customTitles[k]||lesson.t; const notes=state.notes[k]||[];
+    let txt=`☕ *Java COMPLETO — Tracker de Estudos*\n━━━━━━━━━━━━━━━━━━━\n📚 Seção ${sec.num}: ${sec.title}\n🎬 Aula ${lessonN}: ${title}\n`;
+    if(document.getElementById('chk-status')?.checked) txt+=`⏱ ${lesson.d}\n${isDone?'✅ Concluída':'⏳ Pendente'}\n`;
+    if(document.getElementById('chk-notes')?.checked){
+      txt+=notes.length?`\n📝 *Anotações*\n`+notes.map(n=>`${NE[n.type]} *${NL[n.type]}* — ${n.title}${n.body?'\n'+n.body:''}`).join('\n\n'):'\n📝 Sem anotações.\n';
+    }
+    txt+=`\n━━━━━━━━━━━━━━━━━━━\n🔗 Java COMPLETO — Nelio Alves (Udemy)`;
+    return txt;
+  }
+  if(curExpTab==='secao'){
+    const sec=SECTIONS.find(s=>s.id===expCtx.expSecId); if(!sec) return '';
+    const done=sec.lessons.filter(l=>state.done[lk(sec.id,l.n)]).length;
+    const pct=Math.round(done/sec.lessons.length*100);
+    let txt=`☕ *Java COMPLETO*\n━━━━━━━━━━━━━━━━━━━\n📚 *Seção ${sec.num}: ${sec.title}*\n⏱ ${sec.dur}\n`;
+    if(document.getElementById('chk-sec-prog')?.checked) txt+=`\n📊 ${done}/${sec.lessons.length} (${pct}%)\n[${'█'.repeat(Math.round(pct/10))}${'░'.repeat(10-Math.round(pct/10))}]\n`;
+    if(document.getElementById('chk-sec-lessons')?.checked) txt+=`\n📋 *Aulas*\n`+sec.lessons.map(l=>`${state.done[lk(sec.id,l.n)]?'✅':'⬜'} ${l.n}. ${state.customTitles[lk(sec.id,l.n)]||l.t} (${l.d})`).join('\n')+'\n';
+    if(document.getElementById('chk-sec-notes')?.checked){
+      sec.lessons.forEach(l=>{ const notes=state.notes[lk(sec.id,l.n)]||[]; if(notes.length){ txt+=`\n🎬 Aula ${l.n}: ${l.t}\n`+notes.map(n=>`${NE[n.type]} ${n.title}`).join('\n')+'\n'; } });
+    }
+    txt+=`━━━━━━━━━━━━━━━━━━━\n🔗 Java COMPLETO — Nelio Alves`;
+    return txt;
+  }
+  // geral
+  const {totalDone,pct,secsDone,notesCount,hours,sessions}=calcStats();
+  let txt=`☕ *Java COMPLETO — Progresso*\n━━━━━━━━━━━━━━━━━━━\n`;
+  if(document.getElementById('chk-g-stats')?.checked) txt+=`[${'█'.repeat(Math.round(pct/10))}${'░'.repeat(10-Math.round(pct/10))}] ${pct}%\n✅ ${totalDone}/263 aulas\n📚 ${secsDone}/20 seções\n⏱ ${hours.toFixed(1)}h estudadas\n📓 ${sessions} sessões\n📝 ${notesCount} anotações\n`;
+  if(document.getElementById('chk-g-secs')?.checked){ txt+=`\n📚 *Por Seção*\n`; SECTIONS.forEach(sec=>{const done=sec.lessons.filter(l=>state.done[lk(sec.id,l.n)]).length;const p=Math.round(done/sec.lessons.length*100);const ic=p===100?'✅':p>0?'🔄':'⬜';txt+=`${ic} S${sec.num}: ${sec.title} — ${done}/${sec.lessons.length} (${p}%)\n`;}); }
+  if(document.getElementById('chk-g-notes')?.checked){ const all=[];SECTIONS.forEach(sec=>sec.lessons.forEach(l=>{const k=lk(sec.id,l.n);(state.notes[k]||[]).forEach(n=>all.push({...n,lessonN:l.n,secNum:sec.num}));})); if(all.length){txt+=`\n📝 *Anotações (${all.length})*\n`;all.slice(0,20).forEach(n=>{txt+=`${NE[n.type]} [S${n.secNum}/A${n.lessonN}] ${n.title}\n`;});} }
+  txt+=`━━━━━━━━━━━━━━━━━━━\n🔗 Java COMPLETO · ${new Date().toLocaleDateString('pt-BR')}`;
+  return txt;
+}
+function refreshPreview(){ const id='prev-'+curExpTab; const el=document.getElementById(id); if(el) el.textContent=buildExpText(); }
+function exportWpp(){ window.open('https://wa.me/?text='+encodeURIComponent(buildExpText()),'_blank'); }
+function exportEmail(){
+  const sub=`☕ Java COMPLETO — ${curExpTab==='geral'?'Progresso':'Aula '+expCtx.lessonN}`;
+  window.location.href=`mailto:?subject=${encodeURIComponent(sub)}&body=${encodeURIComponent(buildExpText())}`;
+}
+function exportCopy(){
+  navigator.clipboard.writeText(buildExpText()).then(()=>{
+    const b=document.getElementById('btn-copy-exp'); if(b){b.textContent='✅ Copiado!';b.classList.add('copied');setTimeout(()=>{b.textContent='📋 Copiar';b.classList.remove('copied');},2000);}
+  });
+}
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeExport();});
+
+// ══════════════════════════════════════════════════════════
+// MOBILE
+// ══════════════════════════════════════════════════════════
+const isMobile=()=>window.innerWidth<=700;
+let mScreen='secoes';
+let mPrev='secoes';
+let mNoteFilter='all';
+
+function mNav(name){
+  if(name!=='aula') mPrev=mScreen!=='aula'?mScreen:mPrev;
+  mScreen=name;
+  document.querySelectorAll('.bnav-btn').forEach(b=>b.classList.remove('active'));
+  const ab=document.getElementById('bnav-'+name); if(ab) ab.classList.add('active');
+  else { const sb=document.getElementById('bnav-secoes'); if(sb) sb.classList.add('active'); }
+  document.querySelectorAll('.m-screen').forEach(s=>{ s.style.display='none'; });
+  const t=document.getElementById('ms-'+name);
+  if(t){
+    t.style.display=(name==='aula'||name==='busca')?'flex':'block';
+    if(name==='aula'||name==='busca') t.style.flexDirection='column';
+  }
+  if(name==='stats'){ mUpdateProgList(); updateStats(); }
+  if(name==='codigo') mRenderCode();
+  if(name==='diario') mRenderLog();
+  if(name==='secoes') mRenderSections();
+}
+function mBack(){ mNav(mPrev||'secoes'); }
+
+function mRenderSections(){
+  const c=document.getElementById('m-sec-list'); if(!c) return;
+  let html='';
+  SECTIONS.forEach(sec=>{
+    const done=sec.lessons.filter(l=>state.done[lk(sec.id,l.n)]).length;
+    const pct=Math.round(done/sec.lessons.length*100);
+    const isOpen=sec._mopen||false;
+    html+=`<div style="background:#fff;border:1px solid #e8e6e0;border-radius:12px;margin-bottom:9px;overflow:hidden">
+      <div style="display:flex;align-items:center;gap:9px;padding:12px 13px;cursor:pointer" onclick="mToggleSec('${sec.id}')">
+        <div style="width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;background:${sec.color}22;color:${sec.color};flex-shrink:0">${sec.num}</div>
+        <div style="flex:1;min-width:0">
+          <div style="font-size:13px;font-weight:700;color:#1a1a18;line-height:1.3">${sec.title}</div>
+          <div style="font-size:11px;color:#888;margin-top:2px">${done}/${sec.lessons.length} · ${sec.dur}</div>
+        </div>
+        <div style="font-size:11px;color:#bbb;transition:transform .2s;transform:rotate(${isOpen?90:0}deg)">▶</div>
+      </div>
+      <div style="height:3px;background:#f0eeea;margin:0 13px"><div style="height:100%;background:#1D9E75;width:${pct}%;border-radius:2px"></div></div>
+      ${isOpen?`<div style="padding:4px 0 8px;border-top:1px solid #f5f4f0">
+        ${sec.lessons.map(l=>{
+          const k=lk(sec.id,l.n); const isDone=!!state.done[k];
+          const title=state.customTitles[k]||l.t;
+          return `<div style="display:flex;align-items:center;gap:9px;padding:9px 13px;cursor:pointer;border-left:2px solid transparent" onclick="mOpenLesson('${sec.id}',${l.n})">
+            <div style="width:18px;height:18px;border:2px solid ${isDone?'#1D9E75':'#ccc'};border-radius:4px;background:${isDone?'#1D9E75':'transparent'};display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:800;color:#fff;flex-shrink:0" onclick="event.stopPropagation();toggleDone('${sec.id}',${l.n})">${isDone?'✓':''}</div>
+            <div style="font-size:10px;color:#aaa;min-width:20px;flex-shrink:0">${l.n}</div>
+            <div style="flex:1;font-size:13px;color:${isDone?'#bbb':'#1a1a18'};${isDone?'text-decoration:line-through':''};line-height:1.4">${title}</div>
+            <div style="font-size:11px;color:#bbb;flex-shrink:0">${l.d}</div>
+          </div>`;
+        }).join('')}
+      </div>`:''}
+    </div>`;
+  });
+  c.innerHTML=html;
+}
+function mToggleSec(id){ const s=SECTIONS.find(x=>x.id===id); if(s) s._mopen=!s._mopen; mRenderSections(); }
+
+function mOpenLesson(secId,n){
+  expCtx.secId=secId; expCtx.lessonN=n;
+  mPrev=mScreen!=='aula'?mScreen:mPrev; mScreen='aula';
+  const sec=SECTIONS.find(s=>s.id===secId); const lesson=sec.lessons.find(l=>l.n===n);
+  const k=lk(secId,n); const title=state.customTitles[k]||lesson.t;
+  document.getElementById('m-aula-sec').textContent=`Seção ${sec.num} · ${sec.title}`;
+  document.getElementById('m-aula-ttl').textContent=title;
+  document.querySelectorAll('.bnav-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('bnav-secoes').classList.add('active');
+  document.querySelectorAll('.m-screen').forEach(s=>s.style.display='none');
+  const t=document.getElementById('ms-aula'); t.style.display='flex'; t.style.flexDirection='column';
+  mRenderLesson(secId,n);
+}
+function mExportLesson(){ openExport(expCtx.secId,expCtx.lessonN); }
+
+function mRenderLesson(secId,n){
+  const sec=SECTIONS.find(s=>s.id===secId); const lesson=sec.lessons.find(l=>l.n===n);
+  const k=lk(secId,n); const isDone=!!state.done[k];
+  const title=state.customTitles[k]||lesson.t;
+  document.getElementById('m-aula-ttl').textContent=title;
+  const notes=state.notes[k]||[]; const codes=state.codes[k]||[];
+  const mlt=window._mLessonTab||'notas';
+  const body=document.getElementById('m-aula-body');
+  body.innerHTML=`
+    <div style="margin:11px 12px 0;background:#fff;border:1px solid #e8e6e0;border-radius:13px;padding:15px">
+      <div style="font-size:15px;font-weight:700;color:#1a1a18;line-height:1.4;margin-bottom:8px">${title}</div>
+      <div style="display:flex;gap:9px;font-size:12px;color:#aaa;margin-bottom:13px;flex-wrap:wrap">
+        <span>Aula ${n}</span><span>⏱ ${lesson.d}</span>
+        ${isDone?'<span style="color:#1D9E75;font-weight:700">✅ Concluída</span>':'<span>⏳ Pendente</span>'}
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+        <button onclick="toggleDone('${secId}',${n});mRenderLesson('${secId}',${n})" style="padding:11px 7px;border-radius:10px;border:none;cursor:pointer;font-size:13px;font-weight:700;background:${isDone?'#f0eeea':'#1D9E75'};color:${isDone?'#1a1a18':'#fff'}">
+          ${isDone?'↩ Desmarcar':'✓ Concluir'}
+        </button>
+        <button onclick="mEditTitle('${secId}',${n})" style="padding:11px 7px;border-radius:10px;border:none;cursor:pointer;font-size:13px;font-weight:700;background:#f5f4f0;color:#666">✏️ Editar</button>
+      </div>
+    </div>
+    <div style="margin:11px 12px 80px">
+      <!-- sub-tabs -->
+      <div style="display:flex;gap:0;border-bottom:1px solid #e8e6e0;margin-bottom:12px">
+        <button style="flex:1;padding:9px;font-size:12px;font-weight:600;border:none;background:none;cursor:pointer;border-bottom:2px solid ${mlt==='notas'?'#185FA5':'transparent'};color:${mlt==='notas'?'#1a1a18':'#888'}" onclick="mSetLessonTab('notas','${secId}',${n})">📝 Notas (${notes.length})</button>
+        <button style="flex:1;padding:9px;font-size:12px;font-weight:600;border:none;background:none;cursor:pointer;border-bottom:2px solid ${mlt==='codigo'?'#534AB7':'transparent'};color:${mlt==='codigo'?'#1a1a18':'#888'}" onclick="mSetLessonTab('codigo','${secId}',${n})">💻 Código (${codes.length})</button>
+      </div>
+      <!-- NOTAS panel -->
+      <div id="m-panel-notas" style="display:${mlt==='notas'?'block':'none'}">
+        <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:9px" id="m-nt-btns">
+          ${['tip','doubt','important','concept'].map(t=>`<button class="ntb ${curNoteType===t?'sel-'+t:''}" data-type="${t}" onclick="mSetNoteType(this)">${NOTE_EMOJI[t]} ${NOTE_TYPES[t].label}</button>`).join('')}
+        </div>
+        <input type="text" id="m-note-title" placeholder="Título da anotação..." style="display:block;width:100%;font-size:14px;padding:11px 12px;border:1px solid #e8e6e0;border-radius:10px;background:#faf9f7;color:#1a1a18;font-family:inherit;outline:none;margin-bottom:8px"/>
+        <textarea id="m-note-body" placeholder="Dica, dúvida ou conceito..." style="display:block;width:100%;font-size:14px;padding:11px 12px;border:1px solid #e8e6e0;border-radius:10px;background:#faf9f7;color:#1a1a18;font-family:inherit;outline:none;resize:none;height:85px;line-height:1.6;margin-bottom:8px"></textarea>
+        <button onclick="mAddNote('${k}','${secId}',${n})" style="display:block;width:100%;padding:13px;border:none;border-radius:10px;background:#1a1a18;color:#fff;font-size:14px;font-weight:700;cursor:pointer;margin-bottom:13px">+ Adicionar anotação</button>
+        <div id="m-notes-${k}">${renderNotesHTML(k)}</div>
+      </div>
+      <!-- CÓDIGO panel -->
+      <div id="m-panel-codigo" style="display:${mlt==='codigo'?'block':'none'}">
+        <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px" id="m-lang-btns">
+          ${['java','sql','xml','bash','json'].map(l=>`<button class="lang-btn ${curLang===l?'sel':''}" data-lang="${l}" onclick="mSetLang(this)">${l.toUpperCase()}</button>`).join('')}
+        </div>
+        <input type="text" id="m-code-title" placeholder="Título do trecho..." style="display:block;width:100%;font-size:14px;padding:11px 12px;border:1px solid #e8e6e0;border-radius:10px;background:#faf9f7;color:#1a1a18;font-family:inherit;outline:none;margin-bottom:8px"/>
+        <textarea id="m-code-body" placeholder="// Cole ou escreva o código aqui..." style="display:block;width:100%;font-size:13px;padding:11px 12px;border:1px solid #e8e6e0;border-radius:10px;background:#1a1a18;color:#e8e8e8;font-family:'Courier New',monospace;outline:none;resize:none;height:120px;line-height:1.7;margin-bottom:8px"></textarea>
+        <button onclick="mAddCode('${k}','${secId}',${n})" style="display:block;width:100%;padding:13px;border:none;border-radius:10px;background:#534AB7;color:#fff;font-size:14px;font-weight:700;cursor:pointer;margin-bottom:13px">+ Salvar código</button>
+        <div id="m-codes-${k}">${renderCodesHTML(k,secId,n)}</div>
+      </div>
+    </div>`;
+}
+function mSetLessonTab(tab,secId,n){
+  window._mLessonTab=tab;
+  document.getElementById('m-panel-notas').style.display=tab==='notas'?'block':'none';
+  document.getElementById('m-panel-codigo').style.display=tab==='codigo'?'block':'none';
+}
+function mSetNoteType(btn){ curNoteType=btn.dataset.type; document.querySelectorAll('#m-nt-btns .ntb').forEach(b=>{b.className='ntb';if(b.dataset.type===curNoteType)b.classList.add('sel-'+curNoteType);}); }
+function mSetLang(btn){ curLang=btn.dataset.lang; document.querySelectorAll('#m-lang-btns .lang-btn').forEach(b=>{b.className='lang-btn';if(b.dataset.lang===curLang)b.classList.add('sel');}); }
+
+function mAddNote(k,secId,n){
+  const ti=document.getElementById('m-note-title'); const bi=document.getElementById('m-note-body');
+  const title=ti?.value.trim(); const body=bi?.value.trim();
+  if(!title&&!body) return;
+  if(!state.notes[k]) state.notes[k]=[];
+  state.notes[k].unshift({id:Date.now(),type:curNoteType,title:title||'(sem título)',body,date:new Date().toLocaleDateString('pt-BR')});
+  if(ti)ti.value=''; if(bi)bi.value='';
+  save(); updateStats(); mRenderLesson(secId,n); mSetLessonTab('notas',secId,n); dRenderGlobalNotes();
+}
+function mAddCode(k,secId,n){
+  const ti=document.getElementById('m-code-title'); const bi=document.getElementById('m-code-body');
+  const body=bi?.value.trim(); if(!body) return;
+  const sec=SECTIONS.find(s=>s.id===secId); const lesson=sec.lessons.find(l=>l.n===n);
+  if(!state.codes[k]) state.codes[k]=[];
+  state.codes[k].push({id:Date.now(),lang:curLang,title:ti?.value.trim()||`Aula ${n} - trecho ${state.codes[k].length+1}`,body,date:new Date().toLocaleDateString('pt-BR'),secId,lessonN:n,secTitle:sec.title,lessonTitle:state.customTitles[k]||lesson.t});
+  if(ti)ti.value=''; if(bi)bi.value='';
+  save(); updateStats(); mRenderLesson(secId,n); mSetLessonTab('codigo',secId,n); dRenderGlobalCode(); mRenderCode();
+}
+function mEditTitle(secId,n){
+  const k=lk(secId,n); const sec=SECTIONS.find(s=>s.id===secId); const lesson=sec.lessons.find(l=>l.n===n);
+  const v=prompt('Editar título:',state.customTitles[k]||lesson.t);
+  if(v!==null){ const t=v.trim(); if(t&&t!==lesson.t) state.customTitles[k]=t; else delete state.customTitles[k]; save(); mRenderLesson(secId,n); mRenderSections(); dRenderSidebar(); }
+}
+
+function mRenderCode(){
+  const area=document.getElementById('m-code-list'); if(!area) return;
+  const all=getAllCodes();
+  if(!all.length){ area.innerHTML=`<div class="code-empty" style="padding:40px">Nenhum código ainda.<br>Abra uma aula → aba <strong>💻 Código</strong></div>`; return; }
+  area.innerHTML=`<div style="font-size:14px;font-weight:800;color:#1a1a18;margin-bottom:12px">💻 Código Completo (${all.length} trechos)</div>`+
+    all.map(c=>`<div class="code-block" style="margin-bottom:12px">
+      <div class="code-block-hdr">
+        <div class="code-block-meta">
+          <span style="font-size:10px;font-weight:800;padding:2px 8px;border-radius:10px;background:${LANG_COLORS[c.lang]||'#666'}22;color:${LANG_COLORS[c.lang]||'#aaa'}">${c.lang.toUpperCase()}</span>
+          <span class="code-block-title">${escHtml(c.title)}</span>
+        </div>
+        <div class="code-block-actions">
+          <button class="code-icon-btn" onclick="mOpenLesson('${c.secId}',${c.lessonN})">→ Aula</button>
+        </div>
+      </div>
+      <div class="code-pre" style="font-size:11px;color:#888;padding:6px 13px;border-bottom:1px solid #333">S${c.secNum} · Aula ${c.lessonN} · ${escHtml(c.lessonTitle)}</div>
+      <pre class="code-pre" style="font-size:11px">${syntaxHL(c.body,c.lang)}</pre>
+    </div>`).join('');
+}
+
+function mSearch(q){
+  const c=document.getElementById('m-search-results'); if(!c) return;
+  if(!q||q.length<2){c.innerHTML='<div class="empty">Digite para buscar...</div>';return;}
+  q=q.toLowerCase();
+  let res=[];
+  SECTIONS.forEach(sec=>sec.lessons.forEach(l=>{
+    const k=lk(sec.id,l.n); const t=state.customTitles[k]||l.t;
+    if(t.toLowerCase().includes(q)||String(l.n).includes(q)) res.push({sec,l,k,t});
+  }));
+  if(!res.length){c.innerHTML='<div class="empty">Nada encontrado.</div>';return;}
+  c.innerHTML=res.map(r=>{
+    const isDone=!!state.done[r.k];
+    return `<div style="display:flex;align-items:center;gap:9px;padding:11px 12px;background:#fff;border:1px solid #e8e6e0;border-radius:10px;margin-bottom:8px;cursor:pointer" onclick="mOpenLesson('${r.sec.id}',${r.l.n})">
+      <div style="width:18px;height:18px;border:2px solid ${isDone?'#1D9E75':'#ccc'};border-radius:4px;background:${isDone?'#1D9E75':'transparent'};display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:800;color:#fff;flex-shrink:0">${isDone?'✓':''}</div>
+      <div style="flex:1;min-width:0">
+        <div style="font-size:13px;color:${isDone?'#bbb':'#1a1a18'};${isDone?'text-decoration:line-through':''};line-height:1.4">${r.t}</div>
+        <div style="font-size:11px;color:#aaa;margin-top:2px">Aula ${r.l.n} · S${r.sec.num} · ${r.l.d}</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function mUpdateProgList(){
+  const pl=document.getElementById('m-prog-list'); if(!pl) return;
+  pl.innerHTML=SECTIONS.map(sec=>{
+    const done=sec.lessons.filter(l=>state.done[lk(sec.id,l.n)]).length;
+    const p=Math.round(done/sec.lessons.length*100);
+    return `<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+      <div style="font-size:11px;color:#555;width:88px;flex-shrink:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">S${sec.num} ${sec.title}</div>
+      <div style="flex:1;height:5px;background:#f0eeea;border-radius:3px"><div style="height:100%;background:#1D9E75;border-radius:3px;width:${p}%"></div></div>
+      <div style="font-size:10px;color:#aaa;min-width:26px;text-align:right">${p}%</div>
+    </div>`;
+  }).join('');
+}
+
+function mRenderLog(){
+  const c=document.getElementById('m-log-list'); if(!c) return;
+  if(!state.logs.length){c.innerHTML='<div class="empty">Nenhuma sessão ainda.</div>';return;}
+  const months=['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+  const sm={}; SECTIONS.forEach(s=>sm[s.id]=s);
+  c.innerHTML=state.logs.map(l=>{
+    const [y,m,d]=l.date.split('-'); const sec=l.sec&&sm[l.sec];
+    return `<div class="log-card" style="margin-bottom:8px">
+      <div class="log-date-blk"><div class="log-day">${d}</div><div class="log-month">${months[parseInt(m)-1]}</div></div>
+      <div class="log-sep"></div>
+      <div class="log-body">
+        <div class="log-title-txt">${sec?'S'+sec.num+': '+sec.title:'Estudo geral'}</div>
+        ${l.desc?`<div class="log-desc-txt">${l.desc}</div>`:''}
+      </div>
+      <div style="text-align:right;flex-shrink:0"><div class="log-h">${l.hours}h</div></div>
+      <button class="del-btn" onclick="deleteLog(${l.id})" style="font-size:13px">✕</button>
+    </div>`;
+  }).join('');
+}
+
+// ── MOBILE INIT ──────────────────────────────────────────────
+function mInit(){
+  const ml=document.getElementById('mobile-layer'); if(!ml) return;
+  // Size dynamically
+  function applyLayout(){
+    const tb=document.querySelector('.topbar');
+    const bn=document.getElementById('bottom-nav'); // keep bottom nav outside layer
+    const tbH=tb?Math.max(tb.getBoundingClientRect().height,44):54;
+    const bnH=bn?Math.max(bn.getBoundingClientRect().height,54):58;
+    ml.style.top=tbH+'px';
+    ml.style.bottom=bnH+'px';
+    ml.style.display='block';
+  }
+  applyLayout();
+  // Data
+  populateLogSelects();
+  mRenderSections();
+  mRenderLog();
+  mUpdateProgList();
+  updateStats();
+  const today=new Date().toISOString().split('T')[0];
+  const md=document.getElementById('m-log-date'); if(md) md.value=today;
+  // Show secoes
+  document.querySelectorAll('.m-screen').forEach(s=>s.style.display='none');
+  const sc=document.getElementById('ms-secoes'); if(sc) sc.style.display='block';
+  document.querySelectorAll('.bnav-btn').forEach(b=>b.classList.remove('active'));
+  const sb=document.getElementById('bnav-secoes'); if(sb) sb.classList.add('active');
+  mScreen='secoes';
+  // Re-apply after paint
+  requestAnimationFrame(()=>requestAnimationFrame(applyLayout));
+}
+
+// ── INIT ─────────────────────────────────────────────────────
+function init(){
+  load();
+  const today=new Date().toISOString().split('T')[0];
+  updateStats();
+  const ldEl=document.getElementById('d-log-date'); if(ldEl) ldEl.value=today;
+  populateLogSelects();
+
+  if(isMobile()){
+    document.querySelector('.desktop-wrap').style.display='none';
+    // defer so layout is painted
+    requestAnimationFrame(()=>requestAnimationFrame(mInit));
+  } else {
+    const ml=document.getElementById('mobile-layer'); if(ml) ml.style.display='none';
+    dRenderSidebar();
+    dRenderOverview();
+    dRenderGlobalNotes();
+    dRenderGlobalCode();
+    renderLogList();
+  }
+}
+
+window.addEventListener('resize',()=>{
+  const mobile=isMobile();
+  document.querySelector('.desktop-wrap').style.display=mobile?'none':'';
+  const ml=document.getElementById('mobile-layer');
+  if(mobile){ if(ml&&ml.style.display==='none') mInit(); }
+  else { if(ml) ml.style.display='none'; dRenderSidebar(); }
+});
 
 init();
 </script>
