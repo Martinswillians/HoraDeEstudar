@@ -200,6 +200,48 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
   .bottom-nav{display:none}
   #mobile-layer{display:none!important}
 }
+
+/* ── NOTES SUMMARY ── */
+.nsummary-hero{background:linear-gradient(135deg,#1a1a18 0%,#2d2d2a 100%);border-radius:14px;padding:22px 24px;margin-bottom:16px;color:#fff}
+.nsummary-hero h2{font-size:18px;font-weight:800;margin-bottom:6px}
+.nsummary-hero p{font-size:12px;color:#aaa;line-height:1.5}
+.nsummary-stats{display:flex;gap:10px;margin-top:14px;flex-wrap:wrap}
+.ns-stat{background:rgba(255,255,255,.08);border-radius:9px;padding:9px 14px;text-align:center;min-width:70px}
+.ns-stat-n{font-size:20px;font-weight:800;color:#fff}
+.ns-stat-l{font-size:10px;color:#aaa;margin-top:1px}
+.nsummary-filters{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:14px;align-items:center}
+.nsummary-filters label{font-size:11px;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:.3px;margin-right:4px}
+.nsummary-export-bar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;padding:14px;background:#fff;border:1px solid #e8e6e0;border-radius:12px;align-items:center}
+.nsummary-export-bar span{font-size:12px;font-weight:700;color:#1a1a18;flex:1}
+.btn-ns-exp{font-size:12px;font-weight:700;padding:9px 16px;border:none;border-radius:9px;cursor:pointer;display:flex;align-items:center;gap:6px;white-space:nowrap}
+.btn-ns-wpp{background:#25D366;color:#fff}
+.btn-ns-wpp:hover{background:#1ebe5d}
+.btn-ns-email{background:#EA4335;color:#fff}
+.btn-ns-email:hover{background:#d93025}
+.btn-ns-word{background:#185FA5;color:#fff}
+.btn-ns-word:hover{background:#1255a0}
+.btn-ns-copy{background:#1a1a18;color:#fff}
+.btn-ns-copy:hover{background:#333}
+.nsummary-section{background:#fff;border:1px solid #e8e6e0;border-radius:12px;overflow:hidden;margin-bottom:12px}
+.nsummary-sec-hdr{display:flex;align-items:center;gap:10px;padding:13px 16px;cursor:pointer;user-select:none;border-bottom:1px solid #f0eeea}
+.nsummary-sec-hdr:hover{background:#faf9f7}
+.nsummary-sec-badge{font-size:11px;font-weight:800;padding:3px 10px;border-radius:20px}
+.nsummary-sec-title{flex:1;font-size:13px;font-weight:700;color:#1a1a18}
+.nsummary-sec-count{font-size:11px;color:#888}
+.nsummary-sec-arrow{font-size:10px;color:#bbb;transition:transform .2s}
+.nsummary-sec-arrow.open{transform:rotate(90deg)}
+.nsummary-lessons{padding:4px 0 8px}
+.nsummary-lesson-hdr{padding:10px 16px 6px;font-size:11px;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:.4px;border-top:1px solid #f5f4f0}
+.nsummary-lesson-hdr:first-child{border-top:none}
+.nsummary-note-row{display:flex;align-items:flex-start;gap:10px;padding:7px 16px;transition:background .1s}
+.nsummary-note-row:hover{background:#faf9f7}
+.nsummary-note-type{font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;flex-shrink:0;margin-top:1px}
+.nsummary-note-content{flex:1;min-width:0}
+.nsummary-note-title{font-size:12px;font-weight:600;color:#1a1a18;line-height:1.4}
+.nsummary-note-body{font-size:12px;color:#666;line-height:1.5;margin-top:2px;white-space:pre-wrap}
+.nsummary-note-meta{font-size:10px;color:#bbb;margin-top:3px}
+.nsummary-empty{text-align:center;padding:40px 20px;color:#bbb;font-size:13px}
+
 </style>
 </head>
 <body>
@@ -289,6 +331,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
       <button class="ctab-btn active" onclick="setCtab('visao',this)">Visão Geral</button>
       <button class="ctab-btn" onclick="setCtab('aula',this)">Aula Atual</button>
       <button class="ctab-btn" onclick="setCtab('notas',this)">Anotações</button>
+      <button class="ctab-btn" onclick="setCtab('sumario',this)">📋 Sumário</button>
       <button class="ctab-btn" onclick="setCtab('codigo',this)">💻 Código</button>
       <button class="ctab-btn" onclick="setCtab('diario',this)">Diário</button>
     </div>
@@ -301,6 +344,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
       </div>
     </div>
     <div id="ctab-notas" class="ctab"><div id="d-global-notes"></div></div>
+    <div id="ctab-sumario" class="ctab"><div id="d-notes-summary"></div></div>
     <div id="ctab-codigo" class="ctab"><div id="d-global-code"></div></div>
     <div id="ctab-diario" class="ctab">
       <div class="log-form">
@@ -325,6 +369,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
   <button class="bnav-btn" id="bnav-stats" onclick="mNav('stats')"><span class="bnav-icon">📊</span>Progresso</button>
   <button class="bnav-btn" id="bnav-codigo" onclick="mNav('codigo')"><span class="bnav-icon">💻</span>Código</button>
   <button class="bnav-btn" id="bnav-diario" onclick="mNav('diario')"><span class="bnav-icon">📓</span>Diário</button>
+  <button class="bnav-btn" id="bnav-sumario" onclick="mNav('sumario')"><span class="bnav-icon">📋</span>Sumário</button>
 </nav>
 
 <div id="mobile-layer" style="display:none;position:fixed;left:0;right:0;top:0;bottom:0;z-index:50;background:#f5f4f0;overflow:hidden">
@@ -363,6 +408,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
     </div>
     <button onclick="openExportGeral()" style="width:100%;margin-top:12px;padding:12px;border:none;border-radius:10px;background:#1a1a18;color:#fff;font-size:13px;font-weight:700;cursor:pointer">📤 Exportar Progresso</button>
   </div>
+  <div id="ms-sumario" class="m-screen" style="height:100%;overflow-y:auto;padding:12px;display:none"><div id="m-notes-summary"></div></div>
   <div id="ms-codigo" class="m-screen" style="height:100%;overflow-y:auto;padding:12px;display:none"><div id="m-code-list"></div></div>
   <div id="ms-diario" class="m-screen" style="height:100%;overflow-y:auto;padding:12px;display:none">
     <div class="log-form" style="margin-bottom:12px">
@@ -906,7 +952,7 @@ function addNote(k,secId,n){
   if(!state.notes[k]) state.notes[k]=[];
   state.notes[k].unshift({id:Date.now(),type:curNoteType,title:title||'(sem título)',body,date:new Date().toLocaleDateString('pt-BR')});
   if(ti)ti.value=''; if(bi)bi.value='';
-  save(); updateStats(); dRenderLesson(secId,n); setLessonTab('notas',secId,n); dRenderGlobalNotes();
+  save(); updateStats(); dRenderLesson(secId,n); setLessonTab('notas',secId,n); dRenderGlobalNotes(); _refreshSummaryIfOpen();
 }
 function renderNotesHTML(k){
   const notes=state.notes[k]||[];
@@ -928,7 +974,7 @@ function deleteNote(k,id){
   if(!state.notes[k]) return; state.notes[k]=state.notes[k].filter(n=>n.id!==id); save(); updateStats();
   const c=document.getElementById('d-notes-'+k); if(c) c.innerHTML=renderNotesHTML(k);
   const mc=document.getElementById('m-notes-'+k); if(mc) mc.innerHTML=renderNotesHTML(k);
-  dRenderGlobalNotes();
+  dRenderGlobalNotes(); _refreshSummaryIfOpen();
 }
 function editNote(k,id){
   const note=(state.notes[k]||[]).find(n=>n.id===id); if(!note) return;
@@ -953,7 +999,7 @@ function saveNote(k,id){
   const note=(state.notes[k]||[]).find(n=>n.id===id); if(!note) return;
   const t=document.getElementById('en-title-'+id); const b=document.getElementById('en-body-'+id); const tp=document.getElementById('en-type-'+id);
   if(t) note.title=t.value.trim()||'(sem título)'; if(b) note.body=b.value.trim(); if(tp) note.type=tp.value;
-  save(); const c=document.getElementById('d-notes-'+k); if(c) c.innerHTML=renderNotesHTML(k); dRenderGlobalNotes();
+  save(); const c=document.getElementById('d-notes-'+k); if(c) c.innerHTML=renderNotesHTML(k); dRenderGlobalNotes(); _refreshSummaryIfOpen();
 }
 function cancelNote(k,id){ const c=document.getElementById('d-notes-'+k); if(c) c.innerHTML=renderNotesHTML(k); }
 
@@ -1212,6 +1258,7 @@ function setCtab(name,btn){
   else document.querySelectorAll('.ctab-btn').forEach(b=>{if(b.getAttribute('onclick')&&b.getAttribute('onclick').includes("'"+name+"'"))b.classList.add('active');});
   if(name==='notas') dRenderGlobalNotes();
   if(name==='codigo') dRenderGlobalCode();
+  if(name==='sumario') renderNotesSummary('d-notes-summary');
   if(name==='diario') renderLogList();
   if(name==='visao') dRenderOverview();
 }
@@ -1291,6 +1338,277 @@ function exportCopy(){
 }
 document.addEventListener('keydown',e=>{if(e.key==='Escape')closeExport();});
 
+
+// ══════════════════════════════════════════════════════════
+// NOTES SUMMARY (Sumário de Anotações)
+// ══════════════════════════════════════════════════════════
+let nsSectionFilter = 'all';
+let nsTypeFilter = 'all';
+let nsOpenSections = {};
+
+function getAllNotesGrouped() {
+  const result = [];
+  SECTIONS.forEach(sec => {
+    const secNotes = [];
+    sec.lessons.forEach(l => {
+      const k = lk(sec.id, l.n);
+      const notes = state.notes[k] || [];
+      if (notes.length) {
+        secNotes.push({ lesson: l, k, notes });
+      }
+    });
+    if (secNotes.length) result.push({ sec, lessons: secNotes });
+  });
+  return result;
+}
+
+function getAllNotesFlat(sectionId, typeFilter) {
+  let all = [];
+  SECTIONS.forEach(sec => {
+    if (sectionId !== 'all' && sec.id !== sectionId) return;
+    sec.lessons.forEach(l => {
+      const k = lk(sec.id, l.n);
+      (state.notes[k] || []).forEach(n => {
+        if (typeFilter !== 'all' && n.type !== typeFilter) return;
+        all.push({ ...n, k, secId: sec.id, secNum: sec.num, secTitle: sec.title, secColor: sec.color, lessonN: l.n, lessonTitle: state.customTitles[k] || l.t });
+      });
+    });
+  });
+  return all;
+}
+
+function buildSummaryText(sectionId, typeFilter) {
+  const groups = getAllNotesGrouped();
+  const NE2 = { tip: '💡', doubt: '❓', important: '⭐', concept: '📖' };
+  const NL2 = { tip: 'Dica', doubt: 'Dúvida', important: 'Importante', concept: 'Conceito' };
+  let totalNotes = 0;
+  let txt = '☕ *Java COMPLETO — Sumário de Anotações*\n';
+  txt += '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n';
+  groups.forEach(g => {
+    if (sectionId !== 'all' && g.sec.id !== sectionId) return;
+    let secTxt = '';
+    g.lessons.forEach(({ lesson, k, notes }) => {
+      const filtered = typeFilter === 'all' ? notes : notes.filter(n => n.type === typeFilter);
+      if (!filtered.length) return;
+      totalNotes += filtered.length;
+      secTxt += `🎬 *Aula ${lesson.n}: ${state.customTitles[k] || lesson.t}*\n`;
+      filtered.forEach(n => {
+        secTxt += `  ${NE2[n.type] || '📝'} *${NL2[n.type] || n.type}* — ${n.title}\n`;
+        if (n.body) secTxt += `    ${n.body.replace(/\n/g, '\n    ')}\n`;
+      });
+      secTxt += '\n';
+    });
+    if (secTxt) {
+      txt += `📚 *S${g.sec.num}: ${g.sec.title}*\n${secTxt}`;
+    }
+  });
+  txt += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`;
+  txt += `📝 Total: ${totalNotes} anotações\n`;
+  txt += `🔗 Java COMPLETO · Nelio Alves (Udemy) · ${new Date().toLocaleDateString('pt-BR')}`;
+  return txt;
+}
+
+function renderNotesSummary(targetId, isMobileView) {
+  const el = document.getElementById(targetId);
+  if (!el) return;
+  const allFlat = getAllNotesFlat('all', 'all');
+  const grouped = getAllNotesGrouped();
+  const secCount = grouped.length;
+  const typeCount = { tip: 0, doubt: 0, important: 0, concept: 0 };
+  allFlat.forEach(n => { if (typeCount[n.type] !== undefined) typeCount[n.type]++; });
+
+  const typeColors = {
+    tip: { bg: '#EAF3DE', color: '#27500A', label: '💡 Dicas' },
+    doubt: { bg: '#FAEEDA', color: '#633806', label: '❓ Dúvidas' },
+    important: { bg: '#EEEDFE', color: '#3C3489', label: '⭐ Imp.' },
+    concept: { bg: '#E6F1FB', color: '#0C447C', label: '📖 Conc.' }
+  };
+
+  if (!allFlat.length) {
+    el.innerHTML = `<div class="nsummary-empty">
+      <div style="font-size:40px;margin-bottom:12px">📝</div>
+      <div style="font-size:15px;font-weight:700;color:#888;margin-bottom:6px">Nenhuma anotação ainda</div>
+      <div style="font-size:13px;color:#bbb">Acesse uma aula e adicione suas dicas, dúvidas e conceitos.</div>
+    </div>`;
+    return;
+  }
+
+  // Build sections filter buttons
+  const secBtns = `<label style="font-size:11px;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:.3px">Seção:</label>
+    <button class="ntb${nsSectionFilter==='all'?' active-ns':''}" style="${nsSectionFilter==='all'?'background:#f0eeea;color:#1a1a18;border-color:#888':''}" onclick="setNsSection('all')">Todas</button>
+    ${grouped.map(g => `<button class="ntb${nsSectionFilter===g.sec.id?' active-ns':''}" style="background:${nsSectionFilter===g.sec.id?g.sec.color+'22':'none'};color:${nsSectionFilter===g.sec.id?g.sec.color:'#888'};border-color:${nsSectionFilter===g.sec.id?g.sec.color:'#e8e6e0'}" onclick="setNsSection('${g.sec.id}')">S${g.sec.num}</button>`).join('')}`;
+
+  const typeBtns = `<label style="font-size:11px;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:.3px;margin-top:4px">Tipo:</label>
+    <button class="ntb" style="${nsTypeFilter==='all'?'background:#f0eeea;color:#1a1a18;border-color:#888':''}" onclick="setNsType('all')">Todas (${allFlat.length})</button>
+    ${Object.entries(typeColors).map(([t, tc]) => `<button class="ntb ${nsTypeFilter===t?'sel-'+t:''}" onclick="setNsType('${t}')">${tc.label} (${typeCount[t]})</button>`).join('')}`;
+
+  // Build grouped list
+  let listHtml = '';
+  grouped.forEach(g => {
+    if (nsSectionFilter !== 'all' && g.sec.id !== nsSectionFilter) return;
+    let lessonRows = '';
+    let secNoteCount = 0;
+    g.lessons.forEach(({ lesson, k, notes }) => {
+      const filtered = nsTypeFilter === 'all' ? notes : notes.filter(n => n.type === nsTypeFilter);
+      if (!filtered.length) return;
+      secNoteCount += filtered.length;
+      lessonRows += `<div class="nsummary-lesson-hdr">🎬 Aula ${lesson.n} · ${escHtml(state.customTitles[k] || lesson.t)}</div>`;
+      filtered.forEach(n => {
+        const tc = typeColors[n.type] || typeColors.tip;
+        lessonRows += `<div class="nsummary-note-row">
+          <span class="nsummary-note-type note-badge ${NOTE_TYPES[n.type]?.cls||'nb-tip'}" style="background:${tc.bg};color:${tc.color}">${tc.label.split(' ')[0]}</span>
+          <div class="nsummary-note-content">
+            <div class="nsummary-note-title">${escHtml(n.title)}</div>
+            ${n.body ? `<div class="nsummary-note-body">${escHtml(n.body)}</div>` : ''}
+            <div class="nsummary-note-meta">${n.date}</div>
+          </div>
+        </div>`;
+      });
+    });
+    if (!lessonRows) return;
+    const isOpen = nsOpenSections[g.sec.id] !== false;
+    listHtml += `<div class="nsummary-section">
+      <div class="nsummary-sec-hdr" onclick="toggleNsSection('${g.sec.id}')">
+        <span class="nsummary-sec-badge" style="background:${g.sec.color}22;color:${g.sec.color}">S${g.sec.num}</span>
+        <span class="nsummary-sec-title">${escHtml(g.sec.title)}</span>
+        <span class="nsummary-sec-count">${secNoteCount} nota${secNoteCount!==1?'s':''}</span>
+        <span class="nsummary-sec-arrow ${isOpen?'open':''}">▶</span>
+      </div>
+      ${isOpen ? `<div class="nsummary-lessons">${lessonRows}</div>` : ''}
+    </div>`;
+  });
+
+  const filteredAll = getAllNotesFlat(nsSectionFilter, nsTypeFilter);
+
+  el.innerHTML = `
+    <div class="nsummary-hero">
+      <h2>📋 Sumário de Anotações</h2>
+      <p>Todas as suas anotações organizadas por seção e tipo.<br>Exporte para compartilhar ou revisar.</p>
+      <div class="nsummary-stats">
+        <div class="ns-stat"><div class="ns-stat-n">${allFlat.length}</div><div class="ns-stat-l">Total</div></div>
+        <div class="ns-stat"><div class="ns-stat-n" style="color:#EAF3DE">${typeCount.tip}</div><div class="ns-stat-l">Dicas</div></div>
+        <div class="ns-stat"><div class="ns-stat-n" style="color:#FAEEDA">${typeCount.doubt}</div><div class="ns-stat-l">Dúvidas</div></div>
+        <div class="ns-stat"><div class="ns-stat-n" style="color:#EEEDFE">${typeCount.important}</div><div class="ns-stat-l">Imp.</div></div>
+        <div class="ns-stat"><div class="ns-stat-n" style="color:#E6F1FB">${typeCount.concept}</div><div class="ns-stat-l">Conc.</div></div>
+        <div class="ns-stat"><div class="ns-stat-n">${secCount}</div><div class="ns-stat-l">Seções</div></div>
+      </div>
+    </div>
+    <div class="nsummary-export-bar">
+      <span>📤 Exportar ${filteredAll.length} nota${filteredAll.length!==1?'s':''}</span>
+      <button class="btn-ns-exp btn-ns-wpp" onclick="nsSummaryExportWpp()">📱 WhatsApp</button>
+      <button class="btn-ns-exp btn-ns-email" onclick="nsSummaryExportEmail()">📧 E-mail</button>
+      <button class="btn-ns-exp btn-ns-word" onclick="nsSummaryDownloadWord()">📄 Word</button>
+      <button class="btn-ns-exp btn-ns-copy" id="btn-ns-copy" onclick="nsSummaryCopy()">📋 Copiar</button>
+    </div>
+    <div class="nsummary-filters">${secBtns}</div>
+    <div class="nsummary-filters">${typeBtns}</div>
+    ${listHtml || '<div class="nsummary-empty">Nenhuma anotação neste filtro.</div>'}
+  `;
+}
+
+function setNsSection(id) { nsSectionFilter = id; renderNotesSummary('d-notes-summary'); renderNotesSummary('m-notes-summary', true); }
+function setNsType(t) { nsTypeFilter = t; renderNotesSummary('d-notes-summary'); renderNotesSummary('m-notes-summary', true); }
+function toggleNsSection(id) { nsOpenSections[id] = nsOpenSections[id] === false ? true : false; renderNotesSummary('d-notes-summary'); renderNotesSummary('m-notes-summary', true); }
+
+function nsSummaryExportWpp() { window.open('https://wa.me/?text=' + encodeURIComponent(buildSummaryText(nsSectionFilter, nsTypeFilter)), '_blank'); }
+function nsSummaryExportEmail() {
+  const sub = '☕ Java COMPLETO — Sumário de Anotações';
+  window.location.href = 'mailto:?subject=' + encodeURIComponent(sub) + '&body=' + encodeURIComponent(buildSummaryText(nsSectionFilter, nsTypeFilter));
+}
+function nsSummaryCopy() {
+  navigator.clipboard.writeText(buildSummaryText(nsSectionFilter, nsTypeFilter)).then(() => {
+    const b = document.getElementById('btn-ns-copy');
+    if (b) { b.textContent = '✅ Copiado!'; setTimeout(() => b.textContent = '📋 Copiar', 2000); }
+  });
+}
+
+function nsSummaryDownloadWord() {
+  // Build HTML content for the Word document via blob
+  const allFlat = getAllNotesFlat('all', 'all');
+  const grouped = getAllNotesGrouped();
+  const typeColors = {
+    tip:       { bg: '#EAF3DE', color: '#27500A', label: '💡 Dica' },
+    doubt:     { bg: '#FAEEDA', color: '#633806', label: '❓ Dúvida' },
+    important: { bg: '#EEEDFE', color: '#3C3489', label: '⭐ Importante' },
+    concept:   { bg: '#E6F1FB', color: '#0C447C', label: '📖 Conceito' }
+  };
+  const typeCount = { tip: 0, doubt: 0, important: 0, concept: 0 };
+  allFlat.forEach(n => { if (typeCount[n.type] !== undefined) typeCount[n.type]++; });
+
+  let rows = '';
+  grouped.forEach(g => {
+    if (nsSectionFilter !== 'all' && g.sec.id !== nsSectionFilter) return;
+    let hasContent = false;
+    let secRows = '';
+    g.lessons.forEach(({ lesson, k, notes }) => {
+      const filtered = nsTypeFilter === 'all' ? notes : notes.filter(n => n.type === nsTypeFilter);
+      if (!filtered.length) return;
+      hasContent = true;
+      secRows += `<tr><td colspan="3" style="background:#f5f5f5;padding:7px 10px;font-size:11px;font-weight:700;color:#555;border-top:1px solid #ddd">
+        🎬 Aula ${lesson.n} · ${lesson.t}
+      </td></tr>`;
+      filtered.forEach(n => {
+        const tc = typeColors[n.type] || typeColors.tip;
+        secRows += `<tr>
+          <td style="padding:8px 10px;vertical-align:top;width:90px;white-space:nowrap">
+            <span style="background:${tc.bg};color:${tc.color};font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px">${tc.label}</span>
+          </td>
+          <td style="padding:8px 10px;vertical-align:top">
+            <div style="font-size:12px;font-weight:700;color:#1a1a18">${escHtml(n.title)}</div>
+            ${n.body ? `<div style="font-size:11px;color:#555;margin-top:3px;line-height:1.5;white-space:pre-wrap">${escHtml(n.body)}</div>` : ''}
+          </td>
+          <td style="padding:8px 10px;vertical-align:top;font-size:10px;color:#aaa;white-space:nowrap">${n.date}</td>
+        </tr>`;
+      });
+    });
+    if (!hasContent) return;
+    rows += `<tr><td colspan="3" style="background:${g.sec.color};padding:10px 14px;color:#fff;font-size:14px;font-weight:800">
+      S${g.sec.num} · ${g.sec.title}
+    </td></tr>${secRows}`;
+  });
+
+  const date = new Date().toLocaleDateString('pt-BR');
+  const htmlDoc = `<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40">
+<head><meta charset="UTF-8"/>
+<style>
+  body{font-family:Calibri,Arial,sans-serif;font-size:12pt;color:#1a1a18}
+  h1{font-size:22pt;font-weight:800;color:#1a1a18;margin-bottom:4px}
+  h2{font-size:14pt;font-weight:700;color:#185FA5;margin-top:18px;margin-bottom:6px}
+  table{border-collapse:collapse;width:100%;margin-bottom:18px}
+  td{border:1px solid #e8e6e0}
+  .hero-meta{font-size:10pt;color:#888;margin-bottom:18px;padding-bottom:12px;border-bottom:2px solid #1a1a18}
+  .summary-stats{display:inline-block;background:#f5f5f5;padding:8px 14px;border-radius:6px;margin-bottom:16px;font-size:11pt}
+</style>
+</head><body>
+<h1>☕ Java COMPLETO — Sumário de Anotações</h1>
+<p class="hero-meta">Nelio Alves · Udemy · POO + Projetos · Gerado em ${date}</p>
+<div class="summary-stats">
+  📝 Total: <b>${allFlat.length}</b> anotações &nbsp;|&nbsp;
+  💡 Dicas: <b>${typeCount.tip}</b> &nbsp;|&nbsp;
+  ❓ Dúvidas: <b>${typeCount.doubt}</b> &nbsp;|&nbsp;
+  ⭐ Imp.: <b>${typeCount.important}</b> &nbsp;|&nbsp;
+  📖 Conc.: <b>${typeCount.concept}</b>
+</div>
+<table>${rows}</table>
+</body></html>`;
+
+  const blob = new Blob(['\uFEFF' + htmlDoc], { type: 'application/msword;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `java-completo-sumario-anotacoes-${date.replace(/\//g, '-')}.doc`;
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+
+function _refreshSummaryIfOpen() {
+  const dSumTab = document.getElementById('ctab-sumario');
+  if (dSumTab && dSumTab.classList.contains('active')) renderNotesSummary('d-notes-summary');
+  const mSumScreen = document.getElementById('ms-sumario');
+  if (mSumScreen && mSumScreen.style.display !== 'none') renderNotesSummary('m-notes-summary', true);
+}
+
 // ══════════════════════════════════════════════════════════
 // MOBILE
 // ══════════════════════════════════════════════════════════
@@ -1313,6 +1631,7 @@ function mNav(name){
   }
   if(name==='stats'){ mUpdateProgList(); updateStats(); }
   if(name==='codigo') mRenderCode();
+  if(name==='sumario') renderNotesSummary('m-notes-summary', true);
   if(name==='diario') mRenderLog();
   if(name==='secoes') mRenderSections();
 }
@@ -1433,7 +1752,7 @@ function mAddNote(k,secId,n){
   if(!state.notes[k]) state.notes[k]=[];
   state.notes[k].unshift({id:Date.now(),type:curNoteType,title:title||'(sem título)',body,date:new Date().toLocaleDateString('pt-BR')});
   if(ti)ti.value=''; if(bi)bi.value='';
-  save(); updateStats(); mRenderLesson(secId,n); mSetLessonTab('notas',secId,n); dRenderGlobalNotes();
+  save(); updateStats(); mRenderLesson(secId,n); mSetLessonTab('notas',secId,n); dRenderGlobalNotes(); _refreshSummaryIfOpen();
 }
 function mAddCode(k,secId,n){
   const ti=document.getElementById('m-code-title'); const bi=document.getElementById('m-code-body');
