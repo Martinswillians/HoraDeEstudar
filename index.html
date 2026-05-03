@@ -98,6 +98,26 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .note-actions{display:flex;gap:3px;margin-left:auto}
 .del-btn{background:none;border:none;cursor:pointer;font-size:11px;color:#bbb;padding:2px 5px;border-radius:4px}
 .del-btn:hover{color:#A32D2D}
+/* ── IMAGE UPLOAD ── */
+.img-drop-zone{border:2px dashed #e8e6e0;border-radius:10px;padding:16px;text-align:center;cursor:pointer;transition:all .2s;background:#faf9f7;position:relative;margin-bottom:8px}
+.img-drop-zone:hover,.img-drop-zone.drag-over{border-color:#185FA5;background:#f0f7ff}
+.img-drop-zone input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
+.img-drop-zone-txt{font-size:12px;color:#aaa;pointer-events:none}
+.img-drop-zone-txt b{color:#185FA5}
+.img-preview-wrap{position:relative;display:inline-block;margin-bottom:8px}
+.img-preview-wrap img{max-width:100%;max-height:180px;border-radius:8px;border:1px solid #e8e6e0;display:block}
+.img-preview-wrap .remove-img{position:absolute;top:-6px;right:-6px;width:20px;height:20px;border-radius:50%;background:#A32D2D;color:#fff;border:none;cursor:pointer;font-size:12px;display:flex;align-items:center;justify-content:center;font-weight:800;line-height:1}
+.note-imgs{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+.note-img-thumb{position:relative;cursor:pointer;border-radius:8px;overflow:hidden;border:1px solid #e8e6e0;flex-shrink:0}
+.note-img-thumb img{width:80px;height:80px;object-fit:cover;display:block;transition:opacity .15s}
+.note-img-thumb:hover img{opacity:.85}
+.note-img-thumb .del-img-btn{position:absolute;top:2px;right:2px;width:18px;height:18px;border-radius:50%;background:rgba(163,45,45,.85);color:#fff;border:none;cursor:pointer;font-size:10px;font-weight:800;display:none;align-items:center;justify-content:center}
+.note-img-thumb:hover .del-img-btn{display:flex}
+/* Lightbox */
+.lightbox{display:none;position:fixed;inset:0;background:rgba(0,0,0,.88);z-index:9999;align-items:center;justify-content:center;padding:20px;cursor:zoom-out}
+.lightbox.open{display:flex}
+.lightbox img{max-width:100%;max-height:90vh;border-radius:10px;box-shadow:0 20px 60px rgba(0,0,0,.5);cursor:default}
+.lightbox-close{position:absolute;top:14px;right:18px;color:#fff;font-size:28px;cursor:pointer;background:none;border:none;font-weight:300;line-height:1}
 /* ── CODE ── */
 .lang-btns{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px}
 .lang-btn{font-size:11px;padding:3px 11px;border-radius:20px;border:1.5px solid #e8e6e0;background:none;cursor:pointer;color:#888;font-weight:600;transition:all .15s}
@@ -731,7 +751,7 @@ const SECTIONS = [
   ]},
 ];
 
-// ── CONSTANTS & STATE ──────────────────────────────────────
+// -- CONSTANTS & STATE --------------------------------------
 const TOTAL = SECTIONS.reduce((s,sec)=>s+sec.lessons.length,0);
 const LANG_COLORS = {java:'#f89820',sql:'#336791',xml:'#e44d26',bash:'#4eaa25',json:'#cbcb41'};
 const NOTE_TYPES = {
@@ -761,7 +781,7 @@ function load(){
   }catch(e){}
 }
 
-// ── STATS ───────────────────────────────────────────────────
+// -- STATS ---------------------------------------------------
 function calcStats(){
   let totalDone=0,notesCount=0,codesCount=0;
   SECTIONS.forEach(sec=>sec.lessons.forEach(l=>{
@@ -786,7 +806,7 @@ function updateStats(){
   s('ms-notes',notesCount); s('ms-hours',hours.toFixed(1)+'h'); s('ms-sessions',sessions);
 }
 
-// ── UTILS ───────────────────────────────────────────────────
+// -- UTILS ---------------------------------------------------
 function escHtml(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 function syntaxHL(code,lang){
   if(lang!=='java') return escHtml(code);
@@ -799,7 +819,7 @@ function syntaxHL(code,lang){
     .replace(/@\w+/g,m=>`<span style="color:#fb923c">${m}</span>`);
 }
 
-// ── DESKTOP SIDEBAR ─────────────────────────────────────────
+// -- DESKTOP SIDEBAR -----------------------------------------
 function dRenderSidebar(){
   const c=document.getElementById('d-sections-nav');
   if(!c) return;
@@ -813,7 +833,7 @@ function dRenderSidebar(){
         <div class="sec-num" style="background:${sec.color}22;color:${sec.color}">${sec.num}</div>
         <div class="sec-title">${sec.title}</div>
         <div class="sec-meta">${done}/${sec.lessons.length}</div>
-        <div class="sec-arrow ${isOpen?'open':''}">▶</div>
+        <div class="sec-arrow ${isOpen?'open':''}">></div>
       </div>
       <div class="sec-bar"><div class="sec-bar-fill" style="width:${pct}%"></div></div>
       <div class="lessons-wrap ${isOpen?'open':''}">`;
@@ -859,7 +879,7 @@ function dSearch(q){
   }).join('');
 }
 
-// ── TOGGLE DONE ─────────────────────────────────────────────
+// -- TOGGLE DONE ---------------------------------------------
 function toggleDone(secId,n){
   const k=lk(secId,n); state.done[k]=!state.done[k]; save();
   dRenderSidebar(); updateStats(); dRenderOverview();
@@ -867,7 +887,7 @@ function toggleDone(secId,n){
   mRenderSections(); mUpdateProgList();
 }
 
-// ── DESKTOP LESSON DETAIL ────────────────────────────────────
+// -- DESKTOP LESSON DETAIL ------------------------------------
 function dOpenLesson(secId,n){
   activeKey=lk(secId,n);
   expCtx.secId=secId; expCtx.lessonN=n;
@@ -890,13 +910,13 @@ function dRenderLesson(secId,n){
       <div class="ld-hdr">
         <div class="ld-chk ${isDone?'done':''}" onclick="toggleDone('${secId}',${n})">${isDone?'✓':''}</div>
         <div class="ld-info">
-          <div class="ld-sec-label">Seção ${sec.num} · ${sec.title}</div>
+          <div class="ld-sec-label">Seção ${sec.num} . ${sec.title}</div>
           <div class="ld-title">${title}</div>
           <div class="ld-meta"><span>Aula ${n}</span><span>${lesson.d}</span>${isDone?'<span style="color:#1D9E75;font-weight:600">✓ Concluída</span>':''}</div>
         </div>
         <div class="ld-actions">
           <button class="icon-btn" onclick="dEditTitle(secId,n)">✏️ Editar</button>
-          <button class="icon-btn" onclick="toggleDone('${secId}',${n})">${isDone?'↩ Desmarcar':'✓ Concluir'}</button>
+          <button class="icon-btn" onclick="toggleDone('${secId}',${n})">${isDone?'< Desmarcar':'✓ Concluir'}</button>
           <button class="icon-btn" style="background:#f0f7ff;color:#185FA5;border-color:#c8ddf2" onclick="openExport(secId,n)">📤 Exportar</button>
         </div>
       </div>
@@ -910,7 +930,15 @@ function dRenderLesson(secId,n){
         </div>
         <div class="note-inp-area">
           <input type="text" id="d-note-title" placeholder="Título da anotação..."/>
-          <textarea id="d-note-body" placeholder="Escreva sua dica, dúvida ou conceito..."></textarea>
+          <textarea id="d-note-body" placeholder="Escreva sua dica, dúvida ou conceito..." onpaste="handlePaste(event,'d-img-preview')"></textarea>
+          <div class="img-drop-zone" id="d-drop-zone"
+            ondragover="event.preventDefault();this.classList.add('drag-over')"
+            ondragleave="this.classList.remove('drag-over')"
+            ondrop="handleDrop(event,'d-img-preview')">
+            <input type="file" accept="image/*" multiple onchange="handleFileInput(event,'d-img-preview')"/>
+            <div class="img-drop-zone-txt">🖼 <b>Clique ou arraste</b> para adicionar imagem . ou <b>Ctrl+V</b> para colar</div>
+          </div>
+          <div id="d-img-preview" style="display:flex;flex-wrap:wrap;gap:7px;margin-bottom:4px"></div>
           <button class="btn-add-note" onclick="addNote('${k}',secId,n)">+ Adicionar anotação</button>
         </div>
         <div id="d-notes-${k}">${renderNotesHTML(k)}</div>
@@ -944,14 +972,16 @@ function dEditTitle(secId,n){
   if(v!==null){ const t=v.trim(); if(t&&t!==lesson.t) state.customTitles[k]=t; else delete state.customTitles[k]; save(); dRenderSidebar(); dRenderLesson(secId,n); mRenderSections(); }
 }
 
-// ── NOTES ────────────────────────────────────────────────────
+// -- NOTES ----------------------------------------------------
 function addNote(k,secId,n){
   const ti=document.getElementById('d-note-title'); const bi=document.getElementById('d-note-body');
   const title=ti?.value.trim(); const body=bi?.value.trim();
-  if(!title&&!body) return;
+  const imgs=window._pendingImgs||[];
+  if(!title&&!body&&!imgs.length) return;
   if(!state.notes[k]) state.notes[k]=[];
-  state.notes[k].unshift({id:Date.now(),type:curNoteType,title:title||'(sem título)',body,date:new Date().toLocaleDateString('pt-BR')});
+  state.notes[k].unshift({id:Date.now(),type:curNoteType,title:title||'(sem titulo)',body,imgs:[...imgs],date:new Date().toLocaleDateString('pt-BR')});
   if(ti)ti.value=''; if(bi)bi.value='';
+  window._pendingImgs=[]; refreshImgPreview('d-img-preview');
   save(); updateStats(); dRenderLesson(secId,n); setLessonTab('notas',secId,n); dRenderGlobalNotes(); _refreshSummaryIfOpen();
 }
 function renderNotesHTML(k){
@@ -967,7 +997,12 @@ function renderNotesHTML(k){
       </div>
     </div>
     ${n.body?`<div class="note-card-body">${escHtml(n.body)}</div>`:''}
-    <div style="font-size:10px;color:#bbb;margin-top:5px">${n.date}</div>
+    ${n.imgs&&n.imgs.length?`<div class="note-imgs">${n.imgs.map((img,i)=>`
+      <div class="note-img-thumb">
+        <img src="${img}" alt="imagem ${i+1}" data-idx="${i}" onclick="openLightboxIdx(this)" loading="lazy" style="cursor:zoom-in"/>
+        <button class="del-img-btn" onclick="deleteNoteImg('${k}',${n.id},${i})">✕</button>
+      </div>`).join('')}</div>`:''}
+    <div style="font-size:10px;color:#bbb;margin-top:5px">${n.date}${n.imgs&&n.imgs.length?` . 🖼 ${n.imgs.length} imagem(ns)`:''}</div>
   </div>`}).join('');
 }
 function deleteNote(k,id){
@@ -1009,7 +1044,7 @@ function cancelNote(k,id){
   const mc=document.getElementById('m-notes-'+k); if(mc) mc.innerHTML=renderNotesHTML(k);
 }
 
-// ── GLOBAL NOTES ─────────────────────────────────────────────
+// -- GLOBAL NOTES ---------------------------------------------
 let gNoteFilter='all';
 function dRenderGlobalNotes(){
   const area=document.getElementById('d-global-notes'); if(!area) return;
@@ -1033,14 +1068,14 @@ function dRenderGlobalNotes(){
     </div>
     ${n.body?`<div class="note-card-body">${escHtml(n.body)}</div>`:''}
     <div style="font-size:10px;color:#bbb;margin-top:5px;display:flex;align-items:center;gap:8px">
-      <span>Aula ${n.lessonN} · S${n.secNum} · ${n.date}</span>
-      <button onclick="dOpenLesson('${n.secId}',${n.lessonN})" class="del-btn" style="font-size:11px">→ Ver aula</button>
+      <span>Aula ${n.lessonN} . S${n.secNum} . ${n.date}</span>
+      <button onclick="dOpenLesson('${n.secId}',${n.lessonN})" class="del-btn" style="font-size:11px">> Ver aula</button>
     </div>
   </div>`}).join(''):'<div class="empty">Nenhuma anotação ainda.</div>'}`;
 }
 function setGNoteFilter(t){ gNoteFilter=t; dRenderGlobalNotes(); }
 
-// ── CODE ─────────────────────────────────────────────────────
+// -- CODE -----------------------------------------------------
 function addCode(k,secId,n){
   const ti=document.getElementById('d-code-title'); const bi=document.getElementById('d-code-body');
   const body=bi?.value.trim(); if(!body) return;
@@ -1138,12 +1173,12 @@ function dRenderGlobalCode(){
   blocks.forEach(c=>{
     if(c.secNum!==lastSec){
       if(rawLines.length) rawLines.push('');
-      rawLines.push('// ════════════════════════════════════════════════════');
+      rawLines.push('// ====================================================');
       rawLines.push(`// SECAO ${c.secNum}: ${c.secTitle}`);
-      rawLines.push('// ════════════════════════════════════════════════════');
+      rawLines.push('// ====================================================');
       lastSec=c.secNum;
     }
-    rawLines.push(`// ── Aula ${c.lessonN}: ${c.lessonTitle}`);
+    rawLines.push(`// -- Aula ${c.lessonN}: ${c.lessonTitle}`);
     rawLines.push(`// ${c.title}`);
     c.body.split('\n').forEach(l=>rawLines.push(l));
     rawLines.push('');
@@ -1193,7 +1228,7 @@ function dRenderGlobalCode(){
 
       <!-- Status bar -->
       <div style="background:#1e1e1e;border-bottom:1px solid #222;padding:5px 16px;display:flex;align-items:center;justify-content:space-between">
-        <span style="font-size:10px;color:#555;font-family:monospace">${blocks.length} trechos · ${globalCodeFilter==='all'?'todas as secoes':('S'+(secsWithCode.find(s=>s.id===globalCodeFilter)||{num:'?'}).num)}</span>
+        <span style="font-size:10px;color:#555;font-family:monospace">${blocks.length} trechos . ${globalCodeFilter==='all'?'todas as secoes':('S'+(secsWithCode.find(s=>s.id===globalCodeFilter)||{num:'?'}).num)}</span>
         <span style="font-size:10px;font-weight:700;padding:1px 9px;border-radius:4px;background:${langColor}22;color:${langColor};font-family:monospace">${curGLang.toUpperCase()}</span>
       </div>
 
@@ -1202,8 +1237,8 @@ function dRenderGlobalCode(){
 
       <!-- Bottom bar -->
       <div style="background:#1a1a1a;border-top:1px solid #2a2a2a;padding:5px 16px;display:flex;align-items:center;justify-content:space-between">
-        <span style="font-size:10px;color:#3a3a3a;font-family:monospace">Ln ${totalLines} · ${all.reduce((s,c)=>s+c.body.split('\n').length,0)} linhas de codigo</span>
-        <span style="font-size:10px;color:#3a3a3a;font-family:monospace">Java Study Tracker · UTF-8</span>
+        <span style="font-size:10px;color:#3a3a3a;font-family:monospace">Ln ${totalLines} . ${all.reduce((s,c)=>s+c.body.split('\n').length,0)} linhas de codigo</span>
+        <span style="font-size:10px;color:#3a3a3a;font-family:monospace">Java Study Tracker . UTF-8</span>
       </div>
     </div>`;
 }
@@ -1234,7 +1269,7 @@ function copyFullCode(){
 function downloadCode(){
   const all=getAllCodes(); const f=globalCodeFilter==='all'?all:all.filter(c=>c.secId===globalCodeFilter);
   const l=window._gclang||'java'; const blocks=f.filter(c=>(c.lang||'java')===l);
-  const content=blocks.map(c=>`// ── Aula ${c.lessonN}: ${c.lessonTitle}\n// ${c.title}\n${c.body}`).join('\n\n');
+  const content=blocks.map(c=>`// -- Aula ${c.lessonN}: ${c.lessonTitle}\n// ${c.title}\n${c.body}`).join('\n\n');
   const ext={sql:'sql',json:'json',xml:'xml',bash:'sh'}[l]||'java';
   const blob=new Blob([content],{type:'text/plain'});
   const url=URL.createObjectURL(blob); const a=document.createElement('a');
@@ -1245,7 +1280,7 @@ function deleteGCode(k,id){
   if(activeKey===k){ const [sid,ns]=k.split('_'); dRenderLesson(sid,parseInt(ns)); setLessonTab('codigo',sid,parseInt(ns)); }
 }
 
-// ── DIÁRIO ───────────────────────────────────────────────────
+// -- DIÁRIO ---------------------------------------------------
 function populateLogSelects(){
   const opts='<option value="">Selecione...</option>'+SECTIONS.map(s=>`<option value="${s.id}">S${s.num}: ${s.title}</option>`).join('');
   ['d-log-sec','m-log-sec'].forEach(id=>{const el=document.getElementById(id);if(el)el.innerHTML=opts;});
@@ -1291,7 +1326,7 @@ function renderLogList(){
 }
 function deleteLog(id){ state.logs=state.logs.filter(l=>l.id!==id); save(); updateStats(); renderLogList(); mRenderLog(); }
 
-// ── OVERVIEW ─────────────────────────────────────────────────
+// -- OVERVIEW -------------------------------------------------
 function dRenderOverview(){
   const g=document.getElementById('d-overview'); if(!g) return;
   const half=Math.ceil(SECTIONS.length/2);
@@ -1305,11 +1340,11 @@ function dRenderOverview(){
     </div>`;
   }).join('');
   g.innerHTML=`
-    <div class="ov-card"><h3>Seções 1–10</h3>${makeList(SECTIONS.slice(0,10))}</div>
-    <div class="ov-card"><h3>Seções 11–20</h3>${makeList(SECTIONS.slice(10))}</div>`;
+    <div class="ov-card"><h3>Seções 1-10</h3>${makeList(SECTIONS.slice(0,10))}</div>
+    <div class="ov-card"><h3>Seções 11-20</h3>${makeList(SECTIONS.slice(10))}</div>`;
 }
 
-// ── DESKTOP TABS ─────────────────────────────────────────────
+// -- DESKTOP TABS ---------------------------------------------
 function setCtab(name,btn){
   document.querySelectorAll('.ctab').forEach(el=>el.classList.remove('active'));
   document.querySelectorAll('.ctab-btn').forEach(b=>b.classList.remove('active'));
@@ -1323,7 +1358,7 @@ function setCtab(name,btn){
   if(name==='visao') dRenderOverview();
 }
 
-// ── EXPORT ───────────────────────────────────────────────────
+// -- EXPORT ---------------------------------------------------
 let curExpTab='aula';
 function openExport(secId,n){
   expCtx.secId=secId; expCtx.lessonN=n; expCtx.tab='aula';
@@ -1355,40 +1390,40 @@ function buildExpText(){
     const sec=SECTIONS.find(s=>s.id===secId); const lesson=sec.lessons.find(l=>l.n===lessonN);
     const k=lk(secId,lessonN); const isDone=!!state.done[k];
     const title=state.customTitles[k]||lesson.t; const notes=state.notes[k]||[];
-    let txt=`☕ *Java COMPLETO — Tracker de Estudos*\n━━━━━━━━━━━━━━━━━━━\n📚 Seção ${sec.num}: ${sec.title}\n🎬 Aula ${lessonN}: ${title}\n`;
-    if(document.getElementById('chk-status')?.checked) txt+=`⏱ ${lesson.d}\n${isDone?'✅ Concluída':'⏳ Pendente'}\n`;
+    let txt=`☕ *Java COMPLETO -- Tracker de Estudos*\n-------------------\n📚 Seção ${sec.num}: ${sec.title}\n🎬 Aula ${lessonN}: ${title}\n`;
+    if(document.getElementById('chk-status')?.checked) txt+=`(t) ${lesson.d}\n${isDone?'✅ Concluída':'... Pendente'}\n`;
     if(document.getElementById('chk-notes')?.checked){
-      txt+=notes.length?`\n📝 *Anotações*\n`+notes.map(n=>`${NE[n.type]} *${NL[n.type]}* — ${n.title}${n.body?'\n'+n.body:''}`).join('\n\n'):'\n📝 Sem anotações.\n';
+      txt+=notes.length?`\n📝 *Anotações*\n`+notes.map(n=>`${NE[n.type]} *${NL[n.type]}* -- ${n.title}${n.body?'\n'+n.body:''}`).join('\n\n'):'\n📝 Sem anotações.\n';
     }
-    txt+=`\n━━━━━━━━━━━━━━━━━━━\n🔗 Java COMPLETO — Nelio Alves (Udemy)`;
+    txt+=`\n-------------------\n🔗 Java COMPLETO -- Nelio Alves (Udemy)`;
     return txt;
   }
   if(curExpTab==='secao'){
     const sec=SECTIONS.find(s=>s.id===expCtx.expSecId); if(!sec) return '';
     const done=sec.lessons.filter(l=>state.done[lk(sec.id,l.n)]).length;
     const pct=Math.round(done/sec.lessons.length*100);
-    let txt=`☕ *Java COMPLETO*\n━━━━━━━━━━━━━━━━━━━\n📚 *Seção ${sec.num}: ${sec.title}*\n⏱ ${sec.dur}\n`;
-    if(document.getElementById('chk-sec-prog')?.checked) txt+=`\n📊 ${done}/${sec.lessons.length} (${pct}%)\n[${'█'.repeat(Math.round(pct/10))}${'░'.repeat(10-Math.round(pct/10))}]\n`;
-    if(document.getElementById('chk-sec-lessons')?.checked) txt+=`\n📋 *Aulas*\n`+sec.lessons.map(l=>`${state.done[lk(sec.id,l.n)]?'✅':'⬜'} ${l.n}. ${state.customTitles[lk(sec.id,l.n)]||l.t} (${l.d})`).join('\n')+'\n';
+    let txt=`☕ *Java COMPLETO*\n-------------------\n📚 *Seção ${sec.num}: ${sec.title}*\n(t) ${sec.dur}\n`;
+    if(document.getElementById('chk-sec-prog')?.checked) txt+=`\n📊 ${done}/${sec.lessons.length} (${pct}%)\n[${'#'.repeat(Math.round(pct/10))}${'_'.repeat(10-Math.round(pct/10))}]\n`;
+    if(document.getElementById('chk-sec-lessons')?.checked) txt+=`\n📋 *Aulas*\n`+sec.lessons.map(l=>`${state.done[lk(sec.id,l.n)]?'✅':'[ ]'} ${l.n}. ${state.customTitles[lk(sec.id,l.n)]||l.t} (${l.d})`).join('\n')+'\n';
     if(document.getElementById('chk-sec-notes')?.checked){
       sec.lessons.forEach(l=>{ const notes=state.notes[lk(sec.id,l.n)]||[]; if(notes.length){ txt+=`\n🎬 Aula ${l.n}: ${l.t}\n`+notes.map(n=>`${NE[n.type]} ${n.title}`).join('\n')+'\n'; } });
     }
-    txt+=`━━━━━━━━━━━━━━━━━━━\n🔗 Java COMPLETO — Nelio Alves`;
+    txt+=`-------------------\n🔗 Java COMPLETO -- Nelio Alves`;
     return txt;
   }
   // geral
   const {totalDone,pct,secsDone,notesCount,hours,sessions}=calcStats();
-  let txt=`☕ *Java COMPLETO — Progresso*\n━━━━━━━━━━━━━━━━━━━\n`;
-  if(document.getElementById('chk-g-stats')?.checked) txt+=`[${'█'.repeat(Math.round(pct/10))}${'░'.repeat(10-Math.round(pct/10))}] ${pct}%\n✅ ${totalDone}/263 aulas\n📚 ${secsDone}/20 seções\n⏱ ${hours.toFixed(1)}h estudadas\n📓 ${sessions} sessões\n📝 ${notesCount} anotações\n`;
-  if(document.getElementById('chk-g-secs')?.checked){ txt+=`\n📚 *Por Seção*\n`; SECTIONS.forEach(sec=>{const done=sec.lessons.filter(l=>state.done[lk(sec.id,l.n)]).length;const p=Math.round(done/sec.lessons.length*100);const ic=p===100?'✅':p>0?'🔄':'⬜';txt+=`${ic} S${sec.num}: ${sec.title} — ${done}/${sec.lessons.length} (${p}%)\n`;}); }
+  let txt=`☕ *Java COMPLETO -- Progresso*\n-------------------\n`;
+  if(document.getElementById('chk-g-stats')?.checked) txt+=`[${'#'.repeat(Math.round(pct/10))}${'_'.repeat(10-Math.round(pct/10))}] ${pct}%\n✅ ${totalDone}/263 aulas\n📚 ${secsDone}/20 seções\n(t) ${hours.toFixed(1)}h estudadas\n📓 ${sessions} sessões\n📝 ${notesCount} anotações\n`;
+  if(document.getElementById('chk-g-secs')?.checked){ txt+=`\n📚 *Por Seção*\n`; SECTIONS.forEach(sec=>{const done=sec.lessons.filter(l=>state.done[lk(sec.id,l.n)]).length;const p=Math.round(done/sec.lessons.length*100);const ic=p===100?'✅':p>0?'🔄':'[ ]';txt+=`${ic} S${sec.num}: ${sec.title} -- ${done}/${sec.lessons.length} (${p}%)\n`;}); }
   if(document.getElementById('chk-g-notes')?.checked){ const all=[];SECTIONS.forEach(sec=>sec.lessons.forEach(l=>{const k=lk(sec.id,l.n);(state.notes[k]||[]).forEach(n=>all.push({...n,lessonN:l.n,secNum:sec.num}));})); if(all.length){txt+=`\n📝 *Anotações (${all.length})*\n`;all.slice(0,20).forEach(n=>{txt+=`${NE[n.type]} [S${n.secNum}/A${n.lessonN}] ${n.title}\n`;});} }
-  txt+=`━━━━━━━━━━━━━━━━━━━\n🔗 Java COMPLETO · ${new Date().toLocaleDateString('pt-BR')}`;
+  txt+=`-------------------\n🔗 Java COMPLETO . ${new Date().toLocaleDateString('pt-BR')}`;
   return txt;
 }
 function refreshPreview(){ const id='prev-'+curExpTab; const el=document.getElementById(id); if(el) el.textContent=buildExpText(); }
 function exportWpp(){ window.open('https://wa.me/?text='+encodeURIComponent(buildExpText()),'_blank'); }
 function exportEmail(){
-  const sub=`☕ Java COMPLETO — ${curExpTab==='geral'?'Progresso':'Aula '+expCtx.lessonN}`;
+  const sub=`☕ Java COMPLETO -- ${curExpTab==='geral'?'Progresso':'Aula '+expCtx.lessonN}`;
   window.location.href=`mailto:?subject=${encodeURIComponent(sub)}&body=${encodeURIComponent(buildExpText())}`;
 }
 function exportCopy(){
@@ -1399,9 +1434,9 @@ function exportCopy(){
 document.addEventListener('keydown',e=>{if(e.key==='Escape')closeExport();});
 
 
-// ══════════════════════════════════════════════════════════
+// ==========================================================
 // NOTES SUMMARY (Sumário de Anotações)
-// ══════════════════════════════════════════════════════════
+// ==========================================================
 let nsSectionFilter = 'all';
 let nsTypeFilter = 'all';
 let nsOpenSections = {};
@@ -1442,8 +1477,8 @@ function buildSummaryText(sectionId, typeFilter) {
   const NE2 = { tip: '💡', doubt: '❓', important: '⭐', concept: '📖' };
   const NL2 = { tip: 'Dica', doubt: 'Dúvida', important: 'Importante', concept: 'Conceito' };
   let totalNotes = 0;
-  let txt = '☕ *Java COMPLETO — Sumário de Anotações*\n';
-  txt += '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n';
+  let txt = '☕ *Java COMPLETO -- Sumário de Anotações*\n';
+  txt += '--------------------------------\n\n';
   groups.forEach(g => {
     if (sectionId !== 'all' && g.sec.id !== sectionId) return;
     let secTxt = '';
@@ -1453,7 +1488,7 @@ function buildSummaryText(sectionId, typeFilter) {
       totalNotes += filtered.length;
       secTxt += `🎬 *Aula ${lesson.n}: ${state.customTitles[k] || lesson.t}*\n`;
       filtered.forEach(n => {
-        secTxt += `  ${NE2[n.type] || '📝'} *${NL2[n.type] || n.type}* — ${n.title}\n`;
+        secTxt += `  ${NE2[n.type] || '📝'} *${NL2[n.type] || n.type}* -- ${n.title}\n`;
         if (n.body) secTxt += `    ${n.body.replace(/\n/g, '\n    ')}\n`;
       });
       secTxt += '\n';
@@ -1462,9 +1497,9 @@ function buildSummaryText(sectionId, typeFilter) {
       txt += `📚 *S${g.sec.num}: ${g.sec.title}*\n${secTxt}`;
     }
   });
-  txt += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`;
+  txt += `--------------------------------\n`;
   txt += `📝 Total: ${totalNotes} anotações\n`;
-  txt += `🔗 Java COMPLETO · Nelio Alves (Udemy) · ${new Date().toLocaleDateString('pt-BR')}`;
+  txt += `🔗 Java COMPLETO . Nelio Alves (Udemy) . ${new Date().toLocaleDateString('pt-BR')}`;
   return txt;
 }
 
@@ -1512,7 +1547,7 @@ function renderNotesSummary(targetId, isMobileView) {
       const filtered = nsTypeFilter === 'all' ? notes : notes.filter(n => n.type === nsTypeFilter);
       if (!filtered.length) return;
       secNoteCount += filtered.length;
-      lessonRows += `<div class="nsummary-lesson-hdr">🎬 Aula ${lesson.n} · ${escHtml(state.customTitles[k] || lesson.t)}</div>`;
+      lessonRows += `<div class="nsummary-lesson-hdr">🎬 Aula ${lesson.n} . ${escHtml(state.customTitles[k] || lesson.t)}</div>`;
       filtered.forEach(n => {
         const tc = typeColors[n.type] || typeColors.tip;
         lessonRows += `<div class="nsummary-note-row">
@@ -1532,7 +1567,7 @@ function renderNotesSummary(targetId, isMobileView) {
         <span class="nsummary-sec-badge" style="background:${g.sec.color}22;color:${g.sec.color}">S${g.sec.num}</span>
         <span class="nsummary-sec-title">${escHtml(g.sec.title)}</span>
         <span class="nsummary-sec-count">${secNoteCount} nota${secNoteCount!==1?'s':''}</span>
-        <span class="nsummary-sec-arrow ${isOpen?'open':''}">▶</span>
+        <span class="nsummary-sec-arrow ${isOpen?'open':''}">></span>
       </div>
       ${isOpen ? `<div class="nsummary-lessons">${lessonRows}</div>` : ''}
     </div>`;
@@ -1572,7 +1607,7 @@ function toggleNsSection(id) { nsOpenSections[id] = nsOpenSections[id] === false
 
 function nsSummaryExportWpp() { window.open('https://wa.me/?text=' + encodeURIComponent(buildSummaryText(nsSectionFilter, nsTypeFilter)), '_blank'); }
 function nsSummaryExportEmail() {
-  const sub = '☕ Java COMPLETO — Sumário de Anotações';
+  const sub = '☕ Java COMPLETO -- Sumário de Anotações';
   window.location.href = 'mailto:?subject=' + encodeURIComponent(sub) + '&body=' + encodeURIComponent(buildSummaryText(nsSectionFilter, nsTypeFilter));
 }
 function nsSummaryCopy() {
@@ -1605,7 +1640,7 @@ function nsSummaryDownloadWord() {
       if (!filtered.length) return;
       hasContent = true;
       secRows += `<tr><td colspan="3" style="background:#f5f5f5;padding:7px 10px;font-size:11px;font-weight:700;color:#555;border-top:1px solid #ddd">
-        🎬 Aula ${lesson.n} · ${lesson.t}
+        🎬 Aula ${lesson.n} . ${lesson.t}
       </td></tr>`;
       filtered.forEach(n => {
         const tc = typeColors[n.type] || typeColors.tip;
@@ -1623,7 +1658,7 @@ function nsSummaryDownloadWord() {
     });
     if (!hasContent) return;
     rows += `<tr><td colspan="3" style="background:${g.sec.color};padding:10px 14px;color:#fff;font-size:14px;font-weight:800">
-      S${g.sec.num} · ${g.sec.title}
+      S${g.sec.num} . ${g.sec.title}
     </td></tr>${secRows}`;
   });
 
@@ -1640,8 +1675,8 @@ function nsSummaryDownloadWord() {
   .summary-stats{display:inline-block;background:#f5f5f5;padding:8px 14px;border-radius:6px;margin-bottom:16px;font-size:11pt}
 </style>
 </head><body>
-<h1>☕ Java COMPLETO — Sumário de Anotações</h1>
-<p class="hero-meta">Nelio Alves · Udemy · POO + Projetos · Gerado em ${date}</p>
+<h1>☕ Java COMPLETO -- Sumário de Anotações</h1>
+<p class="hero-meta">Nelio Alves . Udemy . POO + Projetos . Gerado em ${date}</p>
 <div class="summary-stats">
   📝 Total: <b>${allFlat.length}</b> anotações &nbsp;|&nbsp;
   💡 Dicas: <b>${typeCount.tip}</b> &nbsp;|&nbsp;
@@ -1669,9 +1704,9 @@ function _refreshSummaryIfOpen() {
   if (mSumScreen && mSumScreen.style.display !== 'none') renderNotesSummary('m-notes-summary', true);
 }
 
-// ══════════════════════════════════════════════════════════
+// ==========================================================
 // MOBILE
-// ══════════════════════════════════════════════════════════
+// ==========================================================
 const isMobile=()=>window.innerWidth<=700;
 let mScreen='secoes';
 let mPrev='secoes';
@@ -1709,9 +1744,9 @@ function mRenderSections(){
         <div style="width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;background:${sec.color}22;color:${sec.color};flex-shrink:0">${sec.num}</div>
         <div style="flex:1;min-width:0">
           <div style="font-size:13px;font-weight:700;color:#1a1a18;line-height:1.3">${sec.title}</div>
-          <div style="font-size:11px;color:#888;margin-top:2px">${done}/${sec.lessons.length} · ${sec.dur}</div>
+          <div style="font-size:11px;color:#888;margin-top:2px">${done}/${sec.lessons.length} . ${sec.dur}</div>
         </div>
-        <div style="font-size:11px;color:#bbb;transition:transform .2s;transform:rotate(${isOpen?90:0}deg)">▶</div>
+        <div style="font-size:11px;color:#bbb;transition:transform .2s;transform:rotate(${isOpen?90:0}deg)">></div>
       </div>
       <div style="height:3px;background:#f0eeea;margin:0 13px"><div style="height:100%;background:#1D9E75;width:${pct}%;border-radius:2px"></div></div>
       ${isOpen?`<div style="padding:4px 0 8px;border-top:1px solid #f5f4f0">
@@ -1737,7 +1772,7 @@ function mOpenLesson(secId,n){
   mPrev=mScreen!=='aula'?mScreen:mPrev; mScreen='aula';
   const sec=SECTIONS.find(s=>s.id===secId); const lesson=sec.lessons.find(l=>l.n===n);
   const k=lk(secId,n); const title=state.customTitles[k]||lesson.t;
-  document.getElementById('m-aula-sec').textContent=`Seção ${sec.num} · ${sec.title}`;
+  document.getElementById('m-aula-sec').textContent=`Seção ${sec.num} . ${sec.title}`;
   document.getElementById('m-aula-ttl').textContent=title;
   document.querySelectorAll('.bnav-btn').forEach(b=>b.classList.remove('active'));
   document.getElementById('bnav-secoes').classList.add('active');
@@ -1759,12 +1794,12 @@ function mRenderLesson(secId,n){
     <div style="margin:11px 12px 0;background:#fff;border:1px solid #e8e6e0;border-radius:13px;padding:15px">
       <div style="font-size:15px;font-weight:700;color:#1a1a18;line-height:1.4;margin-bottom:8px">${title}</div>
       <div style="display:flex;gap:9px;font-size:12px;color:#aaa;margin-bottom:13px;flex-wrap:wrap">
-        <span>Aula ${n}</span><span>⏱ ${lesson.d}</span>
-        ${isDone?'<span style="color:#1D9E75;font-weight:700">✅ Concluída</span>':'<span>⏳ Pendente</span>'}
+        <span>Aula ${n}</span><span>(t) ${lesson.d}</span>
+        ${isDone?'<span style="color:#1D9E75;font-weight:700">✅ Concluída</span>':'<span>... Pendente</span>'}
       </div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
         <button onclick="toggleDone('${secId}',${n});mRenderLesson('${secId}',${n})" style="padding:11px 7px;border-radius:10px;border:none;cursor:pointer;font-size:13px;font-weight:700;background:${isDone?'#f0eeea':'#1D9E75'};color:${isDone?'#1a1a18':'#fff'}">
-          ${isDone?'↩ Desmarcar':'✓ Concluir'}
+          ${isDone?'< Desmarcar':'✓ Concluir'}
         </button>
         <button onclick="mEditTitle('${secId}',${n})" style="padding:11px 7px;border-radius:10px;border:none;cursor:pointer;font-size:13px;font-weight:700;background:#f5f4f0;color:#666">✏️ Editar</button>
       </div>
@@ -1781,7 +1816,12 @@ function mRenderLesson(secId,n){
           ${['tip','doubt','important','concept'].map(t=>`<button class="ntb ${curNoteType===t?'sel-'+t:''}" data-type="${t}" onclick="mSetNoteType(this)">${NOTE_EMOJI[t]} ${NOTE_TYPES[t].label}</button>`).join('')}
         </div>
         <input type="text" id="m-note-title" placeholder="Título da anotação..." style="display:block;width:100%;font-size:14px;padding:11px 12px;border:1px solid #e8e6e0;border-radius:10px;background:#faf9f7;color:#1a1a18;font-family:inherit;outline:none;margin-bottom:8px"/>
-        <textarea id="m-note-body" placeholder="Dica, dúvida ou conceito..." style="display:block;width:100%;font-size:14px;padding:11px 12px;border:1px solid #e8e6e0;border-radius:10px;background:#faf9f7;color:#1a1a18;font-family:inherit;outline:none;resize:none;height:85px;line-height:1.6;margin-bottom:8px"></textarea>
+        <textarea id="m-note-body" placeholder="Dica, dúvida ou conceito..." onpaste="handlePaste(event,'m-img-preview')" style="display:block;width:100%;font-size:14px;padding:11px 12px;border:1px solid #e8e6e0;border-radius:10px;background:#faf9f7;color:#1a1a18;font-family:inherit;outline:none;resize:none;height:85px;line-height:1.6;margin-bottom:8px"></textarea>
+        <div style="border:2px dashed #e8e6e0;border-radius:10px;padding:12px;text-align:center;position:relative;background:#faf9f7;margin-bottom:8px">
+          <input type="file" accept="image/*" multiple onchange="handleFileInput(event,'m-img-preview')" style="position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%"/>
+          <div style="font-size:12px;color:#aaa;pointer-events:none">🖼 Toque para adicionar imagem . ou <b style='color:#185FA5'>Ctrl+V</b> para colar</div>
+        </div>
+        <div id="m-img-preview" style="display:flex;flex-wrap:wrap;gap:7px;margin-bottom:8px"></div>
         <button onclick="mAddNote('${k}','${secId}',${n})" style="display:block;width:100%;padding:13px;border:none;border-radius:10px;background:#1a1a18;color:#fff;font-size:14px;font-weight:700;cursor:pointer;margin-bottom:13px">+ Adicionar anotação</button>
         <div id="m-notes-${k}">${renderNotesHTML(k)}</div>
       </div>
@@ -1808,10 +1848,12 @@ function mSetLang(btn){ curLang=btn.dataset.lang; document.querySelectorAll('#m-
 function mAddNote(k,secId,n){
   const ti=document.getElementById('m-note-title'); const bi=document.getElementById('m-note-body');
   const title=ti?.value.trim(); const body=bi?.value.trim();
-  if(!title&&!body) return;
+  const imgs=window._mPendingImgs||[];
+  if(!title&&!body&&!imgs.length) return;
   if(!state.notes[k]) state.notes[k]=[];
-  state.notes[k].unshift({id:Date.now(),type:curNoteType,title:title||'(sem título)',body,date:new Date().toLocaleDateString('pt-BR')});
+  state.notes[k].unshift({id:Date.now(),type:curNoteType,title:title||'(sem titulo)',body,imgs:[...imgs],date:new Date().toLocaleDateString('pt-BR')});
   if(ti)ti.value=''; if(bi)bi.value='';
+  window._mPendingImgs=[]; refreshImgPreview('m-img-preview');
   save(); updateStats(); mRenderLesson(secId,n); mSetLessonTab('notas',secId,n); dRenderGlobalNotes(); _refreshSummaryIfOpen();
 }
 function mAddCode(k,secId,n){
@@ -1844,7 +1886,7 @@ function mRenderCode(){
         <div style="padding:28px 18px;text-align:center;color:#555;font-size:12px;font-family:monospace;line-height:1.8">
           <div style="font-size:20px;margin-bottom:8px">💻</div>
           // Nenhum codigo ainda.<br>
-          // Abra uma aula → aba Codigo<br>
+          // Abra uma aula > aba Codigo<br>
           // e salve seus primeiros trechos!
         </div>
       </div>`;
@@ -1862,12 +1904,12 @@ function mRenderCode(){
   filtered.forEach(c=>{
     if(c.secNum!==lastSec){
       if(mergedLines.length) mergedLines.push('');
-      mergedLines.push('// ════════════════════════════════════════');
+      mergedLines.push('// ========================================');
       mergedLines.push(`// SECAO ${c.secNum}: ${c.secTitle}`);
-      mergedLines.push('// ════════════════════════════════════════');
+      mergedLines.push('// ========================================');
       lastSec=c.secNum;
     }
-    mergedLines.push(`// ── Aula ${c.lessonN}: ${c.lessonTitle}`);
+    mergedLines.push(`// -- Aula ${c.lessonN}: ${c.lessonTitle}`);
     mergedLines.push(`// ${c.title}`);
     mergedLines.push(c.body);
     mergedLines.push('');
@@ -1927,8 +1969,8 @@ function mRenderCode(){
 
       <!-- Bottom bar -->
       <div style="background:#1a1a1a;border-top:1px solid #2a2a2a;padding:5px 14px;display:flex;align-items:center;justify-content:space-between">
-        <span style="font-size:10px;color:#444;font-family:monospace">Ln ${totalLines} · Col 1</span>
-        <span style="font-size:10px;color:#444;font-family:monospace">UTF-8 · Java Study Tracker</span>
+        <span style="font-size:10px;color:#444;font-family:monospace">Ln ${totalLines} . Col 1</span>
+        <span style="font-size:10px;color:#444;font-family:monospace">UTF-8 . Java Study Tracker</span>
       </div>
     </div>`;
 }
@@ -1974,7 +2016,7 @@ function mSearch(q){
       <div style="width:18px;height:18px;border:2px solid ${isDone?'#1D9E75':'#ccc'};border-radius:4px;background:${isDone?'#1D9E75':'transparent'};display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:800;color:#fff;flex-shrink:0">${isDone?'✓':''}</div>
       <div style="flex:1;min-width:0">
         <div style="font-size:13px;color:${isDone?'#bbb':'#1a1a18'};${isDone?'text-decoration:line-through':''};line-height:1.4">${r.t}</div>
-        <div style="font-size:11px;color:#aaa;margin-top:2px">Aula ${r.l.n} · S${r.sec.num} · ${r.l.d}</div>
+        <div style="font-size:11px;color:#aaa;margin-top:2px">Aula ${r.l.n} . S${r.sec.num} . ${r.l.d}</div>
       </div>
     </div>`;
   }).join('');
@@ -2013,7 +2055,7 @@ function mRenderLog(){
   }).join('');
 }
 
-// ── MOBILE INIT ──────────────────────────────────────────────
+// -- MOBILE INIT ----------------------------------------------
 function mInit(){
   const ml=document.getElementById('mobile-layer'); if(!ml) return;
   // Size dynamically
@@ -2045,7 +2087,102 @@ function mInit(){
   requestAnimationFrame(()=>requestAnimationFrame(applyLayout));
 }
 
-// ── INIT ─────────────────────────────────────────────────────
+
+// -- IMAGE HANDLING --------------------------------------------
+window._pendingImgs = [];
+window._mPendingImgs = [];
+
+function readImageFile(file, previewId){
+  if(!file||!file.type.startsWith('image/')) return;
+  // Limit: 800px max, compress to keep localStorage small
+  const reader=new FileReader();
+  reader.onload=e=>{
+    const img=new Image();
+    img.onload=()=>{
+      const MAX=800;
+      const canvas=document.createElement('canvas');
+      let w=img.width, h=img.height;
+      if(w>MAX||h>MAX){ if(w>h){h=Math.round(h*MAX/w);w=MAX;}else{w=Math.round(w*MAX/h);h=MAX;} }
+      canvas.width=w; canvas.height=h;
+      canvas.getContext('2d').drawImage(img,0,0,w,h);
+      const dataUrl=canvas.toDataURL('image/jpeg',0.82);
+      if(previewId==='d-img-preview'){ window._pendingImgs.push(dataUrl); }
+      else { window._mPendingImgs.push(dataUrl); }
+      refreshImgPreview(previewId);
+    };
+    img.src=e.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+
+function handlePaste(event, previewId){
+  const items=event.clipboardData?.items;
+  if(!items) return;
+  for(const item of items){
+    if(item.type.startsWith('image/')){
+      event.preventDefault();
+      readImageFile(item.getAsFile(), previewId);
+    }
+  }
+}
+
+function handleDrop(event, previewId){
+  event.preventDefault();
+  const zone=event.currentTarget; zone.classList.remove('drag-over');
+  Array.from(event.dataTransfer.files).forEach(f=>readImageFile(f,previewId));
+}
+
+function handleFileInput(event, previewId){
+  Array.from(event.target.files).forEach(f=>readImageFile(f,previewId));
+  event.target.value=''; // reset so same file can be re-selected
+}
+
+function refreshImgPreview(previewId){
+  const wrap=document.getElementById(previewId); if(!wrap) return;
+  const imgs=previewId==='d-img-preview'?(window._pendingImgs||[]):(window._mPendingImgs||[]);
+  if(!imgs.length){ wrap.innerHTML=''; return; }
+  wrap.innerHTML=imgs.map((src,i)=>`
+    <div class="img-preview-wrap">
+      <img src="${src}" style="max-width:90px;max-height:70px;border-radius:7px;border:1px solid #e8e6e0;display:block;object-fit:cover"/>
+      <button class="remove-img" onclick="removePendingImg(${i},'${previewId}')">✕</button>
+    </div>`).join('');
+}
+
+function removePendingImg(idx, previewId){
+  if(previewId==='d-img-preview') window._pendingImgs.splice(idx,1);
+  else window._mPendingImgs.splice(idx,1);
+  refreshImgPreview(previewId);
+}
+
+function deleteNoteImg(k,noteId,imgIdx){
+  const note=(state.notes[k]||[]).find(n=>n.id===noteId); if(!note||!note.imgs) return;
+  note.imgs.splice(imgIdx,1);
+  save();
+  const c=document.getElementById('d-notes-'+k); if(c) c.innerHTML=renderNotesHTML(k);
+  const mc=document.getElementById('m-notes-'+k); if(mc) mc.innerHTML=renderNotesHTML(k);
+}
+
+function openLightboxIdx(img){
+  openLightbox(img.src);
+}
+function openLightbox(src){
+  const lb=document.getElementById('lightbox');
+  const img=document.getElementById('lightbox-img');
+  if(!lb||!img) return;
+  img.src=src;
+  lb.classList.add('open');
+  document.body.style.overflow='hidden';
+}
+
+function closeLightbox(){
+  const lb=document.getElementById('lightbox'); if(!lb) return;
+  lb.classList.remove('open');
+  document.getElementById('lightbox-img').src='';
+  document.body.style.overflow='';
+}
+document.addEventListener('keydown',e=>{ if(e.key==='Escape'){ closeExport(); closeLightbox(); } });
+
+// -- INIT -----------------------------------------------------
 function init(){
   load();
   const today=new Date().toISOString().split('T')[0];
@@ -2077,5 +2214,10 @@ window.addEventListener('resize',()=>{
 
 init();
 </script>
+  <!-- LIGHTBOX -->
+  <div class="lightbox" id="lightbox" onclick="closeLightbox()">
+    <button class="lightbox-close" onclick="closeLightbox()">✕</button>
+    <img id="lightbox-img" src="" alt="" onclick="event.stopPropagation()"/>
+  </div>
 </body>
 </html>
