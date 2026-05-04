@@ -939,7 +939,7 @@ function dRenderLesson(secId,n){
             <div class="img-drop-zone-txt">🖼 <b>Clique ou arraste</b> para adicionar imagem . ou <b>Ctrl+V</b> para colar</div>
           </div>
           <div id="d-img-preview" style="display:flex;flex-wrap:wrap;gap:7px;margin-bottom:4px"></div>
-          <button class="btn-add-note" onclick="addNote('${k}',secId,n)">+ Adicionar anotação</button>
+          <button class="btn-add-note" onclick="addNote('${k}','${secId}',${n})">+ Adicionar anotação</button>
         </div>
         <div id="d-notes-${k}">${renderNotesHTML(k)}</div>
       </div>
@@ -950,7 +950,7 @@ function dRenderLesson(secId,n){
         <div class="code-inp-area">
           <input type="text" id="d-code-title" placeholder="Título do trecho (ex: Classe Produto, método main...)"/>
           <textarea class="code-editor" id="d-code-body" placeholder="// Escreva ou cole seu código aqui..."></textarea>
-          <button class="btn-add-code" onclick="addCode('${k}',secId,n)">+ Salvar código</button>
+          <button class="btn-add-code" onclick="addCode('${k}','${secId}',${n})">+ Salvar código</button>
         </div>
         <div id="d-codes-${k}">${renderCodesHTML(k,secId,n)}</div>
       </div>
@@ -1102,8 +1102,8 @@ function renderCodesHTML(k,secId,n){
         </div>
         <div class="code-block-actions">
           <button class="code-icon-btn" onclick="copyCodeBlock('cb-${c.id}')">📋</button>
-          <button class="code-icon-btn" onclick="editCode('${k}',${c.id},secId,n)">✏️</button>
-          <button class="code-icon-btn" onclick="deleteCode('${k}',${c.id},secId,n)" style="color:#f87171">✕</button>
+          <button class="code-icon-btn" onclick="editCode('${k}',${c.id},'${secId}',${n})">✏️</button>
+          <button class="code-icon-btn" onclick="deleteCode('${k}',${c.id},'${secId}',${n})" style="color:#f87171">✕</button>
         </div>
       </div>
       <pre class="code-pre">${syntaxHL(c.body,c.lang)}</pre>
@@ -1120,8 +1120,8 @@ function editCode(k,id,secId,n){
     <div class="code-block-hdr">
       <span style="font-size:10px;font-weight:800;padding:2px 8px;border-radius:10px;background:${LANG_COLORS[c.lang]||'#666'}22;color:${LANG_COLORS[c.lang]||'#aaa'}">${c.lang.toUpperCase()}</span>
       <div class="code-block-actions">
-        <button class="code-icon-btn" onclick="saveCode('${k}',${id},secId,n)">💾 Salvar</button>
-        <button class="code-icon-btn" onclick="cancelCode('${k}',secId,n)">✕</button>
+        <button class="code-icon-btn" onclick="saveCode('${k}',${id},'${secId}',${n})">💾 Salvar</button>
+        <button class="code-icon-btn" onclick="cancelCode('${k}','${secId}',${n})">✕</button>
       </div>
     </div>
     <div style="padding:10px 13px;display:flex;flex-direction:column;gap:6px;background:#111">
@@ -1555,7 +1555,8 @@ function renderNotesSummary(targetId, isMobileView) {
           <div class="nsummary-note-content">
             <div class="nsummary-note-title">${escHtml(n.title)}</div>
             ${n.body ? `<div class="nsummary-note-body">${escHtml(n.body)}</div>` : ''}
-            <div class="nsummary-note-meta">${n.date}</div>
+            ${n.imgs && n.imgs.length ? `<div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:6px">${n.imgs.map((img,i) => `<img src="${img}" alt="img ${i+1}" style="max-width:120px;max-height:90px;border-radius:6px;border:1px solid #e8e6e0;object-fit:cover;cursor:zoom-in" onclick="openLightbox('${img}')" loading="lazy"/>`).join('')}</div>` : ''}
+            <div class="nsummary-note-meta">${n.date}${n.imgs && n.imgs.length ? ` · 🖼 ${n.imgs.length} imagem(ns)` : ''}</div>
           </div>
         </div>`;
       });
