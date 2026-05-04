@@ -188,6 +188,44 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .btn-exp-email{background:#EA4335;color:#fff}
 .btn-exp-copy{background:#1a1a18;color:#fff}
 .btn-exp-copy.copied{background:#1D9E75}
+
+/* ── BACKUP / RESTORE MODAL ── */
+.bk-modal{background:#fff;border-radius:14px;width:100%;max-width:640px;max-height:92vh;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.28)}
+.bk-tabs{display:flex;padding:0 22px;border-bottom:1px solid #f0eeea}
+.bk-tab{font-size:12px;font-weight:600;padding:10px 14px;border:none;background:none;cursor:pointer;color:#888;border-bottom:2px solid transparent;margin-bottom:-1px;transition:all .15s}
+.bk-tab.active{color:#1a1a18;border-bottom-color:#185FA5}
+.bk-body{padding:20px 22px;overflow-y:auto;flex:1}
+.bk-section{background:#faf9f7;border:1px solid #e8e6e0;border-radius:11px;padding:16px 18px;margin-bottom:14px}
+.bk-section h3{font-size:12px;font-weight:700;color:#1a1a18;text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px;display:flex;align-items:center;gap:7px}
+.bk-section p{font-size:12px;color:#888;line-height:1.6;margin-bottom:12px}
+.bk-btn{font-size:13px;font-weight:700;padding:10px 20px;border:none;border-radius:9px;cursor:pointer;transition:all .15s;display:inline-flex;align-items:center;gap:7px}
+.bk-btn-primary{background:#185FA5;color:#fff}
+.bk-btn-primary:hover{opacity:.85}
+.bk-btn-success{background:#1D9E75;color:#fff}
+.bk-btn-success:hover{opacity:.85}
+.bk-btn-warn{background:#BA7517;color:#fff}
+.bk-btn-warn:hover{opacity:.85}
+.bk-btn-row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.bk-stats-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+.bk-stat{background:#fff;border:1px solid #e8e6e0;border-radius:8px;padding:9px 14px;text-align:center;flex:1;min-width:70px}
+.bk-stat-n{font-size:18px;font-weight:800;color:#185FA5}
+.bk-stat-l{font-size:10px;color:#888;margin-top:1px}
+.bk-qr-wrap{display:flex;flex-direction:column;align-items:center;gap:12px;padding:12px 0}
+.bk-qr-img{border:1px solid #e8e6e0;border-radius:10px;padding:12px;background:#fff}
+.bk-drop{border:2px dashed #e8e6e0;border-radius:10px;padding:28px;text-align:center;cursor:pointer;position:relative;transition:all .2s;background:#faf9f7}
+.bk-drop:hover,.bk-drop.over{border-color:#185FA5;background:#f0f7ff}
+.bk-drop input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
+.bk-drop-txt{font-size:13px;color:#aaa;pointer-events:none}
+.bk-drop-txt b{color:#185FA5}
+.bk-msg{padding:10px 13px;border-radius:8px;font-size:12px;font-weight:600;margin-top:10px;display:none}
+.bk-msg.ok{background:#EAF3DE;color:#27500A;display:block}
+.bk-msg.err{background:#FAEEDA;color:#A32D2D;display:block}
+.bk-warn-box{background:#FAEEDA;border:1px solid #BA7517;border-radius:9px;padding:12px 14px;font-size:12px;color:#633806;margin-bottom:12px;line-height:1.6}
+.bk-scope-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:14px}
+.bk-scope-item{display:flex;align-items:center;gap:9px;padding:9px 12px;border:1.5px solid #e8e6e0;border-radius:9px;cursor:pointer;transition:all .15s;font-size:12px;font-weight:600;color:#555}
+.bk-scope-item.sel{border-color:#185FA5;background:#f0f7ff;color:#185FA5}
+.bk-scope-item input{accent-color:#185FA5}
+
 /* ── MISC ── */
 .empty{text-align:center;padding:28px 14px;color:#bbb;font-size:13px}
 ::-webkit-scrollbar{width:4px}
@@ -277,6 +315,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
     <span class="badge badge-blue" id="hdr-aulas">0/263 aulas</span>
     <span class="badge badge-amber" id="hdr-hours">0h</span>
     <button class="btn-export-top" onclick="openExportGeral()">📤 Exportar</button>
+        <button class="btn-export-top" style="background:#185FA5;color:#fff" onclick="openBackup()">🔄 Backup</button>
   </div>
 </div>
 
@@ -316,6 +355,114 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
       <button class="btn-exp btn-exp-wpp" onclick="exportWpp()">📱 WhatsApp</button>
       <button class="btn-exp btn-exp-email" onclick="exportEmail()">📧 E-mail</button>
       <button class="btn-exp btn-exp-copy" id="btn-copy-exp" onclick="exportCopy()">📋 Copiar</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══ BACKUP / RESTORE MODAL ═══ -->
+<div class="modal-overlay" id="backup-modal" onclick="if(event.target===this)closeBackup()">
+  <div class="bk-modal">
+    <div class="modal-hdr">
+      <div>
+        <h2>🔄 Backup &amp; Restaurar Dados</h2>
+        <div style="font-size:11px;color:#888;margin-top:2px">Exporte ou importe todos os seus dados de estudo</div>
+      </div>
+      <button class="modal-close" onclick="closeBackup()">✕</button>
+    </div>
+    <div class="bk-tabs">
+      <button class="bk-tab active" onclick="setBkTab('export')">📤 Exportar</button>
+      <button class="bk-tab" onclick="setBkTab('qrcode')">📷 QR Code</button>
+      <button class="bk-tab" onclick="setBkTab('import')">📥 Importar</button>
+    </div>
+    <div class="bk-body">
+
+      <!-- ABA EXPORTAR -->
+      <div id="bktab-export">
+        <div id="bk-snapshot-stats" class="bk-stats-row"></div>
+        <div class="bk-section">
+          <h3>📦 Selecionar dados para exportar</h3>
+          <p>Escolha o que incluir no arquivo de backup. Imagens ficam embutidas em base64.</p>
+          <div class="bk-scope-grid">
+            <label class="bk-scope-item sel" id="bksc-done"><input type="checkbox" checked onchange="bkToggleScope('done',this)"/> ✅ Progresso (aulas)</label>
+            <label class="bk-scope-item sel" id="bksc-notes"><input type="checkbox" checked onchange="bkToggleScope('notes',this)"/> 📝 Anotações + Imagens</label>
+            <label class="bk-scope-item sel" id="bksc-codes"><input type="checkbox" checked onchange="bkToggleScope('codes',this)"/> 💻 Código</label>
+            <label class="bk-scope-item sel" id="bksc-logs"><input type="checkbox" checked onchange="bkToggleScope('logs',this)"/> 📓 Diário</label>
+            <label class="bk-scope-item sel" id="bksc-titles"><input type="checkbox" checked onchange="bkToggleScope('titles',this)"/> ✏️ Títulos personalizados</label>
+          </div>
+          <div id="bk-size-info" style="font-size:11px;color:#888;margin-bottom:12px"></div>
+          <div class="bk-btn-row">
+            <button class="bk-btn bk-btn-primary" onclick="bkExportJson()">⬇ Baixar JSON</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ABA QR CODE -->
+      <div id="bktab-qrcode" style="display:none">
+        <div class="bk-section">
+          <h3>📷 Gerar QR Code de backup</h3>
+          <p>Gera um QR Code com seus dados comprimidos. Ideal para transferir entre dispositivos.<br>
+          <b>Atenção:</b> imagens e muitos dados podem tornar o QR inlegível. Use JSON para backups completos.</p>
+          <div class="bk-warn-box">💡 QR Codes suportam até ~7KB (nível L). Para backups completos com imagens, use <b>Exportar JSON</b>. Desmarque itens para reduzir o tamanho.</div>
+          <div class="bk-scope-grid">
+            <label class="bk-scope-item sel" id="bkqr-done"><input type="checkbox" checked onchange="bkQrUpdate()"/> ✅ Progresso</label>
+            <label class="bk-scope-item sel" id="bkqr-notes"><input type="checkbox" checked onchange="bkQrUpdate()"/> 📝 Anotações</label>
+            <label class="bk-scope-item" id="bkqr-imgs"><input type="checkbox" onchange="bkQrUpdate()"/> 🖼 Imagens (pesado)</label>
+            <label class="bk-scope-item sel" id="bkqr-codes"><input type="checkbox" checked onchange="bkQrUpdate()"/> 💻 Código</label>
+            <label class="bk-scope-item sel" id="bkqr-logs"><input type="checkbox" checked onchange="bkQrUpdate()"/> 📓 Diário</label>
+          </div>
+          <div id="bk-qr-size" style="font-size:11px;margin-bottom:12px"></div>
+          <div class="bk-qr-wrap">
+            <div id="bk-qr-canvas" class="bk-qr-img"></div>
+            <div id="bk-qr-status" style="font-size:12px;color:#888;text-align:center"></div>
+          </div>
+          <div class="bk-btn-row" style="margin-top:8px">
+            <button class="bk-btn bk-btn-primary" onclick="bkDownloadQr()">⬇ Salvar QR como imagem</button>
+            <button class="bk-btn bk-btn-success" onclick="bkQrUpdate()">🔄 Atualizar QR</button>
+          </div>
+        </div>
+        <div class="bk-section">
+          <h3>📷 Escanear QR para importar</h3>
+          <p>Use a câmera para ler um QR de backup e restaurar os dados automaticamente.</p>
+          <div id="bk-scan-area">
+            <div class="bk-btn-row">
+              <button class="bk-btn bk-btn-primary" onclick="bkStartScan()">📷 Abrir câmera para escanear</button>
+              <button class="bk-btn" style="background:#f0eeea;color:#555" onclick="bkStopScan()">✕ Parar câmera</button>
+            </div>
+            <video id="bk-scan-video" style="display:none;width:100%;border-radius:10px;margin-top:12px;border:1px solid #e8e6e0"></video>
+            <canvas id="bk-scan-canvas" style="display:none"></canvas>
+          </div>
+          <div id="bk-scan-msg" class="bk-msg"></div>
+        </div>
+      </div>
+
+      <!-- ABA IMPORTAR -->
+      <div id="bktab-import" style="display:none">
+        <div class="bk-warn-box">⚠️ Importar um backup <b>mesclará</b> os dados com o estado atual (novas entradas são adicionadas, não sobrescrevem). Para substituir tudo, marque "Substituir completamente" abaixo.</div>
+        <div class="bk-section">
+          <h3>📁 Importar arquivo JSON</h3>
+          <p>Selecione um arquivo <code>.json</code> exportado anteriormente pelo sistema.</p>
+          <div class="bk-drop" id="bk-drop-zone"
+            ondragover="event.preventDefault();this.classList.add('over')"
+            ondragleave="this.classList.remove('over')"
+            ondrop="bkHandleDrop(event)">
+            <input type="file" accept=".json,application/json" onchange="bkHandleFile(event)"/>
+            <div class="bk-drop-txt">📂 <b>Clique ou arraste</b> o arquivo JSON aqui</div>
+          </div>
+          <div id="bk-import-preview" style="margin-top:10px;display:none">
+            <div id="bk-import-stats" class="bk-stats-row" style="margin-bottom:8px"></div>
+            <label style="display:flex;align-items:center;gap:8px;font-size:12px;cursor:pointer;margin-bottom:10px">
+              <input type="checkbox" id="bk-overwrite" style="accent-color:#A32D2D"/>
+              <span><b style="color:#A32D2D">Substituir completamente</b> (apaga dados atuais antes de importar)</span>
+            </label>
+            <div class="bk-btn-row">
+              <button class="bk-btn bk-btn-success" onclick="bkConfirmImport()">✅ Confirmar importação</button>
+            </div>
+          </div>
+          <div id="bk-import-msg" class="bk-msg"></div>
+        </div>
+      </div>
+
     </div>
   </div>
 </div>
@@ -427,6 +574,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
       <div id="m-prog-list"></div>
     </div>
     <button onclick="openExportGeral()" style="width:100%;margin-top:12px;padding:12px;border:none;border-radius:10px;background:#1a1a18;color:#fff;font-size:13px;font-weight:700;cursor:pointer">📤 Exportar Progresso</button>
+    <button onclick="openBackup()" style="width:100%;margin-top:8px;padding:12px;border:none;border-radius:10px;background:#185FA5;color:#fff;font-size:13px;font-weight:700;cursor:pointer">🔄 Backup &amp; Restaurar</button>
   </div>
   <div id="ms-sumario" class="m-screen" style="height:100%;overflow-y:auto;padding:12px;display:none"><div id="m-notes-summary"></div></div>
   <div id="ms-codigo" class="m-screen" style="height:100%;overflow-y:auto;padding:12px;display:none"><div id="m-code-list"></div></div>
@@ -2181,7 +2329,429 @@ function closeLightbox(){
   document.getElementById('lightbox-img').src='';
   document.body.style.overflow='';
 }
-document.addEventListener('keydown',e=>{ if(e.key==='Escape'){ closeExport(); closeLightbox(); } });
+document.addEventListener('keydown',e=>{ if(e.key==='Escape'){ closeExport(); closeLightbox(); closeBackup(); } });
+
+
+// =============================================================
+// BACKUP & RESTORE — JSON + QR Code
+// =============================================================
+
+let _bkScope = {done:true, notes:true, codes:true, logs:true, titles:true};
+let _bkPendingData = null;
+let _bkScanStream = null;
+let _bkScanTimer = null;
+
+function openBackup(){
+  // Render current snapshot stats
+  const {totalDone,notesCount,codesCount,hours,sessions} = calcStats();
+  const statsEl = document.getElementById('bk-snapshot-stats');
+  if(statsEl){
+    statsEl.innerHTML = [
+      {n:totalDone, l:'Aulas OK'},
+      {n:notesCount, l:'Anotações'},
+      {n:codesCount, l:'Códigos'},
+      {n:hours.toFixed(1)+'h', l:'Horas'},
+      {n:sessions, l:'Sessões'},
+    ].map(x=>`<div class="bk-stat"><div class="bk-stat-n">${x.n}</div><div class="bk-stat-l">${x.l}</div></div>`).join('');
+  }
+  bkUpdateSizeInfo();
+  document.getElementById('backup-modal').classList.add('open');
+  setBkTab('export');
+}
+
+function closeBackup(){
+  document.getElementById('backup-modal').classList.remove('open');
+  bkStopScan();
+}
+
+function setBkTab(tab){
+  ['export','qrcode','import'].forEach(t=>{
+    const el = document.getElementById('bktab-'+t); if(el) el.style.display = t===tab?'block':'none';
+    const btn = document.querySelector('.bk-tab[onclick*="'+t+'"]');
+    if(btn) btn.classList.toggle('active', t===tab);
+  });
+  if(tab==='qrcode') bkQrUpdate();
+}
+
+function bkToggleScope(key, chk){
+  _bkScope[key] = chk.checked;
+  const item = document.getElementById('bksc-'+key); if(item) item.classList.toggle('sel', chk.checked);
+  bkUpdateSizeInfo();
+}
+
+function bkBuildPayload(scope){
+  const payload = {
+    _v: 3,
+    _ts: new Date().toISOString(),
+    _app: 'JavaTracker',
+  };
+  if(scope.done)   payload.done   = state.done;
+  if(scope.notes)  payload.notes  = state.notes;  // includes imgs (base64)
+  if(scope.codes)  payload.codes  = state.codes;
+  if(scope.logs)   payload.logs   = state.logs;
+  if(scope.titles) payload.customTitles = state.customTitles;
+  return payload;
+}
+
+function bkBuildQrPayload(scope){
+  // QR: strip images to keep size manageable (unless user opted in)
+  const payload = {_v:3, _ts:new Date().toISOString(), _app:'JavaTracker'};
+  if(scope.done)  payload.done  = state.done;
+  if(scope.codes) payload.codes = state.codes;
+  if(scope.logs)  payload.logs  = state.logs;
+  if(scope.notes){
+    // Optionally strip imgs
+    const stripped = {};
+    Object.keys(state.notes).forEach(k=>{
+      stripped[k] = (state.notes[k]||[]).map(n=>{
+        const c = Object.assign({}, n);
+        if(!scope.imgs) delete c.imgs;
+        return c;
+      });
+    });
+    payload.notes = stripped;
+  }
+  if(scope.titles) payload.customTitles = state.customTitles;
+  return payload;
+}
+
+function bkPayloadSize(payload){
+  const json = JSON.stringify(payload);
+  const bytes = new Blob([json]).size;
+  if(bytes < 1024) return bytes+'B';
+  if(bytes < 1024*1024) return (bytes/1024).toFixed(1)+'KB';
+  return (bytes/(1024*1024)).toFixed(2)+'MB';
+}
+
+function bkUpdateSizeInfo(){
+  const payload = bkBuildPayload(_bkScope);
+  const el = document.getElementById('bk-size-info');
+  if(el){
+    const keys = Object.keys(payload).filter(k=>!k.startsWith('_'));
+    const imgs = Object.values(state.notes).flat().reduce((s,n)=>s+(n.imgs?n.imgs.length:0),0);
+    el.textContent = `Tamanho estimado: ${bkPayloadSize(payload)} · Inclui: ${keys.join(', ')}${imgs?` · ${imgs} imagem(ns) embutida(s)`:''}`;
+  }
+}
+
+// ---- EXPORT JSON -----------------------------------------------
+function bkExportJson(){
+  const payload = bkBuildPayload(_bkScope);
+  const json = JSON.stringify(payload, null, 2);
+  const blob = new Blob([json], {type:'application/json;charset=utf-8'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  const date = new Date().toLocaleDateString('pt-BR').replace(/\//g,'-');
+  a.href = url;
+  a.download = 'java-tracker-backup-'+date+'.json';
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+// ---- QR CODE ---------------------------------------------------
+function bkQrUpdate(){
+  // Read checkboxes
+  const scope = {
+    done:  document.querySelector('#bkqr-done input')?.checked,
+    notes: document.querySelector('#bkqr-notes input')?.checked,
+    imgs:  document.querySelector('#bkqr-imgs input')?.checked,
+    codes: document.querySelector('#bkqr-codes input')?.checked,
+    logs:  document.querySelector('#bkqr-logs input')?.checked,
+  };
+  // Update sel class
+  ['done','notes','imgs','codes','logs'].forEach(k=>{
+    const el = document.getElementById('bkqr-'+k);
+    const chk = el?.querySelector('input');
+    if(el && chk) el.classList.toggle('sel', chk.checked);
+  });
+
+  const payload = bkBuildQrPayload(scope);
+  const json = JSON.stringify(payload);
+  const bytes = new Blob([json]).size;
+
+  // Limites reais qrcodejs: L=~7KB, M=~3.4KB, Q=~2.4KB
+  const LIMIT_L = 7000;
+  const sizeEl = document.getElementById('bk-qr-size');
+  if(sizeEl){
+    const color = bytes > LIMIT_L ? '#A32D2D' : bytes > 4000 ? '#BA7517' : '#1D9E75';
+    const warn  = bytes > LIMIT_L ? ' — ❌ Excede limite. Desmarque itens ou use JSON.' :
+                  bytes > 4000    ? ' — ⚠️ Próximo do limite.' : '';
+    sizeEl.innerHTML = `Tamanho: <b style="color:${color}">${bkPayloadSize(payload)}</b>${warn}`;
+  }
+
+  const wrap = document.getElementById('bk-qr-canvas');
+  const statusEl = document.getElementById('bk-qr-status');
+  if(!wrap) return;
+  wrap.innerHTML = '';
+
+  if(bytes > LIMIT_L){
+    wrap.innerHTML = `<div style="padding:20px 16px;color:#A32D2D;font-size:12px;text-align:center;line-height:1.7">
+      ❌ Dados muito grandes para QR (${bkPayloadSize(payload)}).<br>
+      <b>Dicas:</b> desmarque Anotações e/ou Código,<br>
+      ou use <b>Exportar JSON</b> para backup completo.
+    </div>`;
+    return;
+  }
+
+  // Use qrcodejs via CDN
+  if(typeof QRCode === 'undefined'){
+    const script = document.createElement('script');
+    script.src = 'https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js';
+    script.onload = () => bkRenderQr(json, wrap, statusEl, bytes);
+    script.onerror = () => { wrap.innerHTML = '<div style="padding:18px;color:#A32D2D;font-size:12px">Falha ao carregar biblioteca QR. Verifique sua conexão.</div>'; };
+    document.head.appendChild(script);
+  } else {
+    bkRenderQr(json, wrap, statusEl, bytes);
+  }
+}
+
+function bkRenderQr(json, wrap, statusEl, bytes){
+  wrap.innerHTML = '';
+  // Escolher nível de correção dinamicamente
+  // L: ~7KB, M: ~3.4KB — usar L para maximizar capacidade
+  const level = QRCode.CorrectLevel.L;
+  try {
+    new QRCode(wrap, {
+      text: json,
+      width: 280,
+      height: 280,
+      colorDark: '#1a1a18',
+      colorLight: '#ffffff',
+      correctLevel: level,
+    });
+    const kb = bytes ? ' ('+bkPayloadSize({_dummy:json})+')' : '';
+    if(statusEl) statusEl.textContent = '✅ QR gerado com sucesso. Escaneie com outro dispositivo.';
+    window._lastQrJson = json;
+  } catch(e){
+    // Falha mesmo com nível L — dados ainda grandes demais
+    wrap.innerHTML = `<div style="padding:18px;color:#A32D2D;font-size:12px;text-align:center;line-height:1.7">
+      ❌ Dados ainda muito grandes (${bkPayloadSize({_d:json})}).<br>
+      Desmarque Anotações e Código, ou use <b>Exportar JSON</b>.
+    </div>`;
+    if(statusEl) statusEl.textContent = '';
+  }
+}
+
+function bkDownloadQr(){
+  const img = document.querySelector('#bk-qr-canvas img');
+  if(!img){ alert('Gere o QR Code primeiro.'); return; }
+  const a = document.createElement('a');
+  a.href = img.src;
+  const date = new Date().toLocaleDateString('pt-BR').replace(/\//g,'-');
+  a.download = 'java-tracker-qr-'+date+'.png';
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+}
+
+// ---- QR SCAN --------------------------------------------------
+async function bkStartScan(){
+  const video = document.getElementById('bk-scan-video');
+  const msg = document.getElementById('bk-scan-msg');
+  if(!msg) return;
+  msg.className = 'bk-msg';
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({video:{facingMode:'environment'}});
+    _bkScanStream = stream;
+    video.srcObject = stream;
+    video.style.display = 'block';
+    await video.play();
+    msg.className = 'bk-msg ok'; msg.textContent = '📷 Câmera ativa. Aponte para o QR Code de backup...';
+
+    // Load jsQR
+    if(typeof jsQR === 'undefined'){
+      const script = document.createElement('script');
+      script.src = 'https://cdnjs.cloudflare.com/ajax/libs/jsQR/1.4.0/jsQR.min.js';
+      script.onload = () => bkScanLoop(video, msg);
+      script.onerror = () => { msg.className='bk-msg err'; msg.textContent='Falha ao carregar biblioteca de leitura QR.'; };
+      document.head.appendChild(script);
+    } else {
+      bkScanLoop(video, msg);
+    }
+  } catch(e){
+    msg.className = 'bk-msg err';
+    msg.textContent = 'Erro ao acessar câmera: '+e.message;
+  }
+}
+
+function bkScanLoop(video, msg){
+  const canvas = document.getElementById('bk-scan-canvas');
+  const ctx = canvas.getContext('2d');
+  function tick(){
+    if(video.style.display === 'none' || !_bkScanStream) return;
+    if(video.readyState === video.HAVE_ENOUGH_DATA){
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+      ctx.drawImage(video, 0, 0);
+      const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+      const code = jsQR(imgData.data, imgData.width, imgData.height);
+      if(code){
+        bkStopScan();
+        bkProcessQrData(code.data, msg);
+        return;
+      }
+    }
+    _bkScanTimer = requestAnimationFrame(tick);
+  }
+  _bkScanTimer = requestAnimationFrame(tick);
+}
+
+function bkStopScan(){
+  if(_bkScanStream){ _bkScanStream.getTracks().forEach(t=>t.stop()); _bkScanStream=null; }
+  if(_bkScanTimer){ cancelAnimationFrame(_bkScanTimer); _bkScanTimer=null; }
+  const video = document.getElementById('bk-scan-video');
+  if(video) video.style.display = 'none';
+}
+
+function bkProcessQrData(jsonStr, msgEl){
+  try {
+    const data = JSON.parse(jsonStr);
+    if(data._app !== 'JavaTracker') throw new Error('QR não é um backup JavaTracker.');
+    _bkPendingData = data;
+    const msg = msgEl || document.getElementById('bk-scan-msg');
+    const notes = Object.values(data.notes||{}).flat().length;
+    const codes = Object.values(data.codes||{}).flat().length;
+    const done = Object.keys(data.done||{}).filter(k=>data.done[k]).length;
+    if(msg){
+      msg.className = 'bk-msg ok';
+      msg.textContent = `✅ QR lido! ${done} aulas, ${notes} anotações, ${codes} códigos. Confirme abaixo para importar.`;
+    }
+    // Auto switch to import confirm
+    setBkTab('import');
+    bkShowImportPreview(data);
+  } catch(e){
+    if(msgEl){ msgEl.className = 'bk-msg err'; msgEl.textContent = 'Erro ao ler QR: '+e.message; }
+  }
+}
+
+// ---- IMPORT JSON -----------------------------------------------
+function bkHandleDrop(event){
+  event.preventDefault();
+  const zone = document.getElementById('bk-drop-zone'); if(zone) zone.classList.remove('over');
+  const file = event.dataTransfer.files[0]; if(file) bkReadFile(file);
+}
+
+function bkHandleFile(event){
+  const file = event.target.files[0]; if(file) bkReadFile(file);
+  event.target.value = '';
+}
+
+function bkReadFile(file){
+  const msg = document.getElementById('bk-import-msg');
+  if(!file.name.endsWith('.json') && file.type !== 'application/json'){
+    if(msg){ msg.className='bk-msg err'; msg.textContent='Selecione um arquivo .json válido.'; }
+    return;
+  }
+  const reader = new FileReader();
+  reader.onload = e => {
+    try {
+      const data = JSON.parse(e.target.result);
+      if(data._app !== 'JavaTracker') throw new Error('Arquivo não é um backup JavaTracker.');
+      _bkPendingData = data;
+      bkShowImportPreview(data);
+    } catch(err){
+      if(msg){ msg.className='bk-msg err'; msg.textContent='Erro ao ler arquivo: '+err.message; }
+    }
+  };
+  reader.readAsText(file);
+}
+
+function bkShowImportPreview(data){
+  const preview = document.getElementById('bk-import-preview');
+  const statsEl = document.getElementById('bk-import-stats');
+  const msg = document.getElementById('bk-import-msg');
+  if(!preview || !statsEl) return;
+
+  const done    = Object.keys(data.done||{}).filter(k=>data.done[k]).length;
+  const notes   = Object.values(data.notes||{}).flat().length;
+  const codes   = Object.values(data.codes||{}).flat().length;
+  const logs    = (data.logs||[]).length;
+  const imgs    = Object.values(data.notes||{}).flat().reduce((s,n)=>s+(n.imgs?n.imgs.length:0),0);
+  const ts      = data._ts ? new Date(data._ts).toLocaleString('pt-BR') : '—';
+
+  statsEl.innerHTML = [
+    {n:done, l:'Aulas OK'},
+    {n:notes, l:'Anotações'},
+    {n:codes, l:'Códigos'},
+    {n:logs,  l:'Sessões'},
+    {n:imgs,  l:'Imagens'},
+  ].map(x=>`<div class="bk-stat"><div class="bk-stat-n">${x.n}</div><div class="bk-stat-l">${x.l}</div></div>`).join('');
+
+  preview.style.display = 'block';
+  if(msg){ msg.className='bk-msg ok'; msg.textContent = `Backup de ${ts} carregado. Revise e confirme.`; }
+}
+
+function bkConfirmImport(){
+  if(!_bkPendingData){ alert('Nenhum dado carregado.'); return; }
+  const msg = document.getElementById('bk-import-msg');
+  const overwrite = document.getElementById('bk-overwrite')?.checked;
+
+  const data = _bkPendingData;
+
+  if(overwrite){
+    // Full replace
+    state = {
+      done:         data.done         || {},
+      notes:        data.notes        || {},
+      codes:        data.codes        || {},
+      logs:         data.logs         || [],
+      customTitles: data.customTitles || {},
+    };
+  } else {
+    // Merge — new entries only
+    if(data.done){
+      Object.assign(state.done, data.done);
+    }
+    if(data.notes){
+      Object.keys(data.notes).forEach(k=>{
+        if(!state.notes[k]) state.notes[k] = [];
+        const existingIds = new Set((state.notes[k]||[]).map(n=>n.id));
+        (data.notes[k]||[]).forEach(n=>{ if(!existingIds.has(n.id)) state.notes[k].push(n); });
+      });
+    }
+    if(data.codes){
+      Object.keys(data.codes).forEach(k=>{
+        if(!state.codes[k]) state.codes[k] = [];
+        const existingIds = new Set((state.codes[k]||[]).map(c=>c.id));
+        (data.codes[k]||[]).forEach(c=>{ if(!existingIds.has(c.id)) state.codes[k].push(c); });
+      });
+    }
+    if(data.logs){
+      const existingIds = new Set(state.logs.map(l=>l.id));
+      (data.logs||[]).forEach(l=>{ if(!existingIds.has(l.id)) state.logs.push(l); });
+    }
+    if(data.customTitles){
+      Object.assign(state.customTitles, data.customTitles);
+    }
+  }
+
+  save();
+  updateStats();
+
+  // Refresh all visible UI
+  const mobile = isMobile();
+  if(mobile){
+    mRenderSections();
+    mRenderLog();
+    mUpdateProgList();
+    renderNotesSummary('m-notes-summary', true);
+  } else {
+    dRenderSidebar();
+    dRenderOverview();
+    dRenderGlobalNotes();
+    dRenderGlobalCode();
+    renderLogList();
+    renderNotesSummary('d-notes-summary');
+  }
+  _refreshSummaryIfOpen();
+
+  _bkPendingData = null;
+  document.getElementById('bk-import-preview').style.display = 'none';
+
+  if(msg){
+    msg.className = 'bk-msg ok';
+    msg.textContent = overwrite ? '✅ Dados substituídos com sucesso!' : '✅ Dados mesclados com sucesso!';
+    setTimeout(()=>{ closeBackup(); },2200);
+  }
+}
+
 
 // -- INIT -----------------------------------------------------
 function init(){
