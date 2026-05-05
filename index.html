@@ -189,6 +189,61 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .btn-exp-copy{background:#1a1a18;color:#fff}
 .btn-exp-copy.copied{background:#1D9E75}
 
+
+/* ── COURSE MANAGER MODAL ── */
+.cm-modal{background:#fff;border-radius:14px;width:100%;max-width:680px;max-height:94vh;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.28)}
+.cm-tabs{display:flex;padding:0 22px;border-bottom:1px solid #f0eeea}
+.cm-tab{font-size:12px;font-weight:600;padding:10px 14px;border:none;background:none;cursor:pointer;color:#888;border-bottom:2px solid transparent;margin-bottom:-1px;transition:all .15s}
+.cm-tab.active{color:#1a1a18;border-bottom-color:#1D9E75}
+.cm-body{padding:20px 22px;overflow-y:auto;flex:1}
+/* Course cards */
+.course-card{background:#faf9f7;border:1.5px solid #e8e6e0;border-radius:12px;padding:14px 16px;margin-bottom:10px;cursor:pointer;transition:all .18s;display:flex;align-items:center;gap:13px}
+.course-card:hover{border-color:#1D9E75;background:#f0fdf8}
+.course-card.active-course{border-color:#1D9E75;background:#f0fdf8;box-shadow:0 0 0 3px #1D9E7520}
+.course-card-icon{width:44px;height:44px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0}
+.course-card-info{flex:1;min-width:0}
+.course-card-name{font-size:14px;font-weight:700;color:#1a1a18;line-height:1.3}
+.course-card-meta{font-size:11px;color:#888;margin-top:2px}
+.course-card-actions{display:flex;gap:5px;flex-shrink:0}
+.cm-icon-btn{background:none;border:1px solid #e8e6e0;cursor:pointer;font-size:11px;color:#888;padding:4px 9px;border-radius:6px;font-weight:600;transition:all .15s}
+.cm-icon-btn:hover{color:#1a1a18;border-color:#aaa}
+.cm-icon-btn.danger:hover{color:#A32D2D;border-color:#A32D2D}
+/* Form */
+.cm-form-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
+.cm-form-full{grid-column:1/-1}
+.cm-label{font-size:11px;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:.4px;display:block;margin-bottom:4px}
+.cm-input{width:100%;font-size:13px;padding:9px 12px;border:1.5px solid #e8e6e0;border-radius:9px;background:#faf9f7;color:#1a1a18;font-family:inherit;outline:none;transition:border .15s}
+.cm-input:focus{border-color:#185FA5;background:#fff}
+.cm-textarea{resize:vertical;min-height:60px;line-height:1.6}
+/* Section editor */
+.cm-sec-block{background:#fff;border:1px solid #e8e6e0;border-radius:10px;margin-bottom:10px;overflow:hidden}
+.cm-sec-hdr{display:flex;align-items:center;gap:8px;padding:10px 13px;cursor:pointer;user-select:none;background:#faf9f7;border-bottom:1px solid #f0eeea}
+.cm-sec-hdr-num{width:26px;height:26px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;background:#185FA520;color:#185FA5;flex-shrink:0}
+.cm-sec-hdr-title{flex:1;font-size:12px;font-weight:700;color:#1a1a18}
+.cm-sec-hdr-count{font-size:11px;color:#888}
+.cm-sec-lessons{padding:10px 13px;display:none}
+.cm-sec-lessons.open{display:block}
+.cm-lesson-row{display:flex;align-items:center;gap:7px;margin-bottom:6px}
+.cm-lesson-row input{flex:1;font-size:12px;padding:7px 10px;border:1px solid #e8e6e0;border-radius:7px;background:#faf9f7;color:#1a1a18;font-family:inherit;outline:none}
+.cm-lesson-row input:focus{border-color:#185FA5}
+.cm-lesson-dur{width:56px;font-size:12px;padding:7px 8px;border:1px solid #e8e6e0;border-radius:7px;background:#faf9f7;color:#1a1a18;font-family:inherit;outline:none;text-align:center}
+.cm-lesson-dur:focus{border-color:#185FA5}
+.cm-btn{font-size:12px;font-weight:700;padding:9px 18px;border:none;border-radius:9px;cursor:pointer;transition:all .15s;display:inline-flex;align-items:center;gap:7px}
+.cm-btn-primary{background:#1D9E75;color:#fff}
+.cm-btn-primary:hover{opacity:.85}
+.cm-btn-secondary{background:#f0eeea;color:#555}
+.cm-btn-secondary:hover{background:#e8e6e0}
+.cm-btn-danger{background:#A32D2D;color:#fff}
+.cm-btn-danger:hover{opacity:.85}
+.cm-btn-blue{background:#185FA5;color:#fff}
+.cm-btn-blue:hover{opacity:.85}
+.cm-btn-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
+.cm-import-hint{font-size:11px;color:#888;line-height:1.6;margin-bottom:12px;padding:10px 13px;background:#f0f7ff;border-radius:8px;border-left:3px solid #185FA5}
+.cm-msg{padding:9px 13px;border-radius:8px;font-size:12px;font-weight:600;margin-top:8px}
+.cm-msg-ok{background:#EAF3DE;color:#27500A}
+.cm-msg-err{background:#FAEEDA;color:#A32D2D}
+.cm-badge-active{background:#1D9E75;color:#fff;font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;margin-left:6px}
+
 /* ── BACKUP / RESTORE MODAL ── */
 .bk-modal{background:#fff;border-radius:14px;width:100%;max-width:640px;max-height:92vh;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.28)}
 .bk-tabs{display:flex;padding:0 22px;border-bottom:1px solid #f0eeea}
@@ -307,15 +362,103 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 <!-- TOPBAR -->
 <div class="topbar">
   <div>
-    <h1>☕ Java COMPLETO — Tracker de Estudos</h1>
-    <p>Nelio Alves · Udemy · POO + Projetos · 263 aulas</p>
+    <h1 id="hdr-title">☕ Java COMPLETO — Tracker de Estudos</h1>
+    <p id="hdr-subtitle">Nelio Alves · Udemy · POO + Projetos · 263 aulas</p>
   </div>
   <div class="top-badges">
     <span class="badge badge-green" id="hdr-pct">0%</span>
-    <span class="badge badge-blue" id="hdr-aulas">0/263 aulas</span>
+    <span class="badge badge-blue" id="hdr-aulas">0/0 aulas</span>
     <span class="badge badge-amber" id="hdr-hours">0h</span>
-    <button class="btn-export-top" onclick="openExportGeral()">📤 Exportar</button>
+    <button class="btn-export-top" style="background:#1D9E75;color:#fff" onclick="openCourseModal()">📚 Cursos</button>
+        <button class="btn-export-top" onclick="openExportGeral()">📤 Exportar</button>
         <button class="btn-export-top" style="background:#185FA5;color:#fff" onclick="openBackup()">🔄 Backup</button>
+  </div>
+</div>
+
+
+<!-- ═══ COURSE MANAGER MODAL ═══ -->
+<div class="modal-overlay" id="course-modal" onclick="if(event.target===this)closeCourseModal()">
+  <div class="cm-modal">
+    <div class="modal-hdr">
+      <div>
+        <h2>📚 Gerenciar Cursos</h2>
+        <div style="font-size:11px;color:#888;margin-top:2px">Crie, edite ou troque de curso</div>
+      </div>
+      <button class="modal-close" onclick="closeCourseModal()">✕</button>
+    </div>
+    <div class="cm-tabs">
+      <button class="cm-tab active" id="cmtab-btn-list" onclick="setCmTab('list')">📋 Meus Cursos</button>
+      <button class="cm-tab" id="cmtab-btn-new" onclick="setCmTab('new')">➕ Novo Curso</button>
+      <button class="cm-tab" id="cmtab-btn-import" onclick="setCmTab('import')">📥 Importar JSON</button>
+    </div>
+    <div class="cm-body">
+
+      <!-- LISTA DE CURSOS -->
+      <div id="cmtab-list">
+        <div id="cm-course-list"></div>
+        <div id="cm-list-msg"></div>
+      </div>
+
+      <!-- NOVO / EDITAR CURSO -->
+      <div id="cmtab-new" style="display:none">
+        <input type="hidden" id="cm-editing-id"/>
+        <div class="cm-form-grid">
+          <div class="cm-form-full">
+            <label class="cm-label">Nome do curso *</label>
+            <input class="cm-input" id="cm-name" placeholder="Ex: Python do Zero ao Avançado"/>
+          </div>
+          <div>
+            <label class="cm-label">Instrutor</label>
+            <input class="cm-input" id="cm-instructor" placeholder="Ex: João Silva"/>
+          </div>
+          <div>
+            <label class="cm-label">Plataforma</label>
+            <input class="cm-input" id="cm-platform" placeholder="Ex: Udemy, YouTube..."/>
+          </div>
+          <div>
+            <label class="cm-label">Ícone (emoji)</label>
+            <input class="cm-input" id="cm-icon" placeholder="🐍" maxlength="4" style="font-size:24px;text-align:center"/>
+          </div>
+          <div>
+            <label class="cm-label">Cor tema (hex)</label>
+            <input class="cm-input" id="cm-color" type="color" value="#185FA5" style="height:44px;padding:4px 8px;cursor:pointer"/>
+          </div>
+          <div class="cm-form-full">
+            <label class="cm-label">Descrição</label>
+            <textarea class="cm-input cm-textarea" id="cm-desc" placeholder="Breve descrição do conteúdo..."></textarea>
+          </div>
+        </div>
+
+        <!-- SEÇÕES E AULAS -->
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+          <div style="font-size:12px;font-weight:700;color:#1a1a18;text-transform:uppercase;letter-spacing:.4px">Seções e Aulas</div>
+          <button class="cm-btn cm-btn-secondary" onclick="cmAddSection()" style="padding:6px 13px;font-size:11px">+ Adicionar Seção</button>
+        </div>
+        <div id="cm-sections-editor"></div>
+
+        <div class="cm-btn-row">
+          <button class="cm-btn cm-btn-primary" onclick="cmSaveCourse()">💾 Salvar Curso</button>
+          <button class="cm-btn cm-btn-secondary" onclick="setCmTab('list')">Cancelar</button>
+        </div>
+        <div id="cm-form-msg" style="margin-top:8px"></div>
+      </div>
+
+      <!-- IMPORTAR JSON -->
+      <div id="cmtab-import" style="display:none">
+        <div class="cm-import-hint">
+          📋 <b>Formato esperado:</b> JSON com a estrutura<br>
+          <code style="font-size:11px">{"name":"...","instructor":"...","sections":[{"title":"...","lessons":[{"n":1,"t":"...","d":"5m"}]}]}</code><br>
+          O campo <code>d</code> (duração) é opcional.
+        </div>
+        <label class="cm-label">Cole o JSON do curso</label>
+        <textarea class="cm-input cm-textarea" id="cm-import-json" rows="10" style="min-height:160px;font-family:monospace;font-size:11px" placeholder='{"name":"Meu Curso","instructor":"Prof. X","sections":[{"title":"Módulo 1","lessons":[{"n":1,"t":"Introdução","d":"10m"}]}]}'></textarea>
+        <div class="cm-btn-row">
+          <button class="cm-btn cm-btn-blue" onclick="cmImportJson()">📥 Importar</button>
+        </div>
+        <div id="cm-import-msg" style="margin-top:8px"></div>
+      </div>
+
+    </div>
   </div>
 </div>
 
@@ -594,8 +737,9 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 </div>
 
 <script>
-const SECTIONS = [
-  {id:'s1',num:1,title:'Apresentação do curso',dur:'19m',color:'#185FA5',lessons:[
+// ── CURSOS ──────────────────────────────────────────────────────
+// Curso embutido: Java COMPLETO (padrão, sempre disponível)
+const JAVA_SECTIONS = [{id:'s1',num:1,title:'Apresentação do curso',dur:'19m',color:'#185FA5',lessons:[
     {n:1,t:'Conteúdo programático - o que você vai aprender?',d:'5m'},
     {n:2,t:'Mapa de estudos da carreira Java',d:'4m'},
     {n:3,t:'Conteúdos bônus',d:'5m'},
@@ -899,8 +1043,34 @@ const SECTIONS = [
   ]},
 ];
 
+const JAVA_COURSE_DEF = {
+  id: 'java-completo',
+  name: 'Java COMPLETO',
+  instructor: 'Nelio Alves',
+  platform: 'Udemy',
+  icon: '☕',
+  color: '#185FA5',
+  desc: 'POO + Projetos · Curso completo de Java',
+  sections: JAVA_SECTIONS,
+  builtin: true,
+};
+
+// Curso ativo (referência reativa)
+let SECTIONS = JAVA_SECTIONS;
+let ACTIVE_COURSE = JAVA_COURSE_DEF;
+
+// TOTAL é calculado dinamicamente
+let TOTAL = SECTIONS.reduce((s,sec)=>s+sec.lessons.length,0);
+
+function setActiveCourse(course){
+  ACTIVE_COURSE = course;
+  SECTIONS = course.sections;
+  TOTAL = SECTIONS.reduce((s,sec)=>s+sec.lessons.length,0);
+  // Reset open state nos sections
+  SECTIONS.forEach(s=>{ s._dopen=false; s._mopen=false; });
+}
+
 // -- CONSTANTS & STATE --------------------------------------
-const TOTAL = SECTIONS.reduce((s,sec)=>s+sec.lessons.length,0);
 const LANG_COLORS = {java:'#f89820',sql:'#336791',xml:'#e44d26',bash:'#4eaa25',json:'#cbcb41'};
 const NOTE_TYPES = {
   tip:       {label:'Dica',      cls:'nb-tip'},
@@ -912,6 +1082,7 @@ const NOTE_EMOJI = {tip:'💡',doubt:'❓',important:'⭐',concept:'📖'};
 
 let state = {
   done:{}, notes:{}, codes:{}, logs:[], customTitles:{},
+  activeCourseId: 'java-completo',
 };
 let activeKey = null;
 let curNoteType = 'tip';
@@ -921,11 +1092,32 @@ let expCtx = {tab:'aula', secId:null, lessonN:null, expSecId:null};
 let globalCodeFilter = 'all';
 
 function lk(secId, n){ return secId+'_'+n; }
+
+// Cursos customizados (armazenados separadamente para não inflar o state)
+let CUSTOM_COURSES = [];
+
+function saveCourses(){ try{ localStorage.setItem('jt3_courses', JSON.stringify(CUSTOM_COURSES)); }catch(e){} }
+function loadCourses(){
+  try{
+    const d = localStorage.getItem('jt3_courses');
+    if(d) CUSTOM_COURSES = JSON.parse(d);
+  }catch(e){ CUSTOM_COURSES = []; }
+}
+
+function getAllCoursesList(){
+  return [JAVA_COURSE_DEF, ...CUSTOM_COURSES];
+}
+
+function getCourseById(id){
+  if(id === 'java-completo') return JAVA_COURSE_DEF;
+  return CUSTOM_COURSES.find(c=>c.id===id) || null;
+}
+
 function save(){ try{localStorage.setItem('jt3',JSON.stringify(state));}catch(e){} }
 function load(){
   try{
     const d=localStorage.getItem('jt3');
-    if(d){ const p=JSON.parse(d); state=Object.assign({done:{},notes:{},codes:{},logs:[],customTitles:{}},p); }
+    if(d){ const p=JSON.parse(d); state=Object.assign({done:{},notes:{},codes:{},logs:[],customTitles:{},activeCourseId:'java-completo'},p); }
   }catch(e){}
 }
 
@@ -947,10 +1139,11 @@ function calcStats(){
 function updateStats(){
   const {totalDone,pct,secsDone,notesCount,codesCount,hours,sessions}=calcStats();
   const s=(id,v)=>{const el=document.getElementById(id);if(el)el.textContent=v;};
-  s('hdr-pct',pct+'%'); s('hdr-aulas',totalDone+'/263'); s('hdr-hours',hours.toFixed(1)+'h');
-  s('st-pct',pct+'%'); s('st-aulas',totalDone+'/263'); s('st-secs',secsDone+'/20');
+  const T=TOTAL, NS=SECTIONS.length;
+  s('hdr-pct',pct+'%'); s('hdr-aulas',totalDone+'/'+T); s('hdr-hours',hours.toFixed(1)+'h');
+  s('st-pct',pct+'%'); s('st-aulas',totalDone+'/'+T); s('st-secs',secsDone+'/'+NS);
   s('st-notes',notesCount); s('st-codes',codesCount); s('st-hours',hours.toFixed(1)+'h');
-  s('ms-pct',pct+'%'); s('ms-aulas',totalDone+'/263'); s('ms-secs',secsDone+'/20');
+  s('ms-pct',pct+'%'); s('ms-aulas',totalDone+'/'+T); s('ms-secs',secsDone+'/'+NS);
   s('ms-notes',notesCount); s('ms-hours',hours.toFixed(1)+'h'); s('ms-sessions',sessions);
 }
 
@@ -2329,7 +2522,7 @@ function closeLightbox(){
   document.getElementById('lightbox-img').src='';
   document.body.style.overflow='';
 }
-document.addEventListener('keydown',e=>{ if(e.key==='Escape'){ closeExport(); closeLightbox(); closeBackup(); } });
+document.addEventListener('keydown',e=>{ if(e.key==='Escape'){ closeExport(); closeLightbox(); closeBackup(); closeCourseModal(); } });
 
 
 // =============================================================
@@ -2754,8 +2947,345 @@ function bkConfirmImport(){
 
 
 // -- INIT -----------------------------------------------------
+
+// =============================================================
+// COURSE MANAGER
+// =============================================================
+
+let _cmSections = [];   // seções no editor (array de objetos mutáveis)
+let _cmOpenSecs = {};   // quais seções estão expandidas no editor
+let _cmEditingId = null;// id do curso sendo editado (null = novo)
+
+function openCourseModal(){
+  renderCourseList();
+  setCmTab('list');
+  document.getElementById('course-modal').classList.add('open');
+}
+function closeCourseModal(){
+  document.getElementById('course-modal').classList.remove('open');
+}
+
+function setCmTab(tab){
+  ['list','new','import'].forEach(t=>{
+    const el=document.getElementById('cmtab-'+t); if(el) el.style.display=t===tab?'block':'none';
+    const btn=document.getElementById('cmtab-btn-'+t); if(btn) btn.classList.toggle('active',t===tab);
+  });
+  if(tab==='new' && !_cmEditingId) cmInitNewForm();
+}
+
+// ── Lista de cursos ────────────────────────────────────────────
+function renderCourseList(){
+  var el=document.getElementById('cm-course-list'); if(!el) return;
+  var courses=getAllCoursesList();
+  el.innerHTML=courses.map(function(c){
+    var isActive=c.id===state.activeCourseId;
+    var doneCount=0;
+    if(isActive){ doneCount=Object.keys(state.done).filter(function(k){return state.done[k];}).length; }
+    var total=c.sections.reduce(function(s,sec){return s+sec.lessons.length;},0);
+    var cid=c.id;
+    var cname=escHtml(c.name);
+    var cinstructor=escHtml(c.instructor||'');
+    var cplatform=escHtml(c.platform||'');
+    var cicon=c.icon||'\uD83D\uDCDA';
+    var ccolor=c.color||'#185FA5';
+    var meta=[cinstructor,cplatform].filter(Boolean).join(' \u00b7 ')+' \u00b7 '+c.sections.length+' se\u00e7\u00f5es \u00b7 '+total+' aulas';
+    var activeBadge=isActive?'<span class="cm-badge-active">Ativo</span>':'';
+    var q="'";
+    var useBtn=isActive
+      ?'<span style="font-size:11px;color:#1D9E75;font-weight:700;padding:4px 6px">\u2713 Em uso</span>'
+      :'<button class="cm-icon-btn" onclick="cmSelectCourse('+q+cid+q+')">&#9658; Usar</button>';
+    var editBtn=!c.builtin?'<button class="cm-icon-btn" onclick="cmEditCourse('+q+cid+q+')">\u270f\ufe0f</button>':'';
+    var delBtn=!c.builtin?'<button class="cm-icon-btn danger" onclick="cmDeleteCourse('+q+cid+q+')">\u2715</button>':'';
+    return '<div class="course-card '+(isActive?'active-course':'')+'" onclick="cmSelectCourse('+q+cid+q+')">'+
+      '<div class="course-card-icon" style="background:'+ccolor+'22">'+cicon+'</div>'+
+      '<div class="course-card-info">'+
+        '<div class="course-card-name">'+cname+activeBadge+'</div>'+
+        '<div class="course-card-meta">'+meta+'</div>'+
+      '</div>'+
+      '<div class="course-card-actions" onclick="event.stopPropagation()">'+useBtn+editBtn+delBtn+'</div>'+
+    '</div>';
+  }).join('');
+}
+
+function cmSelectCourse(id){
+  if(id===state.activeCourseId){ closeCourseModal(); return; }
+  const course=getCourseById(id);
+  if(!course){ alert('Curso não encontrado: '+id); return; }
+  // Confirmar troca se houver dados no curso atual
+  const curKeys=Object.keys(state.done).filter(k=>state.done[k]);
+  if(curKeys.length>0){
+    if(!confirm('Trocar de curso? Seus dados do curso atual ficam salvos e voltam quando você retornar a ele.')) return;
+  }
+  try {
+    // Salvar estado atual
+    try{ localStorage.setItem('jt3_'+state.activeCourseId, JSON.stringify(state)); }catch(e){}
+    // Carregar estado do novo curso (se existir)
+    const stored=localStorage.getItem('jt3_'+id);
+    if(stored){
+      try{ const p=JSON.parse(stored); state=Object.assign({done:{},notes:{},codes:{},logs:[],customTitles:{},activeCourseId:id},p); }catch(e){}
+    } else {
+      state={done:{},notes:{},codes:{},logs:[],customTitles:{},activeCourseId:id};
+    }
+    state.activeCourseId=id;
+    save();
+    applyActiveCourse();
+    updateStats();
+    activeKey=null;
+    // Refresh UI
+    try {
+      if(isMobile()){
+        mRenderSections();
+        try{ mRenderLog(); }catch(e){}
+        try{ mUpdateProgList(); }catch(e){}
+        try{ renderNotesSummary('m-notes-summary',true); }catch(e){}
+      } else {
+        dRenderSidebar();
+        try{ dRenderOverview(); }catch(e){}
+        try{ dRenderGlobalNotes(); }catch(e){}
+        try{ dRenderGlobalCode(); }catch(e){}
+        try{ renderLogList(); }catch(e){}
+        const la=document.getElementById('d-lesson-area');
+        if(la) la.innerHTML='<div class="empty" style="background:#fff;border:1px solid #e8e6e0;border-radius:12px;padding:40px;text-align:center;color:#888">Selecione uma aula na barra lateral para começar.</div>';
+      }
+    }catch(e){ console.error('cmSelectCourse UI refresh error:', e); }
+    try{ _refreshSummaryIfOpen(); }catch(e){}
+  } catch(e) {
+    console.error('cmSelectCourse error:', e);
+  } finally {
+    closeCourseModal();
+  }
+}
+
+function cmDeleteCourse(id){
+  if(!confirm('Excluir este curso? Os dados de estudo associados também serão removidos.')) return;
+  CUSTOM_COURSES=CUSTOM_COURSES.filter(c=>c.id!==id);
+  saveCourses();
+  try{ localStorage.removeItem('jt3_'+id); }catch(e){}
+  if(state.activeCourseId===id) cmSelectCourse('java-completo');
+  renderCourseList();
+}
+
+function cmEditCourse(id){
+  const course=getCourseById(id); if(!course||course.builtin) return;
+  _cmEditingId=id;
+  setCmTab('new');
+  document.getElementById('cm-editing-id').value=id;
+  document.getElementById('cm-name').value=course.name||'';
+  document.getElementById('cm-instructor').value=course.instructor||'';
+  document.getElementById('cm-platform').value=course.platform||'';
+  document.getElementById('cm-icon').value=course.icon||'📚';
+  document.getElementById('cm-color').value=course.color||'#185FA5';
+  document.getElementById('cm-desc').value=course.desc||'';
+  _cmSections=JSON.parse(JSON.stringify(course.sections||[]));
+  _cmOpenSecs={};
+  renderCmSectionsEditor();
+}
+
+// ── Editor de seções ───────────────────────────────────────────
+function cmInitNewForm(){
+  _cmEditingId=null;
+  document.getElementById('cm-editing-id').value='';
+  document.getElementById('cm-name').value='';
+  document.getElementById('cm-instructor').value='';
+  document.getElementById('cm-platform').value='';
+  document.getElementById('cm-icon').value='📚';
+  document.getElementById('cm-color').value='#185FA5';
+  document.getElementById('cm-desc').value='';
+  _cmSections=[{id:'s1',num:1,title:'',color:'#185FA5',lessons:[{n:1,t:'',d:''}]}];
+  _cmOpenSecs={s1:true};
+  renderCmSectionsEditor();
+  const msg=document.getElementById('cm-form-msg'); if(msg) msg.innerHTML='';
+}
+
+function renderCmSectionsEditor(){
+  const el=document.getElementById('cm-sections-editor'); if(!el) return;
+  el.innerHTML=_cmSections.map((sec,si)=>{
+    const isOpen=_cmOpenSecs[sec.id]!==false;
+    return `<div class="cm-sec-block">
+      <div class="cm-sec-hdr" onclick="cmToggleSecEditor('${sec.id}')">
+        <div class="cm-sec-hdr-num">${sec.num}</div>
+        <input class="cm-input" value="${escHtml(sec.title)}" placeholder="Nome da seção..." 
+          style="flex:1;padding:5px 9px;font-size:12px;font-weight:600;border:none;background:transparent;outline:none"
+          oninput="_cmSections[${si}].title=this.value" onclick="event.stopPropagation()"/>
+        <input type="color" value="${sec.color||'#185FA5'}" title="Cor da seção"
+          style="width:28px;height:28px;border:none;border-radius:6px;cursor:pointer;padding:2px;background:none"
+          oninput="_cmSections[${si}].color=this.value" onclick="event.stopPropagation()"/>
+        <span class="cm-sec-hdr-count">${sec.lessons.length} aulas</span>
+        <button onclick="event.stopPropagation();cmRemoveSec(${si})" style="background:none;border:none;cursor:pointer;color:#bbb;font-size:14px;padding:0 4px" title="Remover seção">✕</button>
+        <span style="color:#bbb;font-size:12px">${isOpen?'▲':'▼'}</span>
+      </div>
+      <div class="cm-sec-lessons ${isOpen?'open':''}">
+        ${sec.lessons.map((l,li)=>`
+        <div class="cm-lesson-row">
+          <span style="font-size:10px;color:#bbb;min-width:20px;text-align:right">${l.n}</span>
+          <input value="${escHtml(l.t)}" placeholder="Nome da aula..." class="cm-lesson-inp-${si}-${li}"
+            oninput="_cmSections[${si}].lessons[${li}].t=this.value"/>
+          <input value="${escHtml(l.d)}" placeholder="5m" class="cm-lesson-dur"
+            oninput="_cmSections[${si}].lessons[${li}].d=this.value"/>
+          <button onclick="cmRemoveLesson(${si},${li})" style="background:none;border:none;cursor:pointer;color:#ccc;font-size:14px;padding:0 3px" title="Remover aula">✕</button>
+        </div>`).join('')}
+        <button onclick="cmAddLesson(${si})" style="font-size:11px;padding:6px 12px;border:1px dashed #e8e6e0;border-radius:7px;background:none;cursor:pointer;color:#888;margin-top:4px;width:100%">+ Adicionar aula</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function cmToggleSecEditor(id){
+  _cmOpenSecs[id] = _cmOpenSecs[id]===false ? true : false;
+  renderCmSectionsEditor();
+}
+
+function cmAddSection(){
+  const num=_cmSections.length+1;
+  const id='s'+Date.now();
+  _cmSections.push({id,num,title:'',color:'#185FA5',lessons:[{n:1,t:'',d:''}]});
+  _cmOpenSecs[id]=true;
+  renderCmSectionsEditor();
+  // Scroll to bottom
+  const el=document.getElementById('cm-sections-editor');
+  if(el) setTimeout(()=>el.scrollIntoView({block:'end',behavior:'smooth'}),50);
+}
+
+function cmRemoveSec(si){
+  if(_cmSections.length===1){ alert('O curso precisa de ao menos uma seção.'); return; }
+  _cmSections.splice(si,1);
+  _cmSections.forEach((s,i)=>{s.num=i+1;});
+  renderCmSectionsEditor();
+}
+
+function cmAddLesson(si){
+  const sec=_cmSections[si];
+  const nextN=(sec.lessons[sec.lessons.length-1]?.n||0)+1;
+  sec.lessons.push({n:nextN,t:'',d:''});
+  renderCmSectionsEditor();
+}
+
+function cmRemoveLesson(si,li){
+  const sec=_cmSections[si];
+  if(sec.lessons.length===1){ alert('A seção precisa de ao menos uma aula.'); return; }
+  sec.lessons.splice(li,1);
+  // Renumerar
+  sec.lessons.forEach((l,i)=>{l.n=i+1;});
+  renderCmSectionsEditor();
+}
+
+// ── Salvar curso ───────────────────────────────────────────────
+function cmSaveCourse(){
+  const name=document.getElementById('cm-name').value.trim();
+  const msg=document.getElementById('cm-form-msg');
+  if(!name){ if(msg){msg.className='cm-msg cm-msg-err';msg.textContent='Informe o nome do curso.';} return; }
+
+  // Validar seções
+  const sections=_cmSections.map((sec,si)=>{
+    const lessons=sec.lessons.filter(l=>l.t.trim());
+    return {
+      id: sec.id || 's'+(si+1),
+      num: si+1,
+      title: sec.title||('Módulo '+(si+1)),
+      color: sec.color||'#185FA5',
+      dur: '',
+      lessons: lessons.map((l,li)=>({n:li+1,t:l.t.trim(),d:l.d||''})),
+    };
+  }).filter(s=>s.lessons.length>0);
+
+  if(!sections.length){ if(msg){msg.className='cm-msg cm-msg-err';msg.textContent='Adicione ao menos uma seção com aulas.';} return; }
+
+  const editingId=document.getElementById('cm-editing-id').value;
+  const id=editingId || ('course-'+Date.now());
+
+  const course={
+    id,
+    name,
+    instructor: document.getElementById('cm-instructor').value.trim(),
+    platform:   document.getElementById('cm-platform').value.trim(),
+    icon:       document.getElementById('cm-icon').value.trim()||'📚',
+    color:      document.getElementById('cm-color').value||'#185FA5',
+    desc:       document.getElementById('cm-desc').value.trim(),
+    sections,
+    builtin:    false,
+  };
+
+  if(editingId){
+    const idx=CUSTOM_COURSES.findIndex(c=>c.id===editingId);
+    if(idx>=0) CUSTOM_COURSES[idx]=course; else CUSTOM_COURSES.push(course);
+    // Se for o curso ativo, reaplicar
+    if(state.activeCourseId===editingId){ state.activeCourseId=id; setActiveCourse(course); applyActiveCourse(); updateStats(); }
+  } else {
+    CUSTOM_COURSES.push(course);
+  }
+  saveCourses();
+  _cmEditingId=null;
+
+  if(msg){msg.className='cm-msg cm-msg-ok';msg.textContent='✅ Curso salvo com sucesso!';}
+  setTimeout(()=>{ renderCourseList(); setCmTab('list'); },800);
+}
+
+// ── Importar JSON ──────────────────────────────────────────────
+function cmImportJson(){
+  const raw=document.getElementById('cm-import-json').value.trim();
+  const msg=document.getElementById('cm-import-msg');
+  try{
+    const data=JSON.parse(raw);
+    // Aceitar tanto estrutura direta quanto array de cursos
+    const list=Array.isArray(data)?data:[data];
+    let added=0;
+    list.forEach(d=>{
+      const name=(d.name||'').trim(); if(!name) return;
+      const sections=(d.sections||[]).map((sec,si)=>({
+        id: sec.id||'s'+(si+1),
+        num: si+1,
+        title: sec.title||sec.name||('Módulo '+(si+1)),
+        color: sec.color||'#185FA5',
+        dur: sec.dur||'',
+        lessons: (sec.lessons||[]).map((l,li)=>({
+          n: l.n||li+1,
+          t: l.t||l.title||l.name||'',
+          d: l.d||l.dur||'',
+        })).filter(l=>l.t),
+      })).filter(s=>s.lessons.length>0);
+      if(!sections.length) return;
+      const course={
+        id:'course-'+Date.now()+'-'+added,
+        name,
+        instructor: d.instructor||d.author||'',
+        platform:   d.platform||d.source||'',
+        icon:       d.icon||'📚',
+        color:      d.color||'#185FA5',
+        desc:       d.desc||d.description||'',
+        sections,
+        builtin:    false,
+      };
+      CUSTOM_COURSES.push(course);
+      added++;
+    });
+    saveCourses();
+    if(added){
+      msg.className='cm-msg cm-msg-ok'; msg.textContent='✅ '+added+' curso(s) importado(s)!';
+      document.getElementById('cm-import-json').value='';
+      setTimeout(()=>{ renderCourseList(); setCmTab('list'); },800);
+    } else {
+      msg.className='cm-msg cm-msg-err'; msg.textContent='Nenhum curso válido encontrado no JSON.';
+    }
+  }catch(e){
+    msg.className='cm-msg cm-msg-err'; msg.textContent='JSON inválido: '+e.message;
+  }
+}
+
+
+function applyActiveCourse(){
+  const course = getCourseById(state.activeCourseId||'java-completo') || JAVA_COURSE_DEF;
+  setActiveCourse(course);
+  const t=document.getElementById('hdr-title');
+  const sb=document.getElementById('hdr-subtitle');
+  if(t) t.textContent=(course.icon||'📚')+' '+course.name+' — Tracker de Estudos';
+  if(sb) sb.textContent=[course.instructor,course.platform,course.desc].filter(Boolean).join(' · ');
+  document.title=course.name+' — Tracker de Estudos';
+}
+
 function init(){
+  loadCourses();
   load();
+  applyActiveCourse();
   const today=new Date().toISOString().split('T')[0];
   updateStats();
   const ldEl=document.getElementById('d-log-date'); if(ldEl) ldEl.value=today;
