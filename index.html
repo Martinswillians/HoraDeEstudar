@@ -1213,10 +1213,16 @@ function parseDuration(d){
 
 function calcStats(){
   let totalDone=0,estimatedHours=0;
+  const seenDoneKeys=new Set();
   SECTIONS.forEach(sec=>sec.lessons.forEach(l=>{
     const k=lk(sec.id,l.n);
+    seenDoneKeys.add(k);
     if(state.done[k]){ totalDone++; estimatedHours+=parseDuration(l.d); }
   }));
+  // Contar aulas marcadas que não pertencem às seções ativas (importadas de outra versão)
+  Object.entries(state.done||{}).forEach(([k,v])=>{
+    if(!seenDoneKeys.has(k) && v===true) totalDone++;
+  });
   const pct=Math.round(totalDone/Math.max(TOTAL,1)*100);
   const secsDone=SECTIONS.filter(sec=>sec.lessons.every(l=>state.done[lk(sec.id,l.n)])).length;
   const logHours=state.logs.reduce((s,l)=>s+(parseFloat(l.hours)||0),0);
@@ -1601,11 +1607,34 @@ function copyCodeBlock(blockId){
 }
 
 function getAllCodes(){
-  let all=[];
+  // Primeiro tenta via SECTIONS (para ordenação correta)
+  const all=[];
+  const seen=new Set();
   SECTIONS.forEach(sec=>sec.lessons.forEach(l=>{
     const k=lk(sec.id,l.n);
-    (state.codes[k]||[]).forEach(c=>all.push({...c,k,secId:sec.id,secNum:sec.num,secTitle:sec.title,lessonN:l.n,lessonTitle:state.customTitles[k]||l.t}));
+    (state.codes[k]||[]).forEach(c=>{
+      seen.add(c.id);
+      all.push({...c, k, secId:sec.id, secNum:sec.num, secTitle:sec.title, lessonN:l.n, lessonTitle:state.customTitles[k]||l.t});
+    });
   }));
+  // Fallback: pega qualquer código do state que não foi encontrado via SECTIONS
+  // (ex: importados de outro curso ou versão)
+  Object.entries(state.codes||{}).forEach(([k,arr])=>{
+    (arr||[]).forEach(c=>{
+      if(!seen.has(c.id)){
+        // Usar metadados embutidos no próprio código
+        all.push({
+          ...c, k,
+          secId:    c.secId    || k.split('_')[0],
+          secNum:   c.secNum   || 0,
+          secTitle: c.secTitle || 'Seção importada',
+          lessonN:  c.lessonN  || parseInt(k.split('_')[1])||0,
+          lessonTitle: c.lessonTitle || state.customTitles[k] || k,
+        });
+        seen.add(c.id);
+      }
+    });
+  });
   return all;
 }
 
@@ -1621,7 +1650,10 @@ function dRenderGlobalCode(){
   }
   const secsWithCode=SECTIONS.filter(sec=>sec.lessons.some(l=>(state.codes[lk(sec.id,l.n)]||[]).length>0));
   const langs=[...new Set(all.map(c=>c.lang||'java'))];
-  const curGLang=window._gclang||langs[0]||'java';
+  // Garante que curGLang sempre seja uma linguagem com código disponível
+  let curGLang=window._gclang||'java';
+  if(!langs.includes(curGLang)) curGLang=langs[0]||'java';
+  window._gclang=curGLang;
   const filtered=globalCodeFilter==='all'?all:all.filter(c=>c.secId===globalCodeFilter);
   const blocks=filtered.filter(c=>(c.lang||'java')===curGLang);
 
@@ -1906,32 +1938,67 @@ let nsOpenSections = {};
 
 function getAllNotesGrouped() {
   const result = [];
+  const seen = new Set();
   SECTIONS.forEach(sec => {
     const secNotes = [];
     sec.lessons.forEach(l => {
       const k = lk(sec.id, l.n);
       const notes = state.notes[k] || [];
       if (notes.length) {
+        notes.forEach(n=>seen.add(n.id));
         secNotes.push({ lesson: l, k, notes });
       }
     });
     if (secNotes.length) result.push({ sec, lessons: secNotes });
   });
+  // Fallback: notas importadas que não pertencem a nenhuma seção ativa
+  const orphanLessons = [];
+  Object.entries(state.notes||{}).forEach(([k, notes])=>{
+    const unseen = (notes||[]).filter(n=>!seen.has(n.id));
+    if(unseen.length){
+      const [sid, ln] = k.split('_');
+      orphanLessons.push({ lesson:{n:parseInt(ln)||0, t:k, d:''}, k, notes:unseen });
+      unseen.forEach(n=>seen.add(n.id));
+    }
+  });
+  if(orphanLessons.length){
+    result.push({ sec:{id:'_imported',num:'?',title:'Importadas',color:'#888'}, lessons:orphanLessons });
+  }
   return result;
 }
 
 function getAllNotesFlat(sectionId, typeFilter) {
   let all = [];
+  const seen = new Set();
   SECTIONS.forEach(sec => {
     if (sectionId !== 'all' && sec.id !== sectionId) return;
     sec.lessons.forEach(l => {
       const k = lk(sec.id, l.n);
       (state.notes[k] || []).forEach(n => {
         if (typeFilter !== 'all' && n.type !== typeFilter) return;
+        seen.add(n.id);
         all.push({ ...n, k, secId: sec.id, secNum: sec.num, secTitle: sec.title, secColor: sec.color, lessonN: l.n, lessonTitle: state.customTitles[k] || l.t });
       });
     });
   });
+  // Fallback: notas importadas não encontradas via SECTIONS
+  if(sectionId==='all'){
+    Object.entries(state.notes||{}).forEach(([k, notes])=>{
+      (notes||[]).forEach(n=>{
+        if(seen.has(n.id)) return;
+        if(typeFilter !== 'all' && n.type !== typeFilter) return;
+        seen.add(n.id);
+        const [sid,ln]=k.split('_');
+        all.push({
+          ...n, k,
+          secId:n.secId||sid, secNum:n.secNum||0,
+          secTitle:n.secTitle||'Seção importada', secColor:'#888',
+          lessonN:n.lessonN||parseInt(ln)||0,
+          lessonTitle:n.lessonTitle||state.customTitles[k]||k
+        });
+      });
+    });
+  }
   return all;
 }
 
@@ -3060,6 +3127,10 @@ function bkConfirmImport(){
   if(!state.activeCourseId) state.activeCourseId = currentActiveCourseId;
 
   save();
+
+  // Resetar filtros de código e língua para garantir exibição completa
+  globalCodeFilter = 'all';
+  window._gclang = 'java';
 
   // Reaplicar curso ativo para garantir SECTIONS e TOTAL corretos
   applyActiveCourse();
