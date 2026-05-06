@@ -1226,14 +1226,25 @@ function updateStats(){
 // -- UTILS ---------------------------------------------------
 function escHtml(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 function syntaxHL(code,lang){
-  if(lang!=='java') return escHtml(code);
-  return escHtml(code)
-    .replace(/\/\/.*/g,m=>`<span style="color:#6b7280;font-style:italic">${m}</span>`)
-    .replace(/\/\*[\s\S]*?\*\//g,m=>`<span style="color:#6b7280;font-style:italic">${m}</span>`)
-    .replace(/"([^"]*)"/g,m=>`<span style="color:#86efac">${m}</span>`)
-    .replace(/\b(public|private|protected|class|interface|extends|implements|new|return|void|static|final|abstract|if|else|for|while|do|switch|case|break|continue|try|catch|finally|throw|throws|import|package|this|super|null|true|false|instanceof|enum|record|var|int|long|double|float|boolean|char|byte|short|String)\b/g,m=>`<span style="color:#c084fc">${m}</span>`)
-    .replace(/\b(\d+\.?\d*[fLdF]?)\b/g,m=>`<span style="color:#fbbf24">${m}</span>`)
-    .replace(/@\w+/g,m=>`<span style="color:#fb923c">${m}</span>`);
+  const esc=escHtml(code);
+  if(lang!=='java') return esc;
+  // Use placeholder tokens to avoid regex collision
+  const spans=[];
+  let result=esc;
+  const ph=(s)=>{ const i=spans.length; spans.push(s); return `\x00${i}\x00`; };
+  // Comments first (highest priority, must not be re-processed)
+  result=result.replace(/\/\/.*/g,m=>ph(`<span style="color:#6b7280;font-style:italic">${m}</span>`));
+  result=result.replace(/\/\*[\s\S]*?\*\//g,m=>ph(`<span style="color:#6b7280;font-style:italic">${m}</span>`));
+  // Strings
+  result=result.replace(/"[^"]*"/g,m=>ph(`<span style="color:#86efac">${m}</span>`));
+  // Keywords
+  result=result.replace(/\b(public|private|protected|class|interface|extends|implements|new|return|void|static|final|abstract|if|else|for|while|do|switch|case|break|continue|try|catch|finally|throw|throws|import|package|this|super|null|true|false|instanceof|enum|record|var|int|long|double|float|boolean|char|byte|short|String)\b/g,m=>ph(`<span style="color:#c084fc">${m}</span>`));
+  // Numbers
+  result=result.replace(/\b(\d+\.?\d*[fLdF]?)\b/g,m=>ph(`<span style="color:#fbbf24">${m}</span>`));
+  // Annotations
+  result=result.replace(/@\w+/g,m=>ph(`<span style="color:#fb923c">${m}</span>`));
+  // Restore placeholders
+  return result.replace(/\x00(\d+)\x00/g,(_,i)=>spans[+i]);
 }
 
 // -- DESKTOP SIDEBAR -----------------------------------------
@@ -1241,10 +1252,12 @@ function dRenderSidebar(){
   const c=document.getElementById('d-sections-nav');
   if(!c) return;
   let html='';
+  let globalLessonOffset=0;
   SECTIONS.forEach(sec=>{
     const done=sec.lessons.filter(l=>state.done[lk(sec.id,l.n)]).length;
     const pct=Math.round(done/sec.lessons.length*100);
     const isOpen=sec._dopen||false;
+    const secOffset=globalLessonOffset;
     html+=`<div class="sec-group">
       <div class="sec-hdr ${isOpen?'open':''}" onclick="dToggleSec('${sec.id}')">
         <div class="sec-num" style="background:${sec.color}22;color:${sec.color}">${sec.num}</div>
@@ -1254,17 +1267,19 @@ function dRenderSidebar(){
       </div>
       <div class="sec-bar"><div class="sec-bar-fill" style="width:${pct}%"></div></div>
       <div class="lessons-wrap ${isOpen?'open':''}">`;
-    sec.lessons.forEach(l=>{
+    sec.lessons.forEach((l,li)=>{
       const k=lk(sec.id,l.n); const isDone=!!state.done[k];
       const title=state.customTitles[k]||l.t;
+      const globalNum=secOffset+li+1;
       html+=`<div class="lesson-row ${activeKey===k?'active-lesson':''}" onclick="dOpenLesson('${sec.id}',${l.n})">
         <div class="lesson-chk ${isDone?'done':''}" onclick="event.stopPropagation();toggleDone('${sec.id}',${l.n})"></div>
-        <div class="lesson-num">${l.n}</div>
+        <div class="lesson-num">${globalNum}</div>
         <div class="lesson-title ${isDone?'done':''}">${title}</div>
         <div class="lesson-dur">${l.d}</div>
       </div>`;
     });
     html+=`</div></div>`;
+    globalLessonOffset+=sec.lessons.length;
   });
   c.innerHTML=html;
 }
@@ -2161,33 +2176,37 @@ function mBack(){ mNav(mPrev||'secoes'); }
 function mRenderSections(){
   const c=document.getElementById('m-sec-list'); if(!c) return;
   let html='';
+  let globalLessonOffset=0; // acumula número global
   SECTIONS.forEach(sec=>{
     const done=sec.lessons.filter(l=>state.done[lk(sec.id,l.n)]).length;
     const pct=Math.round(done/sec.lessons.length*100);
     const isOpen=sec._mopen||false;
+    const secOffset=globalLessonOffset; // offset desta seção
     html+=`<div style="background:#fff;border:1px solid #e8e6e0;border-radius:12px;margin-bottom:9px;overflow:hidden">
       <div style="display:flex;align-items:center;gap:9px;padding:12px 13px;cursor:pointer" onclick="mToggleSec('${sec.id}')">
         <div style="width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;background:${sec.color}22;color:${sec.color};flex-shrink:0">${sec.num}</div>
         <div style="flex:1;min-width:0">
           <div style="font-size:13px;font-weight:700;color:#1a1a18;line-height:1.3">${sec.title}</div>
-          <div style="font-size:11px;color:#888;margin-top:2px">${done}/${sec.lessons.length} . ${sec.dur}</div>
+          <div style="font-size:11px;color:#888;margin-top:2px">${done}/${sec.lessons.length} . ${sec.dur||''}</div>
         </div>
         <div style="font-size:11px;color:#bbb;transition:transform .2s;transform:rotate(${isOpen?90:0}deg)">></div>
       </div>
       <div style="height:3px;background:#f0eeea;margin:0 13px"><div style="height:100%;background:#1D9E75;width:${pct}%;border-radius:2px"></div></div>
       ${isOpen?`<div style="padding:4px 0 8px;border-top:1px solid #f5f4f0">
-        ${sec.lessons.map(l=>{
+        ${sec.lessons.map((l,li)=>{
           const k=lk(sec.id,l.n); const isDone=!!state.done[k];
           const title=state.customTitles[k]||l.t;
+          const globalNum=secOffset+li+1;
           return `<div style="display:flex;align-items:center;gap:9px;padding:9px 13px;cursor:pointer;border-left:2px solid transparent" onclick="mOpenLesson('${sec.id}',${l.n})">
             <div style="width:18px;height:18px;border:2px solid ${isDone?'#1D9E75':'#ccc'};border-radius:4px;background:${isDone?'#1D9E75':'transparent'};display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:800;color:#fff;flex-shrink:0" onclick="event.stopPropagation();toggleDone('${sec.id}',${l.n})">${isDone?'✓':''}</div>
-            <div style="font-size:10px;color:#aaa;min-width:20px;flex-shrink:0">${l.n}</div>
+            <div style="font-size:10px;color:#aaa;min-width:22px;flex-shrink:0">${globalNum}</div>
             <div style="flex:1;font-size:13px;color:${isDone?'#bbb':'#1a1a18'};${isDone?'text-decoration:line-through':''};line-height:1.4">${title}</div>
             <div style="font-size:11px;color:#bbb;flex-shrink:0">${l.d}</div>
           </div>`;
         }).join('')}
       </div>`:''}
     </div>`;
+    globalLessonOffset+=sec.lessons.length;
   });
   c.innerHTML=html;
 }
