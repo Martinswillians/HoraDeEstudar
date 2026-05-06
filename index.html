@@ -385,7 +385,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 <div class="topbar">
   <div>
     <div id="hdr-brand" style="font-size:10px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;color:#1D9E75;margin-bottom:2px;display:flex;align-items:center;gap:5px">
-      <span>🎓</span><span id="hdr-brand-txt">Study Tracker</span>
+      <span>🎓</span><span id="hdr-brand-txt">Hora de estudar 🚀</span>
     </div>
     <h1 id="hdr-title">☕ Java COMPLETO — Tracker de Estudos</h1>
     <p id="hdr-subtitle">Nelio Alves · Udemy · POO + Projetos · 263 aulas</p>
@@ -1302,9 +1302,9 @@ function toggleDone(secId,n){
   dRenderSidebar(); updateStats(); dRenderOverview();
   if(activeKey===k) dRenderLesson(secId,n);
   mRenderSections(); mUpdateProgList();
-  // Refresh motivational brand label
+  // Refresh brand label (sempre fixo)
   const brand=document.getElementById('hdr-brand-txt');
-  if(brand){const {pct}=calcStats();if(pct===0)brand.textContent='Hora de estudar 🚀';else if(pct<25)brand.textContent='Início da jornada 🌱';else if(pct<50)brand.textContent='Estudo em progresso 📈';else if(pct<75)brand.textContent='Mais da metade! 💪';else if(pct<100)brand.textContent='Quase lá! 🏁';else brand.textContent='Curso concluído! 🏆';}
+  if(brand) brand.textContent='Hora de estudar 🚀';
 }
 
 // -- DESKTOP LESSON DETAIL ------------------------------------
@@ -3455,16 +3455,7 @@ function applyActiveCourse(){
   const brand=document.getElementById('hdr-brand-txt');
   if(t) t.textContent=(course.icon||'📚')+' '+course.name+' — Tracker de Estudos';
   if(sb) sb.textContent=[course.instructor,course.platform,course.desc].filter(Boolean).join(' · ');
-  if(brand){
-    // Pick a motivational label based on progress
-    const {pct}=calcStats();
-    if(pct===0) brand.textContent='Hora de estudar 🚀';
-    else if(pct<25) brand.textContent='Início da jornada 🌱';
-    else if(pct<50) brand.textContent='Estudo em progresso 📈';
-    else if(pct<75) brand.textContent='Mais da metade! 💪';
-    else if(pct<100) brand.textContent='Quase lá! 🏁';
-    else brand.textContent='Curso concluído! 🏆';
-  }
+  if(brand) brand.textContent='Hora de estudar 🚀';
   document.title=course.name+' — Tracker de Estudos';
 }
 
