@@ -1191,17 +1191,17 @@ function parseDuration(d){
 }
 
 function calcStats(){
-  let totalDone=0,notesCount=0,codesCount=0,estimatedHours=0;
+  let totalDone=0,estimatedHours=0;
   SECTIONS.forEach(sec=>sec.lessons.forEach(l=>{
     const k=lk(sec.id,l.n);
     if(state.done[k]){ totalDone++; estimatedHours+=parseDuration(l.d); }
-    notesCount+=(state.notes[k]||[]).length;
-    codesCount+=(state.codes[k]||[]).length;
   }));
   const pct=Math.round(totalDone/Math.max(TOTAL,1)*100);
   const secsDone=SECTIONS.filter(sec=>sec.lessons.every(l=>state.done[lk(sec.id,l.n)])).length;
   const logHours=state.logs.reduce((s,l)=>s+(parseFloat(l.hours)||0),0);
-  // Use diary hours if present, otherwise use estimated hours from completed lessons
+  // Contar TODAS as notas e códigos do state (não só os da SECTIONS ativa)
+  const notesCount=Object.values(state.notes).reduce((s,arr)=>s+(arr?arr.length:0),0);
+  const codesCount=Object.values(state.codes).reduce((s,arr)=>s+(arr?arr.length:0),0);
   const hours = logHours > 0 ? logHours : estimatedHours;
   const hoursLabel = logHours > 0 ? logHours : estimatedHours;
   return {totalDone,pct,secsDone,notesCount,codesCount,hours:hoursLabel,logHours,estimatedHours,sessions:state.logs.length};
@@ -2732,13 +2732,16 @@ function bkUpdateSizeInfo(){
 // ---- EXPORT JSON -----------------------------------------------
 function bkExportJson(){
   const payload = bkBuildPayload(_bkScope);
+  // Incluir sempre o curso ativo no backup para restauração correta
+  payload.activeCourseId = state.activeCourseId || 'java-completo';
   const json = JSON.stringify(payload, null, 2);
   const blob = new Blob([json], {type:'application/json;charset=utf-8'});
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   const date = new Date().toLocaleDateString('pt-BR').replace(/\//g,'-');
+  const courseName = (ACTIVE_COURSE.name||'curso').replace(/[^a-zA-Z0-9À-ú]/g,'-').replace(/-+/g,'-').substring(0,30);
   a.href = url;
-  a.download = 'java-tracker-backup-'+date+'.json';
+  a.download = 'java-tracker-backup_'+courseName+'_'+date+'.json';
   document.body.appendChild(a); a.click(); document.body.removeChild(a);
   URL.revokeObjectURL(url);
 }
@@ -2980,15 +2983,18 @@ function bkConfirmImport(){
   const overwrite = document.getElementById('bk-overwrite')?.checked;
 
   const data = _bkPendingData;
+  // Preservar sempre o activeCourseId atual para não perder o curso ativo
+  const currentActiveCourseId = state.activeCourseId || 'java-completo';
 
   if(overwrite){
-    // Full replace
+    // Full replace — mas mantém o activeCourseId do estado atual
     state = {
-      done:         data.done         || {},
-      notes:        data.notes        || {},
-      codes:        data.codes        || {},
-      logs:         data.logs         || [],
-      customTitles: data.customTitles || {},
+      done:           data.done         || {},
+      notes:          data.notes        || {},
+      codes:          data.codes        || {},
+      logs:           data.logs         || [],
+      customTitles:   data.customTitles || {},
+      activeCourseId: data.activeCourseId || currentActiveCourseId,
     };
   } else {
     // Merge — new entries only
@@ -3018,33 +3024,45 @@ function bkConfirmImport(){
     }
   }
 
-  save();
-  updateStats();
+  // Garantir activeCourseId sempre definido
+  if(!state.activeCourseId) state.activeCourseId = currentActiveCourseId;
 
-  // Refresh all visible UI
+  save();
+
+  // Reaplicar curso ativo para garantir SECTIONS e TOTAL corretos
+  applyActiveCourse();
+  updateStats();
+  activeKey = null;
+
+  // Refresh completo de toda a UI
+  populateLogSelects();
   const mobile = isMobile();
   if(mobile){
     mRenderSections();
-    mRenderLog();
-    mUpdateProgList();
-    renderNotesSummary('m-notes-summary', true);
+    try{ mRenderLog(); }catch(e){}
+    try{ mUpdateProgList(); }catch(e){}
+    try{ renderNotesSummary('m-notes-summary', true); }catch(e){}
   } else {
     dRenderSidebar();
     dRenderOverview();
     dRenderGlobalNotes();
     dRenderGlobalCode();
     renderLogList();
-    renderNotesSummary('d-notes-summary');
+    try{ renderNotesSummary('d-notes-summary'); }catch(e){}
+    // Limpar painel de aula aberta para forçar re-seleção
+    const la = document.getElementById('d-lesson-area');
+    if(la) la.innerHTML = '<div class="empty" style="background:#fff;border:1px solid #e8e6e0;border-radius:12px;padding:40px;text-align:center;color:#888">Selecione uma aula na barra lateral para começar.</div>';
   }
   _refreshSummaryIfOpen();
 
   _bkPendingData = null;
-  document.getElementById('bk-import-preview').style.display = 'none';
+  const preview = document.getElementById('bk-import-preview');
+  if(preview) preview.style.display = 'none';
 
   if(msg){
     msg.className = 'bk-msg ok';
     msg.textContent = overwrite ? '✅ Dados substituídos com sucesso!' : '✅ Dados mesclados com sucesso!';
-    setTimeout(()=>{ closeBackup(); },2200);
+    setTimeout(()=>{ closeBackup(); }, 2200);
   }
 }
 
