@@ -1174,7 +1174,28 @@ function save(){ try{localStorage.setItem('jt3',JSON.stringify(state));}catch(e)
 function load(){
   try{
     const d=localStorage.getItem('jt3');
-    if(d){ const p=JSON.parse(d); state=Object.assign({done:{},notes:{},codes:{},logs:[],customTitles:{},activeCourseId:'java-completo'},p); }
+    if(d){
+      const p=JSON.parse(d);
+      state=Object.assign({done:{},notes:{},codes:{},logs:[],customTitles:{},activeCourseId:'java-completo'},p);
+      return;
+    }
+    // Migração: tentar chaves de versões anteriores
+    const oldKeys=['jt2','jt','java-tracker','tracker-state'];
+    for(const key of oldKeys){
+      const old=localStorage.getItem(key);
+      if(old){
+        try{
+          const p=JSON.parse(old);
+          if(p && typeof p.done === 'object'){
+            state=Object.assign({done:{},notes:{},codes:{},logs:[],customTitles:{},activeCourseId:'java-completo'},p);
+            // Migrar para nova chave
+            save();
+            console.log('[Migração] Dados migrados de "'+key+'" para "jt3"');
+            return;
+          }
+        }catch(e){}
+      }
+    }
   }catch(e){}
 }
 
@@ -1350,14 +1371,14 @@ function dRenderLesson(secId,n){
           <div class="ld-meta"><span>Aula ${n}</span><span>${lesson.d}</span>${isDone?'<span style="color:#1D9E75;font-weight:600">✓ Concluída</span>':''}</div>
         </div>
         <div class="ld-actions">
-          <button class="icon-btn" onclick="dEditTitle(secId,n)">✏️ Editar</button>
+          <button class="icon-btn" onclick="dEditTitle('${secId}',${n})">✏️ Editar</button>
           <button class="icon-btn" onclick="toggleDone('${secId}',${n})">${isDone?'< Desmarcar':'✓ Concluir'}</button>
-          <button class="icon-btn" style="background:#f0f7ff;color:#185FA5;border-color:#c8ddf2" onclick="openExport(secId,n)">📤 Exportar</button>
+          <button class="icon-btn" style="background:#f0f7ff;color:#185FA5;border-color:#c8ddf2" onclick="openExport('${secId}',${n})">📤 Exportar</button>
         </div>
       </div>
       <div class="sub-tabs">
-        <button class="sub-tab-btn ${curLessonTab==='notas'?'active':''}" onclick="setLessonTab('notas',secId,n)">📝 Anotações (${notes.length})</button>
-        <button class="sub-tab-btn ${curLessonTab==='codigo'?'active':''}" onclick="setLessonTab('codigo',secId,n)">💻 Código (${codes.length})</button>
+        <button class="sub-tab-btn ${curLessonTab==='notas'?'active':''}" onclick="setLessonTab('notas','${secId}',${n})">📝 Anotações (${notes.length})</button>
+        <button class="sub-tab-btn ${curLessonTab==='codigo'?'active':''}" onclick="setLessonTab('codigo','${secId}',${n})">💻 Código (${codes.length})</button>
       </div>
       <div id="lpanel-notas" style="display:${curLessonTab==='notas'?'block':'none'}">
         <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:9px" id="d-nt-btns">
@@ -1394,8 +1415,10 @@ function dRenderLesson(secId,n){
 
 function setLessonTab(tab,secId,n){
   curLessonTab=tab;
-  document.getElementById('lpanel-notas').style.display=tab==='notas'?'block':'none';
-  document.getElementById('lpanel-codigo').style.display=tab==='codigo'?'block':'none';
+  const pn=document.getElementById('lpanel-notas');
+  const pc=document.getElementById('lpanel-codigo');
+  if(pn) pn.style.display=tab==='notas'?'block':'none';
+  if(pc) pc.style.display=tab==='codigo'?'block':'none';
   document.querySelectorAll('.sub-tab-btn').forEach((b,i)=>b.classList.toggle('active',['notas','codigo'][i]===tab));
 }
 function setNoteType(btn){ curNoteType=btn.dataset.type; document.querySelectorAll('#d-nt-btns .ntb').forEach(b=>{b.className='ntb';if(b.dataset.type===curNoteType)b.classList.add('sel-'+curNoteType);}); }
@@ -2942,7 +2965,16 @@ function bkReadFile(file){
   reader.onload = e => {
     try {
       const data = JSON.parse(e.target.result);
-      if(data._app !== 'JavaTracker') throw new Error('Arquivo não é um backup JavaTracker.');
+      // Verificação flexível: aceita qualquer backup que tenha 'done' e 'notes'
+      const isValid = data._app === 'JavaTracker' ||
+                      (typeof data.done === 'object' && typeof data.notes === 'object');
+      if(!isValid) throw new Error('Arquivo não parece ser um backup válido do tracker.');
+      // Garantir campos mínimos
+      data.done         = data.done         || {};
+      data.notes        = data.notes        || {};
+      data.codes        = data.codes        || {};
+      data.logs         = data.logs         || [];
+      data.customTitles = data.customTitles || {};
       _bkPendingData = data;
       bkShowImportPreview(data);
     } catch(err){
