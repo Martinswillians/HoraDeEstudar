@@ -360,7 +360,59 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 @keyframes brandpulse{0%,100%{opacity:.75}50%{opacity:1}}
 #cm-json-drop:hover{border-color:#185FA5!important;background:#f0f7ff!important}
 
-/* ── DELETE CONFIRM MODAL ── */
+/* ── ACTION BUTTONS (Cursos, Compartilhar, Backup) ── */
+.btn-top-action{
+  position:relative;
+  border:2px solid rgba(255,255,255,0.25)!important;
+  box-shadow:0 2px 8px rgba(0,0,0,.25), inset 0 1px 0 rgba(255,255,255,.15)!important;
+  font-weight:700!important;
+  letter-spacing:.3px;
+  transition:all .18s ease!important;
+  cursor:pointer!important;
+}
+.btn-top-action:hover{
+  transform:translateY(-2px)!important;
+  box-shadow:0 5px 16px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.2)!important;
+  filter:brightness(1.1);
+}
+.btn-top-action:active{ transform:translateY(0)!important; }
+/* Tooltip */
+.btn-top-action::after{
+  content: attr(data-hint);
+  position:absolute;
+  bottom:-38px;
+  left:50%;
+  transform:translateX(-50%);
+  background:rgba(20,20,20,.92);
+  color:#fff;
+  font-size:11px;
+  font-weight:500;
+  padding:5px 10px;
+  border-radius:7px;
+  white-space:nowrap;
+  pointer-events:none;
+  opacity:0;
+  transition:opacity .2s ease, bottom .2s ease;
+  z-index:9999;
+  letter-spacing:.2px;
+}
+.btn-top-action::before{
+  content:'';
+  position:absolute;
+  bottom:-10px;
+  left:50%;
+  transform:translateX(-50%);
+  border:5px solid transparent;
+  border-bottom-color:rgba(20,20,20,.92);
+  pointer-events:none;
+  opacity:0;
+  transition:opacity .2s ease;
+  z-index:9999;
+}
+.btn-top-action:hover::after,
+.btn-top-action:hover::before{ opacity:1; bottom:-42px; }
+
+/* DELETE CONFIRM MODAL */
 .del-modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:9000;align-items:center;justify-content:center;padding:16px}
 .del-modal-overlay.open{display:flex}
 .del-modal{background:#fff;border-radius:16px;width:100%;max-width:440px;box-shadow:0 24px 64px rgba(0,0,0,.3);overflow:hidden;animation:delmodalin .18s ease-out}
@@ -391,12 +443,12 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
     <p id="hdr-subtitle">Nelio Alves · Udemy · POO + Projetos · 263 aulas</p>
   </div>
   <div class="top-badges">
-    <button class="btn-export-top" style="background:#1D9E75;color:#fff" onclick="openCourseModal()">📚 Cursos</button>
+    <button class="btn-export-top btn-top-action" style="background:#1D9E75;color:#fff" onclick="openCourseModal()" title="Selecione, altere ou adicione cursos" data-hint="Selecione, altere ou adicione cursos">📚 Cursos</button>
     <span class="badge badge-green" id="hdr-pct">0%</span>
     <span class="badge badge-blue" id="hdr-aulas">0/0 aulas</span>
     <span class="badge badge-amber" id="hdr-hours">0h</span>
-    <button class="btn-export-top" onclick="openExportGeral()">📤 Exportar</button>
-    <button class="btn-export-top" style="background:#185FA5;color:#fff" onclick="openBackup()">🔄 Backup</button>
+    <button class="btn-export-top btn-top-action" onclick="openExportGeral()" title="Compartilhe informações do curso" data-hint="Compartilhe informações do curso">📤 Compartilhar</button>
+    <button class="btn-export-top btn-top-action" style="background:#185FA5;color:#fff" onclick="openBackup()" title="Exporte ou importe backup do curso" data-hint="Exporte ou importe backup do curso">🔄 Backup</button>
   </div>
 </div>
 
@@ -1170,33 +1222,47 @@ function getCourseById(id){
   return CUSTOM_COURSES.find(c=>c.id===id) || null;
 }
 
-function save(){ try{localStorage.setItem('jt3',JSON.stringify(state));}catch(e){} }
+function stateKey(){ return 'jt3_'+(state.activeCourseId||'java-completo'); }
+function save(){ try{ localStorage.setItem(stateKey(), JSON.stringify(state)); }catch(e){} }
 function load(){
-  try{
-    const d=localStorage.getItem('jt3');
-    if(d){
-      const p=JSON.parse(d);
-      state=Object.assign({done:{},notes:{},codes:{},logs:[],customTitles:{},activeCourseId:'java-completo'},p);
-      return;
-    }
-    // Migração: tentar chaves de versões anteriores
-    const oldKeys=['jt2','jt','java-tracker','tracker-state'];
-    for(const key of oldKeys){
+  // Tenta chave do curso ativo primeiro, depois chave global legada
+  const tryKeys = [
+    'jt3_'+(state.activeCourseId||'java-completo'),
+    'jt3',
+  ];
+  for(const key of tryKeys){
+    try{
+      const d=localStorage.getItem(key);
+      if(d){
+        const p=JSON.parse(d);
+        if(p && typeof p === 'object'){
+          state=Object.assign({done:{},notes:{},codes:{},logs:[],customTitles:{},activeCourseId:'java-completo'},p);
+          // Migrar de chave legada para chave por curso
+          if(key==='jt3'){
+            save(); // grava na chave correta
+            try{ localStorage.removeItem('jt3'); }catch(e){} // remove a legada
+          }
+          return;
+        }
+      }
+    }catch(e){}
+  }
+  // Tentar chaves de versões ainda mais antigas
+  const oldKeys=['jt2','java-tracker','tracker-state'];
+  for(const key of oldKeys){
+    try{
       const old=localStorage.getItem(key);
       if(old){
-        try{
-          const p=JSON.parse(old);
-          if(p && typeof p.done === 'object'){
-            state=Object.assign({done:{},notes:{},codes:{},logs:[],customTitles:{},activeCourseId:'java-completo'},p);
-            // Migrar para nova chave
-            save();
-            console.log('[Migração] Dados migrados de "'+key+'" para "jt3"');
-            return;
-          }
-        }catch(e){}
+        const p=JSON.parse(old);
+        if(p && typeof p.done === 'object'){
+          state=Object.assign({done:{},notes:{},codes:{},logs:[],customTitles:{},activeCourseId:'java-completo'},p);
+          save();
+          console.log('[Migração] Dados migrados de "'+key+'" para "'+stateKey()+'"');
+          return;
+        }
       }
-    }
-  }catch(e){}
+    }catch(e){}
+  }
 }
 
 // -- STATS ---------------------------------------------------
@@ -3126,11 +3192,14 @@ function bkConfirmImport(){
   // Garantir activeCourseId sempre definido
   if(!state.activeCourseId) state.activeCourseId = currentActiveCourseId;
 
-  save();
-
   // Resetar filtros de código e língua para garantir exibição completa
   globalCodeFilter = 'all';
   window._gclang = 'java';
+
+  // Limpar chave legada 'jt3' para evitar conflito com chave por curso
+  try{ localStorage.removeItem('jt3'); }catch(e){}
+
+  save(); // grava em jt3_<activeCourseId>
 
   // Reaplicar curso ativo para garantir SECTIONS e TOTAL corretos
   applyActiveCourse();
@@ -3241,8 +3310,10 @@ function cmSelectCourse(id){
     if(!confirm('Trocar de curso? Seus dados do curso atual ficam salvos e voltam quando você retornar a ele.')) return;
   }
   try {
-    // Salvar estado atual
-    try{ localStorage.setItem('jt3_'+state.activeCourseId, JSON.stringify(state)); }catch(e){}
+    // Salvar estado atual na chave correta do curso
+    try{ localStorage.setItem(stateKey(), JSON.stringify(state)); }catch(e){}
+    // Limpar chave legada para evitar conflitos
+    try{ localStorage.removeItem('jt3'); }catch(e){}
     // Carregar estado do novo curso (se existir)
     const stored=localStorage.getItem('jt3_'+id);
     if(stored){
@@ -3251,7 +3322,7 @@ function cmSelectCourse(id){
       state={done:{},notes:{},codes:{},logs:[],customTitles:{},activeCourseId:id};
     }
     state.activeCourseId=id;
-    save();
+    save(); // grava em jt3_<id>
     applyActiveCourse();
     updateStats();
     activeKey=null;
