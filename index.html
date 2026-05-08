@@ -447,6 +447,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
     <span class="badge badge-green" id="hdr-pct">0%</span>
     <span class="badge badge-blue" id="hdr-aulas">0/0 aulas</span>
     <span class="badge badge-amber" id="hdr-hours">0h</span>
+    <span class="badge" id="hdr-streak" onclick="openStreakModal()" style="cursor:pointer;background:#555;color:#aaa;border:2px dashed rgba(255,255,255,.3);transition:all .2s" title="Streak de dias estudados">💤 0d</span>
     <button class="btn-export-top btn-top-action" onclick="openExportGeral()" title="Compartilhe informações do curso" data-hint="Compartilhe informações do curso">📤 Compartilhar</button>
     <button class="btn-export-top btn-top-action" style="background:#185FA5;color:#fff" onclick="openBackup()" title="Exporte ou importe backup do curso" data-hint="Exporte ou importe backup do curso">🔄 Backup</button>
   </div>
@@ -1181,6 +1182,7 @@ const NOTE_EMOJI = {tip:'💡',doubt:'❓',important:'⭐',concept:'📖'};
 let state = {
   done:{}, notes:{}, codes:{}, logs:[], customTitles:{},
   activeCourseId: 'java-completo',
+  activityDays: {}, // { 'YYYY-MM-DD': true } — dias com atividade
 };
 let activeKey = null;
 let curNoteType = 'tip';
@@ -1188,6 +1190,75 @@ let curLang = 'java';
 let curLessonTab = 'notas'; // 'notas' | 'codigo'
 let expCtx = {tab:'aula', secId:null, lessonN:null, expSecId:null};
 let globalCodeFilter = 'all';
+
+function lk(secId, n){ return secId+'_'+n; }
+
+// ── STREAK ────────────────────────────────────────────────────
+function todayStr(){ return new Date().toISOString().split('T')[0]; }
+
+function recordActivity(){
+  const today = todayStr();
+  if(!state.activityDays) state.activityDays = {};
+  state.activityDays[today] = true;
+  save();
+  updateStreakUI();
+}
+
+function calcStreak(){
+  if(!state.activityDays) return {current:0, longest:0, total:0, todayDone:false};
+  const days = Object.keys(state.activityDays).filter(d=>state.activityDays[d]).sort();
+  if(!days.length) return {current:0, longest:0, total:0, todayDone:false};
+  const today = todayStr();
+  const yesterday = new Date(); yesterday.setDate(yesterday.getDate()-1);
+  const yesterdayStr = yesterday.toISOString().split('T')[0];
+  const todayDone = !!state.activityDays[today];
+  // Current streak: count backwards from today or yesterday
+  let current = 0;
+  let check = todayDone ? today : yesterdayStr;
+  while(state.activityDays[check]){
+    current++;
+    const d = new Date(check); d.setDate(d.getDate()-1);
+    check = d.toISOString().split('T')[0];
+  }
+  // Longest streak
+  let longest = 0, run = 1;
+  for(let i=1;i<days.length;i++){
+    const prev = new Date(days[i-1]); prev.setDate(prev.getDate()+1);
+    if(prev.toISOString().split('T')[0] === days[i]) run++;
+    else run = 1;
+    if(run > longest) longest = run;
+  }
+  if(run > longest) longest = run;
+  if(current > longest) longest = current;
+  return {current, longest, total:days.length, todayDone};
+}
+
+function streakEmoji(n){
+  if(n===0) return '💤';
+  if(n<3) return '🌱';
+  if(n<7) return '🔥';
+  if(n<14) return '🔥🔥';
+  if(n<30) return '⚡';
+  return '🏆';
+}
+
+function updateStreakUI(){
+  const {current, longest, total, todayDone} = calcStreak();
+  const em = streakEmoji(current);
+  // Desktop topbar streak badge
+  const el = document.getElementById('hdr-streak');
+  if(el){
+    el.textContent = em+' '+current+'d';
+    el.title = `Streak atual: ${current} dias\nMaior streak: ${longest} dias\nTotal de dias estudados: ${total}`;
+    el.style.background = current>=7 ? 'linear-gradient(135deg,#f97316,#ef4444)' :
+                          current>=3 ? 'linear-gradient(135deg,#f97316,#fbbf24)' :
+                          current>=1 ? 'linear-gradient(135deg,#fbbf24,#fde68a)' : '#555';
+    el.style.color = current>=1 ? '#fff' : '#aaa';
+    el.style.border = todayDone ? '2px solid rgba(255,255,255,0.4)' : '2px dashed rgba(255,255,255,0.3)';
+  }
+  // Update streak modal content if open
+  renderStreakModal();
+}
 
 function lk(secId, n){ return secId+'_'+n; }
 
@@ -1406,7 +1477,9 @@ function dSearch(q){
 
 // -- TOGGLE DONE ---------------------------------------------
 function toggleDone(secId,n){
-  const k=lk(secId,n); state.done[k]=!state.done[k]; save();
+  const k=lk(secId,n); state.done[k]=!state.done[k];
+  if(state.done[k]) recordActivity(); // registra atividade só ao marcar como feita
+  else save();
   dRenderSidebar(); updateStats(); dRenderOverview();
   if(activeKey===k) dRenderLesson(secId,n);
   mRenderSections(); mUpdateProgList();
@@ -1848,8 +1921,11 @@ function addLog(){
   const desc=document.getElementById('d-log-desc')?.value.trim();
   if(!date||!hours) return;
   state.logs.unshift({id:Date.now(),date,hours:parseFloat(hours),sec,desc});
+  // Registrar atividade no dia da sessão (pode ser retroativo)
+  if(!state.activityDays) state.activityDays={};
+  state.activityDays[date]=true;
   document.getElementById('d-log-hours').value=''; document.getElementById('d-log-desc').value='';
-  save(); updateStats(); renderLogList();
+  save(); updateStats(); renderLogList(); updateStreakUI();
 }
 function mAddLog(){
   const date=document.getElementById('m-log-date')?.value;
@@ -1858,8 +1934,11 @@ function mAddLog(){
   const desc=document.getElementById('m-log-desc')?.value.trim();
   if(!date||!hours) return;
   state.logs.unshift({id:Date.now(),date,hours:parseFloat(hours),sec,desc});
+  // Registrar atividade no dia da sessão
+  if(!state.activityDays) state.activityDays={};
+  state.activityDays[date]=true;
   document.getElementById('m-log-hours').value=''; document.getElementById('m-log-desc').value='';
-  save(); updateStats(); renderLogList(); mRenderLog();
+  save(); updateStats(); renderLogList(); mRenderLog(); updateStreakUI();
 }
 function renderLogList(){
   const target=document.getElementById('d-log-list'); if(!target) return;
@@ -2781,7 +2860,7 @@ function closeLightbox(){
   document.getElementById('lightbox-img').src='';
   document.body.style.overflow='';
 }
-document.addEventListener('keydown',e=>{ if(e.key==='Escape'){ closeExport(); closeLightbox(); closeBackup(); closeCourseModal(); } });
+document.addEventListener('keydown',e=>{ if(e.key==='Escape'){ closeExport(); closeLightbox(); closeBackup(); closeCourseModal(); closDelModal(); closeStreakModal(); } });
 
 
 // =============================================================
@@ -3351,6 +3430,71 @@ function cmSelectCourse(id){
   }
 }
 
+// ── STREAK MODAL ──────────────────────────────────────────────
+function openStreakModal(){
+  document.getElementById('streak-modal-overlay').style.display='flex';
+  renderStreakModal();
+}
+function closeStreakModal(){
+  document.getElementById('streak-modal-overlay').style.display='none';
+}
+function renderStreakModal(){
+  const overlay=document.getElementById('streak-modal-overlay');
+  if(!overlay||overlay.style.display==='none') return;
+  const {current,longest,total,todayDone}=calcStreak();
+  if(!state.activityDays) state.activityDays={};
+  const header=document.getElementById('streak-modal-header');
+  const flame=document.getElementById('streak-modal-flame');
+  const countEl=document.getElementById('streak-modal-count');
+  if(header){
+    const grad=current>=7?'linear-gradient(135deg,#dc2626,#f97316)':
+               current>=3?'linear-gradient(135deg,#f97316,#fbbf24)':
+               current>=1?'linear-gradient(135deg,#fbbf24,#84cc16)':
+               'linear-gradient(135deg,#64748b,#94a3b8)';
+    header.style.background=grad;
+  }
+  if(flame) flame.textContent=streakEmoji(current);
+  if(countEl) countEl.textContent=current;
+  const sv=(id,v)=>{const el=document.getElementById(id);if(el)el.textContent=v;};
+  sv('streak-stat-longest',longest);
+  sv('streak-stat-total',total);
+  const weekStart=new Date(); weekStart.setDate(weekStart.getDate()-weekStart.getDay());
+  let weekCount=0;
+  for(let i=0;i<7;i++){
+    const d=new Date(weekStart); d.setDate(weekStart.getDate()+i);
+    if(state.activityDays[d.toISOString().split('T')[0]]) weekCount++;
+  }
+  sv('streak-stat-week',weekCount);
+  const heatmap=document.getElementById('streak-heatmap');
+  if(heatmap){
+    let html='';
+    for(let i=29;i>=0;i--){
+      const d=new Date(); d.setDate(d.getDate()-i);
+      const ds=d.toISOString().split('T')[0];
+      const active=!!state.activityDays[ds];
+      const isToday=ds===todayStr();
+      const label=d.toLocaleDateString('pt-BR',{day:'2-digit',month:'short'});
+      const bg=active?(isToday?'#1D9E75':'#4ade80'):'#f0eeea';
+      const border=isToday?'border:2px solid #1D9E75':'border:2px solid transparent';
+      html+=`<div title="${label}${active?' ✅':''}" style="width:100%;aspect-ratio:1;border-radius:4px;background:${bg};${border};transition:transform .1s" onmouseover="this.style.transform='scale(1.2)'" onmouseout="this.style.transform='scale(1)'"></div>`;
+    }
+    heatmap.innerHTML=html;
+  }
+  const ms=document.getElementById('streak-milestone');
+  if(ms){
+    const milestones=[[1,'🌱 Primeiro dia! A jornada começa com um único passo.'],[3,'🔥 3 dias seguidos! Você está criando um hábito.'],[7,'⚡ Uma semana inteira! Você é imparável.'],[14,'💪 14 dias! Consistência é a chave do sucesso.'],[21,'🏅 21 dias — hábito formado!'],[30,'🏆 30 dias! Você é uma lenda dos estudos!'],[60,'👑 60 dias! Nível lendário desbloqueado!'],[100,'🌟 100 DIAS! Você é extraordinário!']];
+    let msg='';
+    for(const [n,m] of [...milestones].reverse()){ if(current>=n){msg=m;break;} }
+    if(!todayDone && current>0) msg='📅 Estude hoje para manter seu streak de '+current+' dias!';
+    if(!todayDone && current===0) msg='💤 Nenhum dia ativo ainda. Comece hoje!';
+    ms.style.display=msg?'block':'none';
+    ms.textContent=msg;
+    ms.style.background=todayDone?'#f0fdf4':'#fffbeb';
+    ms.style.borderColor=todayDone?'#bbf7d0':'#fde68a';
+    ms.style.color=todayDone?'#166534':'#92400e';
+  }
+}
+
 // ── Exclusão de curso com confirmação dupla ────────────────────
 let _delPendingId = null;
 
@@ -3674,8 +3818,12 @@ function init(){
   loadCourses();
   load();
   applyActiveCourse();
+  // Migrar dias de atividade dos logs existentes (retroativo)
+  if(!state.activityDays) state.activityDays={};
+  state.logs.forEach(l=>{ if(l.date) state.activityDays[l.date]=true; });
   const today=new Date().toISOString().split('T')[0];
   updateStats();
+  updateStreakUI();
   const ldEl=document.getElementById('d-log-date'); if(ldEl) ldEl.value=today;
   populateLogSelects();
 
@@ -3703,6 +3851,52 @@ window.addEventListener('resize',()=>{
 
 init();
 </script>
+<!-- ═══ STREAK MODAL ═══ -->
+<div id="streak-modal-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:8500;align-items:center;justify-content:center;padding:16px" onclick="if(event.target===this)closeStreakModal()">
+  <div style="background:#fff;border-radius:20px;width:100%;max-width:480px;box-shadow:0 24px 64px rgba(0,0,0,.3);overflow:hidden;animation:delmodalin .18s ease-out">
+    <!-- Header -->
+    <div id="streak-modal-header" style="padding:24px 24px 16px;text-align:center;background:linear-gradient(135deg,#f97316,#ef4444)">
+      <div id="streak-modal-flame" style="font-size:52px;line-height:1;margin-bottom:6px">🔥</div>
+      <div id="streak-modal-count" style="font-size:42px;font-weight:900;color:#fff;line-height:1">0</div>
+      <div style="font-size:13px;font-weight:700;color:rgba(255,255,255,.85);margin-top:2px">dias seguidos</div>
+    </div>
+    <!-- Stats row -->
+    <div style="display:flex;border-bottom:1px solid #f0eeea">
+      <div style="flex:1;padding:14px;text-align:center;border-right:1px solid #f0eeea">
+        <div id="streak-stat-longest" style="font-size:22px;font-weight:800;color:#1a1a18">0</div>
+        <div style="font-size:11px;color:#888;font-weight:600">Maior streak</div>
+      </div>
+      <div style="flex:1;padding:14px;text-align:center;border-right:1px solid #f0eeea">
+        <div id="streak-stat-total" style="font-size:22px;font-weight:800;color:#1a1a18">0</div>
+        <div style="font-size:11px;color:#888;font-weight:600">Dias estudados</div>
+      </div>
+      <div style="flex:1;padding:14px;text-align:center">
+        <div id="streak-stat-week" style="font-size:22px;font-weight:800;color:#1a1a18">0</div>
+        <div style="font-size:11px;color:#888;font-weight:600">Nesta semana</div>
+      </div>
+    </div>
+    <!-- 30-day heatmap -->
+    <div style="padding:18px 20px">
+      <div style="font-size:11px;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:.8px;margin-bottom:10px">Últimos 30 dias</div>
+      <div id="streak-heatmap" style="display:grid;grid-template-columns:repeat(10,1fr);gap:5px"></div>
+      <div style="display:flex;align-items:center;gap:6px;margin-top:10px;justify-content:flex-end">
+        <span style="font-size:10px;color:#bbb">Menos</span>
+        <div style="width:12px;height:12px;border-radius:3px;background:#f0eeea"></div>
+        <div style="width:12px;height:12px;border-radius:3px;background:#bbf7d0"></div>
+        <div style="width:12px;height:12px;border-radius:3px;background:#4ade80"></div>
+        <div style="width:12px;height:12px;border-radius:3px;background:#1D9E75"></div>
+        <span style="font-size:10px;color:#bbb">Mais</span>
+      </div>
+    </div>
+    <!-- Milestone message -->
+    <div id="streak-milestone" style="margin:0 20px 20px;padding:12px 16px;border-radius:10px;background:#f0fdf4;border:1px solid #bbf7d0;font-size:13px;color:#166534;font-weight:600;text-align:center;display:none"></div>
+    <!-- Close -->
+    <div style="padding:0 20px 20px;text-align:center">
+      <button onclick="closeStreakModal()" style="padding:10px 28px;border:none;border-radius:10px;background:#f0eeea;color:#555;font-size:13px;font-weight:700;cursor:pointer">Fechar</button>
+    </div>
+  </div>
+</div>
+
 <!-- ═══ DELETE CONFIRM MODAL ═══ -->
 <div class="del-modal-overlay" id="del-confirm-overlay" onclick="if(event.target===this)closDelModal()">
   <div class="del-modal" id="del-confirm-modal">
