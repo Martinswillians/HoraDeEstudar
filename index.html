@@ -412,6 +412,76 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .btn-top-action:hover::after,
 .btn-top-action:hover::before{ opacity:1; bottom:-42px; }
 
+/* ── POMODORO WIDGET ── */
+#pomo-fab{
+  position:fixed;bottom:80px;right:18px;z-index:7000;
+  width:52px;height:52px;border-radius:50%;border:none;cursor:pointer;
+  background:linear-gradient(135deg,#ef4444,#dc2626);
+  color:#fff;font-size:22px;box-shadow:0 4px 18px rgba(239,68,68,.45);
+  transition:all .2s;display:flex;align-items:center;justify-content:center;
+}
+#pomo-fab:hover{transform:scale(1.1);box-shadow:0 6px 24px rgba(239,68,68,.6)}
+#pomo-fab.running{background:linear-gradient(135deg,#f97316,#ef4444);animation:pomopulse 2s ease-in-out infinite}
+#pomo-fab.break{background:linear-gradient(135deg,#1D9E75,#059669)}
+@keyframes pomopulse{0%,100%{box-shadow:0 4px 18px rgba(239,68,68,.4)}50%{box-shadow:0 4px 28px rgba(239,68,68,.8),0 0 0 8px rgba(239,68,68,.15)}}
+
+#pomo-widget{
+  position:fixed;bottom:144px;right:18px;z-index:7000;
+  background:#1a1a18;border-radius:20px;
+  box-shadow:0 16px 48px rgba(0,0,0,.5);
+  width:300px;overflow:hidden;
+  animation:pomoslide .22s cubic-bezier(.34,1.56,.64,1);
+  display:none;
+}
+@keyframes pomoslide{from{opacity:0;transform:translateY(20px) scale(.95)}to{opacity:1;transform:none}}
+.pomo-header{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:14px 16px 10px;border-bottom:1px solid rgba(255,255,255,.08)
+}
+.pomo-title{font-size:12px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:#aaa}
+.pomo-close{background:none;border:none;color:#666;font-size:18px;cursor:pointer;line-height:1;padding:0}
+.pomo-close:hover{color:#fff}
+/* Mode tabs */
+.pomo-modes{display:flex;gap:4px;padding:10px 14px 6px}
+.pomo-mode-btn{flex:1;padding:6px 4px;border:none;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;background:rgba(255,255,255,.06);color:#888;transition:all .15s}
+.pomo-mode-btn.active{background:rgba(239,68,68,.25);color:#f87171}
+.pomo-mode-btn.active.break-mode{background:rgba(29,158,117,.25);color:#34d399}
+/* Ring */
+.pomo-ring-wrap{display:flex;justify-content:center;align-items:center;padding:16px 0 10px;position:relative}
+#pomo-svg{transform:rotate(-90deg)}
+#pomo-ring-bg{stroke:rgba(255,255,255,.08)}
+#pomo-ring-fill{stroke:#ef4444;stroke-linecap:round;transition:stroke-dashoffset .9s linear,stroke .3s}
+.pomo-time-overlay{position:absolute;text-align:center;pointer-events:none}
+#pomo-display{font-size:38px;font-weight:900;color:#fff;letter-spacing:-1px;line-height:1}
+#pomo-session-label{font-size:10px;color:#666;font-weight:700;margin-top:2px}
+/* Controls */
+.pomo-controls{display:flex;gap:8px;padding:0 16px 14px;justify-content:center}
+.pomo-btn{flex:1;padding:10px 0;border:none;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;transition:all .15s}
+#pomo-btn-main{background:#ef4444;color:#fff}
+#pomo-btn-main:hover{background:#dc2626}
+#pomo-btn-main.running{background:#f97316}
+#pomo-btn-skip{background:rgba(255,255,255,.08);color:#aaa;max-width:52px}
+#pomo-btn-skip:hover{background:rgba(255,255,255,.14)}
+#pomo-btn-reset{background:rgba(255,255,255,.08);color:#aaa;max-width:52px}
+#pomo-btn-reset:hover{background:rgba(255,255,255,.14)}
+/* Sessions dots */
+.pomo-sessions{display:flex;gap:6px;justify-content:center;padding:0 16px 12px}
+.pomo-dot{width:10px;height:10px;border-radius:50%;background:rgba(255,255,255,.12);transition:all .3s}
+.pomo-dot.done{background:#ef4444}
+.pomo-dot.break-done{background:#1D9E75}
+/* Auto-log toggle */
+.pomo-footer{padding:10px 16px 14px;border-top:1px solid rgba(255,255,255,.06);display:flex;align-items:center;justify-content:space-between}
+.pomo-footer label{font-size:11px;color:#666;cursor:pointer;display:flex;align-items:center;gap:6px}
+#pomo-auto-log{accent-color:#1D9E75;width:14px;height:14px}
+#pomo-cycles-label{font-size:11px;color:#555;font-weight:700}
+
+/* Desktop: widget goes to bottom-right, not overlapping nav */
+@media(min-width:769px){
+  #pomo-fab{bottom:24px;right:24px}
+  #pomo-widget{bottom:90px;right:24px}
+}
+/* Mobile nav adjust when widget open */
+
 /* DELETE CONFIRM MODAL */
 .del-modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:9000;align-items:center;justify-content:center;padding:16px}
 .del-modal-overlay.open{display:flex}
@@ -3430,6 +3500,207 @@ function cmSelectCourse(id){
   }
 }
 
+// ══════════════════════════════════════════════════════════════
+// POMODORO TIMER
+// ══════════════════════════════════════════════════════════════
+const POMO_MODES = {
+  focus: { label:'🎯 Foco 25m',   mins:25, color:'#ef4444', ringColor:'#ef4444' },
+  short: { label:'☕ Pausa 5m',   mins:5,  color:'#1D9E75', ringColor:'#34d399' },
+  long:  { label:'🛋 Pausa 15m',  mins:15, color:'#185FA5', ringColor:'#60a5fa' },
+};
+const CIRCUMFERENCE = 2 * Math.PI * 58; // 364.4
+
+let _pomo = {
+  mode:      'focus',
+  running:   false,
+  timer:     null,
+  remaining: 25 * 60,
+  total:     25 * 60,
+  session:   1,        // sessão atual (1-4)
+  cycles:    0,        // ciclos completos hoje
+  cycleDate: '',       // data do último ciclo
+  widgetOpen: false,
+};
+
+function togglePomoWidget(){
+  _pomo.widgetOpen = !_pomo.widgetOpen;
+  const w = document.getElementById('pomo-widget');
+  if(w) w.style.display = _pomo.widgetOpen ? 'block' : 'none';
+  if(_pomo.widgetOpen) pomoRender();
+}
+
+function setPomoMode(mode){
+  if(_pomo.running) return; // não muda durante execução
+  _pomo.mode = mode;
+  _pomo.remaining = POMO_MODES[mode].mins * 60;
+  _pomo.total     = POMO_MODES[mode].mins * 60;
+  document.querySelectorAll('.pomo-mode-btn').forEach(b=>b.classList.remove('active','break-mode'));
+  const btn = document.getElementById('pomo-m-'+mode);
+  if(btn){ btn.classList.add('active'); if(mode!=='focus') btn.classList.add('break-mode'); }
+  pomoRender();
+}
+
+function togglePomo(){
+  if(_pomo.running){ pausePomo(); } else { startPomo(); }
+}
+
+function startPomo(){
+  _pomo.running = true;
+  const fab = document.getElementById('pomo-fab');
+  if(fab){ fab.classList.toggle('running', _pomo.mode==='focus'); fab.classList.toggle('break', _pomo.mode!=='focus'); }
+  _pomo.timer = setInterval(()=>{
+    _pomo.remaining--;
+    pomoRender();
+    if(_pomo.remaining <= 0) pomoComplete();
+  }, 1000);
+  pomoRender();
+}
+
+function pausePomo(){
+  _pomo.running = false;
+  clearInterval(_pomo.timer);
+  const fab = document.getElementById('pomo-fab');
+  if(fab){ fab.classList.remove('running','break'); }
+  pomoRender();
+}
+
+function resetPomo(){
+  pausePomo();
+  _pomo.remaining = _pomo.total;
+  pomoRender();
+}
+
+function skipPomo(){
+  pausePomo();
+  pomoComplete(true); // pula sem registrar
+}
+
+function pomoComplete(skipped=false){
+  pausePomo();
+  const wasFocus = _pomo.mode === 'focus';
+
+  if(wasFocus && !skipped){
+    // Incrementar ciclos
+    const today = todayStr();
+    if(_pomo.cycleDate !== today){ _pomo.cycles=0; _pomo.cycleDate=today; }
+    _pomo.cycles++;
+    // Auto-registrar no Diário se checkbox marcado
+    const autoLog = document.getElementById('pomo-auto-log')?.checked;
+    if(autoLog){
+      pomoAutoLog();
+    }
+    // Registrar atividade
+    recordActivity();
+    // Som de notificação
+    pomoBeep(true);
+    // Toast
+    showPomoToast('🎉 Pomodoro concluído! +25min registrado.', '#1D9E75');
+    // Avançar sessão
+    _pomo.session = (_pomo.session % 4) + 1;
+    // Sugerir pausa
+    const breakMode = _pomo.session === 1 ? 'long' : 'short';
+    setPomoMode(breakMode);
+  } else if(!wasFocus && !skipped){
+    pomoBeep(false);
+    showPomoToast('☕ Pausa concluída! Hora de focar.', '#f97316');
+    setPomoMode('focus');
+  } else {
+    setPomoMode(_pomo.mode==='focus' ? 'short' : 'focus');
+  }
+  pomoRender();
+}
+
+function pomoAutoLog(){
+  // Registra automaticamente 25min (0.42h) no Diário
+  const today = todayStr();
+  const secId = expCtx.secId || (SECTIONS[0]?.id||'');
+  const secLabel = SECTIONS.find(s=>s.id===secId)?.title||'';
+  const lessonTitle = activeKey ? (state.customTitles[activeKey]||'') : '';
+  const desc = '🍅 Pomodoro'+(_pomo.session>1?' #'+_pomo.session:'')+(lessonTitle?' — '+lessonTitle:'');
+  if(!state.activityDays) state.activityDays={};
+  state.activityDays[today]=true;
+  state.logs.unshift({id:Date.now(), date:today, hours:0.42, sec:secId, desc});
+  save(); updateStats(); renderLogList(); mRenderLog();
+}
+
+function pomoRender(){
+  // Ring
+  const pct = _pomo.remaining / _pomo.total;
+  const offset = CIRCUMFERENCE * (1 - pct);
+  const ring = document.getElementById('pomo-ring-fill');
+  if(ring){
+    ring.style.strokeDashoffset = offset;
+    ring.style.stroke = POMO_MODES[_pomo.mode].ringColor;
+  }
+  // Time display
+  const m = Math.floor(_pomo.remaining/60).toString().padStart(2,'0');
+  const s = (_pomo.remaining%60).toString().padStart(2,'0');
+  const disp = document.getElementById('pomo-display');
+  if(disp) disp.textContent = m+':'+s;
+  // Session label
+  const lbl = document.getElementById('pomo-session-label');
+  if(lbl) lbl.textContent = _pomo.mode==='focus' ? 'SESSÃO '+_pomo.session+' DE 4' :
+                             _pomo.mode==='short' ? 'PAUSA CURTA' : 'PAUSA LONGA';
+  // Main button
+  const btn = document.getElementById('pomo-btn-main');
+  if(btn){
+    btn.textContent = _pomo.running ? '⏸ Pausar' : '▶ Iniciar';
+    btn.style.background = _pomo.running ? '#f97316' : POMO_MODES[_pomo.mode].color;
+  }
+  // FAB emoji
+  const fab = document.getElementById('pomo-fab');
+  if(fab) fab.textContent = _pomo.running ? (pct<.5?'🔥':'⏱') : '🍅';
+  // Dots
+  const dots = document.getElementById('pomo-dots');
+  if(dots){
+    dots.innerHTML = [1,2,3,4].map(i=>{
+      const cls = i < _pomo.session ? 'done' : (i===_pomo.session&&_pomo.mode!=='focus' ? 'done' : '');
+      return `<div class="pomo-dot ${cls}"></div>`;
+    }).join('');
+  }
+  // Cycles label
+  const cyc = document.getElementById('pomo-cycles-label');
+  if(cyc) cyc.textContent = _pomo.cycles + ' ciclo'+ (_pomo.cycles!==1?'s':'') +' hoje';
+  // Page title
+  if(_pomo.running){
+    const m2=Math.floor(_pomo.remaining/60).toString().padStart(2,'0');
+    const s2=(_pomo.remaining%60).toString().padStart(2,'0');
+    document.title = m2+':'+s2+' 🍅 '+ACTIVE_COURSE.name;
+  } else {
+    document.title = ACTIVE_COURSE.name+' — Tracker de Estudos';
+  }
+}
+
+function pomoBeep(focus){
+  try{
+    const ctx = new (window.AudioContext||window.webkitAudioContext)();
+    const tones = focus ? [523,659,784] : [784,659,523];
+    tones.forEach((freq,i)=>{
+      const o=ctx.createOscillator(); const g=ctx.createGain();
+      o.connect(g); g.connect(ctx.destination);
+      o.type='sine'; o.frequency.value=freq;
+      g.gain.setValueAtTime(0.18,ctx.currentTime+i*.22);
+      g.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+i*.22+.35);
+      o.start(ctx.currentTime+i*.22); o.stop(ctx.currentTime+i*.22+.4);
+    });
+  }catch(e){}
+}
+
+let _pomoToastTimer=null;
+function showPomoToast(msg, color='#1a1a18'){
+  let t=document.getElementById('pomo-toast');
+  if(!t){
+    t=document.createElement('div'); t.id='pomo-toast';
+    t.style.cssText='position:fixed;bottom:160px;right:24px;z-index:8000;padding:12px 18px;border-radius:12px;font-size:13px;font-weight:700;color:#fff;box-shadow:0 8px 24px rgba(0,0,0,.3);opacity:0;transition:opacity .3s;pointer-events:none;max-width:260px;text-align:center';
+    document.body.appendChild(t);
+  }
+  t.style.background = color;
+  t.textContent = msg;
+  t.style.opacity='1';
+  clearTimeout(_pomoToastTimer);
+  _pomoToastTimer=setTimeout(()=>{ t.style.opacity='0'; },3500);
+}
+
 // ── STREAK MODAL ──────────────────────────────────────────────
 function openStreakModal(){
   document.getElementById('streak-modal-overlay').style.display='flex';
@@ -3851,6 +4122,52 @@ window.addEventListener('resize',()=>{
 
 init();
 </script>
+<!-- ═══ POMODORO ═══ -->
+<button id="pomo-fab" onclick="togglePomoWidget()" title="Pomodoro Timer">🍅</button>
+
+<div id="pomo-widget">
+  <div class="pomo-header">
+    <span class="pomo-title">🍅 Pomodoro</span>
+    <button class="pomo-close" onclick="togglePomoWidget()">✕</button>
+  </div>
+
+  <!-- Mode selector -->
+  <div class="pomo-modes">
+    <button class="pomo-mode-btn active" id="pomo-m-focus" onclick="setPomoMode('focus')">🎯 Foco 25m</button>
+    <button class="pomo-mode-btn" id="pomo-m-short" onclick="setPomoMode('short')">☕ Pausa 5m</button>
+    <button class="pomo-mode-btn" id="pomo-m-long" onclick="setPomoMode('long')">🛋 Pausa 15m</button>
+  </div>
+
+  <!-- Ring timer -->
+  <div class="pomo-ring-wrap">
+    <svg id="pomo-svg" width="140" height="140" viewBox="0 0 140 140">
+      <circle id="pomo-ring-bg" cx="70" cy="70" r="58" fill="none" stroke-width="8"/>
+      <circle id="pomo-ring-fill" cx="70" cy="70" r="58" fill="none" stroke-width="8"
+        stroke-dasharray="364.4" stroke-dashoffset="0"/>
+    </svg>
+    <div class="pomo-time-overlay">
+      <div id="pomo-display">25:00</div>
+      <div id="pomo-session-label">SESSÃO 1</div>
+    </div>
+  </div>
+
+  <!-- Controls -->
+  <div class="pomo-controls">
+    <button class="pomo-btn" id="pomo-btn-reset" onclick="resetPomo()" title="Reiniciar">↺</button>
+    <button class="pomo-btn" id="pomo-btn-main" onclick="togglePomo()">▶ Iniciar</button>
+    <button class="pomo-btn" id="pomo-btn-skip" onclick="skipPomo()" title="Pular">⏭</button>
+  </div>
+
+  <!-- Session dots -->
+  <div class="pomo-sessions" id="pomo-dots"></div>
+
+  <!-- Footer -->
+  <div class="pomo-footer">
+    <label><input type="checkbox" id="pomo-auto-log" checked> Auto-registrar no Diário</label>
+    <span id="pomo-cycles-label">0 ciclos hoje</span>
+  </div>
+</div>
+
 <!-- ═══ STREAK MODAL ═══ -->
 <div id="streak-modal-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:8500;align-items:center;justify-content:center;padding:16px" onclick="if(event.target===this)closeStreakModal()">
   <div style="background:#fff;border-radius:20px;width:100%;max-width:480px;box-shadow:0 24px 64px rgba(0,0,0,.3);overflow:hidden;animation:delmodalin .18s ease-out">
