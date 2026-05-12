@@ -412,6 +412,48 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .btn-top-action:hover::after,
 .btn-top-action:hover::before{ opacity:1; bottom:-42px; }
 
+/* ── GRÁFICO SEMANAL ── */
+.chart-wrap{padding:0 4px}
+.chart-bars{display:flex;align-items:flex-end;gap:6px;height:80px;margin-bottom:4px}
+.chart-bar-col{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px}
+.chart-bar{width:100%;border-radius:4px 4px 0 0;min-height:3px;transition:height .4s ease}
+.chart-bar.today{opacity:1}
+.chart-bar.past{opacity:.6}
+.chart-day{font-size:9px;color:#aaa;font-weight:600}
+.chart-val{font-size:9px;color:#888;font-weight:700;min-height:10px}
+.chart-toggle{display:flex;gap:4px;margin-bottom:8px}
+.chart-toggle button{flex:1;padding:4px 0;font-size:10px;font-weight:700;border:1px solid #e8e6e0;border-radius:6px;background:#fff;color:#888;cursor:pointer;transition:all .15s}
+.chart-toggle button.active{background:#185FA5;color:#fff;border-color:#185FA5}
+
+/* ── METAS ── */
+.goal-bar-wrap{margin:6px 0 2px}
+.goal-bar-track{height:8px;background:#f0eeea;border-radius:4px;overflow:hidden}
+.goal-bar-fill{height:100%;border-radius:4px;transition:width .5s ease}
+.goal-badge{display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:700;padding:2px 8px;border-radius:12px}
+.goal-edit-btn{font-size:10px;font-weight:700;color:#185FA5;background:none;border:none;cursor:pointer;padding:0 2px;opacity:.7}
+.goal-edit-btn:hover{opacity:1}
+
+/* ── ESTIMATIVA ── */
+.estimate-card{background:linear-gradient(135deg,#185FA522,#1D9E7511);border:1px solid #1D9E7533;border-radius:12px;padding:12px 14px;margin-top:8px}
+.estimate-title{font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.7px;color:#1D9E75;margin-bottom:4px}
+.estimate-val{font-size:18px;font-weight:900;color:#1a1a18;line-height:1.2}
+.estimate-sub{font-size:11px;color:#888;margin-top:3px}
+
+/* ── MODAL METAS ── */
+.goal-modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:8000;align-items:center;justify-content:center;padding:16px}
+.goal-modal-overlay.open{display:flex}
+.goal-modal{background:#fff;border-radius:16px;width:100%;max-width:360px;padding:24px;box-shadow:0 16px 48px rgba(0,0,0,.25);animation:delmodalin .18s ease-out}
+.goal-modal h3{font-size:16px;font-weight:800;margin:0 0 16px;color:#1a1a18}
+.goal-row{margin-bottom:14px}
+.goal-row label{font-size:11px;font-weight:700;color:#666;text-transform:uppercase;letter-spacing:.6px;display:block;margin-bottom:5px}
+.goal-row input{width:100%;padding:9px 12px;border:1.5px solid #e8e6e0;border-radius:9px;font-size:14px;font-weight:700;color:#1a1a18;box-sizing:border-box}
+.goal-row input:focus{outline:none;border-color:#185FA5}
+.goal-row .goal-hint{font-size:10px;color:#aaa;margin-top:3px}
+.goal-footer{display:flex;gap:8px;margin-top:18px}
+.goal-btn{flex:1;padding:10px;border:none;border-radius:9px;font-size:13px;font-weight:700;cursor:pointer}
+.goal-btn-save{background:#1D9E75;color:#fff}
+.goal-btn-cancel{background:#f0eeea;color:#666}
+
 /* ── SEARCH GROUPS ── */
 .search-group-label{font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.8px;color:#aaa;padding:4px 0 6px}
 
@@ -1306,8 +1348,9 @@ const NOTE_EMOJI = {tip:'💡',doubt:'❓',important:'⭐',concept:'📖'};
 let state = {
   done:{}, notes:{}, codes:{}, logs:[], customTitles:{},
   activeCourseId: 'java-completo',
-  activityDays: {}, // { 'YYYY-MM-DD': true } — dias com atividade
-  lastLesson: null, // { secId, n } — última aula aberta
+  activityDays: {},
+  lastLesson: null,
+  goals: { dailyLessons: 3, weeklyHours: 5 }, // metas padrão
 };
 let activeKey = null;
 let curNoteType = 'tip';
@@ -2147,6 +2190,8 @@ function addLog(){
   state.activityDays[date]=true;
   document.getElementById('d-log-hours').value=''; document.getElementById('d-log-desc').value='';
   save(); updateStats(); renderLogList(); updateStreakUI();
+  // Atualizar overview com novos dados (gráfico + metas)
+  if(document.getElementById('activity-chart')) dRenderOverview();
 }
 function mAddLog(){
   const date=document.getElementById('m-log-date')?.value;
@@ -3137,7 +3182,7 @@ function closeLightbox(){
   document.getElementById('lightbox-img').src='';
   document.body.style.overflow='';
 }
-document.addEventListener('keydown',e=>{ if(e.key==='Escape'){ if(_focusMode){exitFocusMode();return;} closeExport(); closeLightbox(); closeBackup(); closeCourseModal(); closDelModal(); closeStreakModal(); } });
+document.addEventListener('keydown',e=>{ if(e.key==='Escape'){ if(_focusMode){exitFocusMode();return;} closeExport(); closeLightbox(); closeBackup(); closeCourseModal(); closDelModal(); closeStreakModal(); closeGoalModal(); } });
 
 
 // =============================================================
@@ -4076,7 +4121,228 @@ function exitFocusMode(){
   if(_focusMode) toggleFocusMode();
 }
 
-// ── STREAK MODAL ──────────────────────────────────────────────
+// ── ANÁLISE DE PROGRESSO ──────────────────────────────────────
+
+// Retorna aulas concluídas por dia nos últimos N dias
+function getLessonsPerDay(days=30){
+  // Mapeia cada aula concluída para a data em que foi marcada via activityDays
+  // Como não temos timestamp por aula, usa os dias de atividade + distribuição proporcional
+  // Abordagem real: conta dias com atividade registrada no activityDays
+  const result=[];
+  const today=new Date();
+  for(let i=days-1;i>=0;i--){
+    const d=new Date(today); d.setDate(d.getDate()-i);
+    const ds=d.toISOString().split('T')[0];
+    // Conta sessões de diário nesse dia
+    const logSessions=state.logs.filter(l=>l.date===ds).length;
+    // Atividade binária se não temos dados por aula
+    const active=!!state.activityDays[ds];
+    result.push({date:ds, day:d, sessions:logSessions, active});
+  }
+  return result;
+}
+
+// Retorna sessões de diário agrupadas por dia (últimos N dias)
+function getSessionsPerDay(days=7){
+  const result=[];
+  const today=new Date();
+  const dayNames=['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
+  for(let i=days-1;i>=0;i--){
+    const d=new Date(today); d.setDate(d.getDate()-i);
+    const ds=d.toISOString().split('T')[0];
+    const dayLogs=state.logs.filter(l=>l.date===ds);
+    const hours=dayLogs.reduce((s,l)=>s+(parseFloat(l.hours)||0),0);
+    result.push({
+      date:ds,
+      label: i===0?'Hoje': i===1?'Ontem': dayNames[d.getDay()],
+      sessions:dayLogs.length,
+      hours,
+      isToday: i===0,
+    });
+  }
+  return result;
+}
+
+// Estimativa de conclusão baseada no ritmo das últimas 4 semanas
+function calcEstimation(){
+  const {totalDone}=calcStats();
+  const remaining=Math.max(0,TOTAL-totalDone);
+  if(remaining===0) return {done:true};
+  if(totalDone===0) return {noData:true};
+
+  // Ritmo: aulas concluídas nas últimas 4 semanas / 4
+  const fourWeeksAgo=new Date(); fourWeeksAgo.setDate(fourWeeksAgo.getDate()-28);
+  const fwStr=fourWeeksAgo.toISOString().split('T')[0];
+  // Conta dias com atividade nas últimas 4 semanas
+  const activeDays=Object.keys(state.activityDays||{}).filter(d=>d>=fwStr && state.activityDays[d]).length;
+
+  if(activeDays===0) return {noData:true};
+
+  // Ritmo médio: totalDone / total de dias estudados
+  const totalActiveDays=Object.keys(state.activityDays||{}).filter(d=>state.activityDays[d]).length||1;
+  const avgLessonsPerDay=totalDone/totalActiveDays;
+  const avgLessonsPerWeek=avgLessonsPerDay*5; // assume 5 dias/semana
+
+  const weeksLeft=remaining/Math.max(avgLessonsPerWeek,0.1);
+  const daysLeft=Math.round(weeksLeft*7);
+
+  // Formatar estimativa
+  let label='';
+  if(daysLeft<=7) label=daysLeft+' dias';
+  else if(daysLeft<=30) label=Math.round(daysLeft/7)+' semanas';
+  else if(daysLeft<=365) label=Math.round(daysLeft/30.4)+' meses';
+  else label=Math.round(daysLeft/365*10)/10+' anos';
+
+  const finishDate=new Date(); finishDate.setDate(finishDate.getDate()+daysLeft);
+  const finishStr=finishDate.toLocaleDateString('pt-BR',{month:'long',year:'numeric'});
+
+  return {
+    label,
+    finishStr,
+    daysLeft,
+    avgPerWeek: Math.round(avgLessonsPerWeek*10)/10,
+    remaining,
+  };
+}
+
+// Progresso de meta do dia
+function getTodayProgress(){
+  const today=todayStr();
+  const todayLogs=state.logs.filter(l=>l.date===today);
+  const todayHours=todayLogs.reduce((s,l)=>s+(parseFloat(l.hours)||0),0);
+  // Contar aulas marcadas hoje (via activityDays — aproximação)
+  // Melhor aproximação: contar aulas de sessões registradas hoje
+  return {
+    hours: todayHours,
+    sessions: todayLogs.length,
+    active: !!state.activityDays[today],
+  };
+}
+
+// ── MODAL DE METAS ────────────────────────────────────────────
+function openGoalModal(){
+  const g=state.goals||{};
+  const el=id=>document.getElementById(id);
+  if(el('goal-daily-input')) el('goal-daily-input').value=g.dailyLessons||3;
+  if(el('goal-weekly-input')) el('goal-weekly-input').value=g.weeklyHours||5;
+  const ov=document.getElementById('goal-modal-overlay');
+  if(ov) ov.classList.add('open');
+}
+function closeGoalModal(){
+  const ov=document.getElementById('goal-modal-overlay');
+  if(ov) ov.classList.remove('open');
+}
+function saveGoals(){
+  const daily=parseInt(document.getElementById('goal-daily-input')?.value)||3;
+  const weekly=parseFloat(document.getElementById('goal-weekly-input')?.value)||5;
+  if(!state.goals) state.goals={};
+  state.goals.dailyLessons=Math.max(1,Math.min(50,daily));
+  state.goals.weeklyHours=Math.max(0.5,Math.min(40,weekly));
+  save();
+  closeGoalModal();
+  dRenderOverview();
+}
+
+// ── GRÁFICO SEMANAL + OVERVIEW ────────────────────────────────
+let _chartMode='7';
+
+function renderActivityChart(mode){
+  _chartMode=mode||_chartMode;
+  const days=_chartMode==='7'?7:30;
+  const data=getSessionsPerDay(days);
+  const maxH=Math.max(...data.map(d=>d.hours),0.1);
+  const container=document.getElementById('activity-chart');
+  if(!container) return;
+
+  const toggle=`<div class="chart-toggle">
+    <button class="${_chartMode==='7'?'active':''}" onclick="renderActivityChart('7')">7 dias</button>
+    <button class="${_chartMode==='30'?'active':''}" onclick="renderActivityChart('30')">30 dias</button>
+  </div>`;
+
+  const bars=data.map(d=>{
+    const hPct=maxH>0?Math.round((d.hours/maxH)*100):0;
+    const barH=Math.max(3,hPct);
+    const color=d.isToday?'#185FA5':d.hours>0?'#1D9E75':'#e8e6e0';
+    const valLabel=d.hours>0?(d.hours<1?Math.round(d.hours*60)+'m':d.hours.toFixed(1)+'h'):'';
+    return `<div class="chart-bar-col">
+      <div class="chart-val">${valLabel}</div>
+      <div class="chart-bar ${d.isToday?'today':'past'}" style="height:${barH}%;background:${color}" title="${d.label}: ${d.hours.toFixed(1)}h"></div>
+      <div class="chart-day">${days<=7?d.label:d.date.slice(5)}</div>
+    </div>`;
+  }).join('');
+
+  container.innerHTML=toggle+`<div class="chart-wrap"><div class="chart-bars">${bars}</div></div>`;
+}
+
+function dRenderOverview(){
+  const g=document.getElementById('d-overview'); if(!g) return;
+  const {totalDone}=calcStats();
+  const goals=state.goals||{dailyLessons:3,weeklyHours:5};
+  const today=getTodayProgress();
+  const est=calcEstimation();
+
+  const half=Math.ceil(SECTIONS.length/2);
+  const makeList=secs=>secs.map(sec=>{
+    const done=sec.lessons.filter(l=>state.done[lk(sec.id,l.n)]).length;
+    const p=Math.round(done/sec.lessons.length*100);
+    return `<div class="prog-item">
+      <div class="prog-label">S${sec.num} ${sec.title}</div>
+      <div class="prog-track"><div class="prog-fill" style="width:${p}%"></div></div>
+      <div class="prog-pct">${p}%</div>
+    </div>`;
+  }).join('');
+
+  const dailyHoursGoal=Math.max(0.1,(goals.weeklyHours||5)/5);
+  const dailyPct=Math.min(100,Math.round((today.hours/dailyHoursGoal)*100));
+  const dailyColor=dailyPct>=100?'#1D9E75':dailyPct>=50?'#f97316':'#185FA5';
+
+  const weekData=getSessionsPerDay(7);
+  const weekHours=weekData.reduce((s,d)=>s+d.hours,0);
+  const weekPct=Math.min(100,Math.round((weekHours/(goals.weeklyHours||5))*100));
+  const weekColor=weekPct>=100?'#1D9E75':weekPct>=50?'#f97316':'#185FA5';
+
+  let estHTML='';
+  if(est.done){
+    estHTML=`<div class="estimate-card"><div class="estimate-title">🏆 Curso concluído!</div><div class="estimate-val">Parabéns!</div><div class="estimate-sub">Você completou todas as ${TOTAL} aulas.</div></div>`;
+  } else if(est.noData){
+    estHTML=`<div class="estimate-card" style="opacity:.6"><div class="estimate-title">📈 Estimativa de conclusão</div><div class="estimate-val" style="font-size:13px;font-weight:600">Dados insuficientes</div><div class="estimate-sub">Registre sessões no Diário para ativar a estimativa.</div></div>`;
+  } else {
+    estHTML=`<div class="estimate-card"><div class="estimate-title">📈 Estimativa de conclusão</div><div class="estimate-val">~${est.label}</div><div class="estimate-sub">Ritmo atual: ${est.avgPerWeek} aulas/semana · Previsão: ${est.finishStr}</div></div>`;
+  }
+
+  g.innerHTML=`
+    <div class="ov-card">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+        <h3 style="margin:0">🎯 Metas</h3>
+        <button class="goal-edit-btn" onclick="openGoalModal()">✏️ Editar</button>
+      </div>
+      <div style="margin-bottom:10px">
+        <div style="display:flex;justify-content:space-between;margin-bottom:4px">
+          <span style="font-size:11px;font-weight:700;color:#555">Hoje — ${today.hours.toFixed(1)}h / ${dailyHoursGoal.toFixed(1)}h</span>
+          <span style="font-size:10px;font-weight:800;color:${dailyColor}">${dailyPct}%</span>
+        </div>
+        <div class="goal-bar-track"><div class="goal-bar-fill" style="width:${dailyPct}%;background:${dailyColor}"></div></div>
+        ${today.sessions===0?'<div style="font-size:10px;color:#bbb;margin-top:3px">Nenhuma sessão hoje — registre no Diário!</div>':''}
+      </div>
+      <div>
+        <div style="display:flex;justify-content:space-between;margin-bottom:4px">
+          <span style="font-size:11px;font-weight:700;color:#555">Semana — ${weekHours.toFixed(1)}h / ${goals.weeklyHours}h</span>
+          <span style="font-size:10px;font-weight:800;color:${weekColor}">${weekPct}%</span>
+        </div>
+        <div class="goal-bar-track"><div class="goal-bar-fill" style="width:${weekPct}%;background:${weekColor}"></div></div>
+      </div>
+      ${estHTML}
+    </div>
+    <div class="ov-card">
+      <h3 style="margin:0 0 10px">📊 Horas estudadas</h3>
+      <div id="activity-chart"></div>
+    </div>
+    <div class="ov-card"><h3>Seções 1-${Math.min(10,SECTIONS.length)}</h3>${makeList(SECTIONS.slice(0,10))}</div>
+    <div class="ov-card"><h3>Seções ${Math.min(11,SECTIONS.length+1)}-${SECTIONS.length}</h3>${makeList(SECTIONS.slice(10))}</div>`;
+
+  requestAnimationFrame(()=>renderActivityChart(_chartMode));
+}
+
 function openStreakModal(){
   document.getElementById('streak-modal-overlay').style.display='flex';
   renderStreakModal();
@@ -4519,6 +4785,22 @@ window.addEventListener('resize',()=>{
 
 init();
 </script>
+
+<!-- ═══ GOAL MODAL ═══ -->
+<div id="goal-modal-overlay" class="goal-modal-overlay" onclick="if(event.target===this)closeGoalModal()">
+  <div class="goal-modal">
+    <h3>🎯 Definir Metas de Estudo</h3>
+    <div class="goal-row">
+      <label>Horas por semana</label>
+      <input type="number" id="goal-weekly-input" min="0.5" max="40" step="0.5" value="5">
+      <div class="goal-hint">Meta de horas totais de estudo por semana</div>
+    </div>
+    <div class="goal-footer">
+      <button class="goal-btn goal-btn-cancel" onclick="closeGoalModal()">Cancelar</button>
+      <button class="goal-btn goal-btn-save" onclick="saveGoals()">✅ Salvar metas</button>
+    </div>
+  </div>
+</div>
 
 <!-- ═══ STREAK MODAL ═══ -->
 <div id="streak-modal-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:8500;align-items:center;justify-content:center;padding:16px" onclick="if(event.target===this)closeStreakModal()">
