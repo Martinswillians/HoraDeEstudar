@@ -412,9 +412,44 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .btn-top-action:hover::after,
 .btn-top-action:hover::before{ opacity:1; bottom:-42px; }
 
-/* ── POMODORO WIDGET ── */
+/* ── SEARCH GROUPS ── */
+.search-group-label{font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.8px;color:#aaa;padding:4px 0 6px}
+
+/* ── MODO FOCO ── */
+body.focus-mode .topbar,
+body.focus-mode .sidebar,
+body.focus-mode .ctabs,
+body.focus-mode .stats-row,
+body.focus-mode nav[class*="mobile-nav"],
+body.focus-mode #mobile-nav{ display:none!important; }
+body.focus-mode .desktop-wrap{ grid-template-columns:0 1fr!important; }
+body.focus-mode .content-panel{ border-radius:0!important; }
+body.focus-mode #focus-mode-btn{
+  position:fixed;top:12px;right:12px;z-index:9000;
+  background:rgba(26,26,24,.85);color:#fff;
+  border:1px solid rgba(255,255,255,.15);
+  backdrop-filter:blur(8px);
+}
+/* Botão no topbar */
+#focus-mode-btn{
+  padding:6px 12px;border-radius:8px;font-size:12px;font-weight:700;
+  cursor:pointer;border:1.5px solid rgba(255,255,255,.25);
+  background:rgba(255,255,255,.08);color:#ccc;
+  transition:all .2s;letter-spacing:.3px;
+}
+#focus-mode-btn:hover{background:rgba(255,255,255,.18);color:#fff}
+/* Toast de modo foco */
+#focus-toast{
+  position:fixed;top:16px;left:50%;transform:translateX(-50%);
+  background:rgba(26,26,24,.92);color:#fff;
+  padding:8px 18px;border-radius:20px;font-size:12px;font-weight:700;
+  z-index:9999;pointer-events:none;
+  opacity:0;transition:opacity .3s;
+  backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.1);
+  white-space:nowrap;
+}
 #pomo-fab{
-  position:fixed;bottom:80px;right:18px;z-index:7000;
+  position:fixed;bottom:80px;right:18px;z-index:9500;
   width:52px;height:52px;border-radius:50%;border:none;cursor:pointer;
   background:linear-gradient(135deg,#ef4444,#dc2626);
   color:#fff;font-size:22px;box-shadow:0 4px 18px rgba(239,68,68,.45);
@@ -426,26 +461,29 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 @keyframes pomopulse{0%,100%{box-shadow:0 4px 18px rgba(239,68,68,.4)}50%{box-shadow:0 4px 28px rgba(239,68,68,.8),0 0 0 8px rgba(239,68,68,.15)}}
 
 #pomo-widget{
-  position:fixed;bottom:144px;right:18px;z-index:7000;
+  position:fixed;bottom:144px;right:18px;z-index:9500;
   background:#1a1a18;border-radius:20px;
   box-shadow:0 16px 48px rgba(0,0,0,.5);
-  width:300px;overflow:hidden;
-  animation:pomoslide .22s cubic-bezier(.34,1.56,.64,1);
+  width:300px;
+  max-width:calc(100vw - 24px);
   display:none;
-  touch-action:none;
   user-select:none;
   -webkit-user-select:none;
 }
 #pomo-widget.dragging{
-  animation:none!important;
   box-shadow:0 28px 72px rgba(0,0,0,.75);
   opacity:.95;
+  transition:none!important;
 }
 @keyframes pomoslide{from{opacity:0;transform:translateY(20px) scale(.95)}to{opacity:1;transform:none}}
 .pomo-header{
   display:flex;align-items:center;justify-content:space-between;
   padding:14px 16px 10px;border-bottom:1px solid rgba(255,255,255,.08);
   cursor:grab;
+  touch-action:none;
+  -webkit-user-select:none;
+  user-select:none;
+  border-radius:20px 20px 0 0;
 }
 .pomo-header.grabbing{cursor:grabbing;}
 .pomo-drag-hint{font-size:9px;color:rgba(255,255,255,.2);letter-spacing:.5px;font-weight:600;pointer-events:none;margin:0 6px;}
@@ -487,9 +525,12 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 #pomo-cycles-label{font-size:11px;color:#555;font-weight:700}
 
 /* Desktop: widget goes to bottom-right, not overlapping nav */
-@media(min-width:769px){
-  #pomo-fab{bottom:24px;right:24px}
-  #pomo-widget{bottom:90px;right:24px}
+@media(min-width:600px){
+  #pomo-fab{bottom:24px;right:24px;z-index:9500}
+  #pomo-widget{bottom:90px;right:24px;z-index:9500}
+}
+@media(max-width:599px){
+  #pomo-fab{bottom:72px;right:16px;z-index:9500}
 }
 /* Mobile nav adjust when widget open */
 
@@ -529,10 +570,12 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
     <span class="badge badge-blue" id="hdr-aulas">0/0 aulas</span>
     <span class="badge badge-amber" id="hdr-hours">0h</span>
     <span class="badge" id="hdr-streak" onclick="openStreakModal()" style="cursor:pointer;background:#555;color:#aaa;border:2px dashed rgba(255,255,255,.3);transition:all .2s" title="Streak de dias estudados">💤 0d</span>
+    <button id="focus-mode-btn" onclick="toggleFocusMode()" title="Modo Foco — esconde menus para tela cheia">🎯 Foco</button>
     <button class="btn-export-top btn-top-action" onclick="openExportGeral()" title="Compartilhe informações do curso" data-hint="Compartilhe informações do curso">📤 Compartilhar</button>
     <button class="btn-export-top btn-top-action" style="background:#185FA5;color:#fff" onclick="openBackup()" title="Exporte ou importe backup do curso" data-hint="Exporte ou importe backup do curso">🔄 Backup</button>
   </div>
 </div>
+<div id="focus-toast"></div>
 
 
 <!-- ═══ COURSE MANAGER MODAL ═══ -->
@@ -802,7 +845,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
       <div id="d-sections-nav"></div>
     </div>
     <div id="side-busca" style="display:none">
-      <div class="search-wrap"><input type="text" placeholder="Buscar aula..." oninput="dSearch(this.value)"/></div>
+      <div class="search-wrap"><input type="text" placeholder="Buscar aulas, anotações, código..." oninput="dSearch(this.value)"/></div>
       <div id="d-search-results" style="padding:6px 0"></div>
     </div>
   </div>
@@ -1264,6 +1307,7 @@ let state = {
   done:{}, notes:{}, codes:{}, logs:[], customTitles:{},
   activeCourseId: 'java-completo',
   activityDays: {}, // { 'YYYY-MM-DD': true } — dias com atividade
+  lastLesson: null, // { secId, n } — última aula aberta
 };
 let activeKey = null;
 let curNoteType = 'tip';
@@ -1537,23 +1581,117 @@ function setSideTab(tab,btn){
 }
 function dSearch(q){
   const c=document.getElementById('d-search-results'); if(!c) return;
-  if(!q||q.length<2){c.innerHTML='<div class="empty">Digite para buscar...</div>';return;}
+  if(!q||q.length<2){
+    c.innerHTML='<div class="empty">Digite para buscar aulas, anotações ou código...</div>';
+    return;
+  }
   q=q.toLowerCase();
-  let res=[];
+  const results={lessons:[],notes:[],codes:[]};
+
+  // 1. Busca em aulas (título + número)
   SECTIONS.forEach(sec=>sec.lessons.forEach(l=>{
     const k=lk(sec.id,l.n); const t=state.customTitles[k]||l.t;
-    if(t.toLowerCase().includes(q)||String(l.n).includes(q)) res.push({sec,l,k,t});
+    if(t.toLowerCase().includes(q)||String(l.n).includes(q))
+      results.lessons.push({sec,l,k,t,match:'titulo'});
   }));
-  if(!res.length){c.innerHTML='<div class="empty">Nada encontrado.</div>';return;}
-  c.innerHTML=res.map(r=>{
-    const isDone=!!state.done[r.k];
-    return `<div class="lesson-row ${activeKey===r.k?'active-lesson':''}" onclick="dOpenLesson('${r.sec.id}',${r.l.n})">
-      <div class="lesson-chk ${isDone?'done':''}"></div>
-      <div class="lesson-num">${r.l.n}</div>
-      <div class="lesson-title ${isDone?'done':''}">${r.t}</div>
-      <div class="lesson-dur">${r.l.d}</div>
-    </div>`;
-  }).join('');
+
+  // 2. Busca em anotações (título + corpo)
+  SECTIONS.forEach(sec=>sec.lessons.forEach(l=>{
+    const k=lk(sec.id,l.n);
+    (state.notes[k]||[]).forEach(note=>{
+      const inTitle=(note.title||'').toLowerCase().includes(q);
+      const inBody=(note.body||'').toLowerCase().includes(q);
+      if(inTitle||inBody){
+        const t=state.customTitles[k]||l.t;
+        const snippet=inBody?highlight(note.body,q,80):highlight(note.title,q,80);
+        results.notes.push({sec,l,k,t,note,snippet});
+      }
+    });
+  }));
+
+  // 3. Busca em código (título + corpo)
+  SECTIONS.forEach(sec=>sec.lessons.forEach(l=>{
+    const k=lk(sec.id,l.n);
+    (state.codes[k]||[]).forEach(code=>{
+      const inTitle=(code.title||'').toLowerCase().includes(q);
+      const inBody=(code.body||'').toLowerCase().includes(q);
+      if(inTitle||inBody){
+        const t=state.customTitles[k]||l.t;
+        const snippet=inBody?highlight(code.body,q,80):highlight(code.title,q,80);
+        results.codes.push({sec,l,k,t,code,snippet});
+      }
+    });
+  }));
+
+  const total=results.lessons.length+results.notes.length+results.codes.length;
+  if(!total){c.innerHTML='<div class="empty">Nada encontrado em aulas, anotações ou código.</div>';return;}
+
+  let html=`<div style="font-size:11px;color:#888;font-weight:700;padding:6px 0 10px">${total} resultado(s) encontrado(s)</div>`;
+
+  if(results.lessons.length){
+    html+=`<div class="search-group-label">📚 Aulas (${results.lessons.length})</div>`;
+    html+=results.lessons.map(r=>{
+      const isDone=!!state.done[r.k];
+      return `<div class="lesson-row ${activeKey===r.k?'active-lesson':''}" onclick="dOpenLesson('${r.sec.id}',${r.l.n})">
+        <div class="lesson-chk ${isDone?'done':''}"></div>
+        <div class="lesson-num">${r.l.n}</div>
+        <div class="lesson-title ${isDone?'done':''}">${highlightHTML(r.t,q)}</div>
+        <div class="lesson-dur">${r.l.d}</div>
+      </div>`;
+    }).join('');
+  }
+
+  if(results.notes.length){
+    html+=`<div class="search-group-label" style="margin-top:12px">📝 Anotações (${results.notes.length})</div>`;
+    html+=results.notes.map(r=>{
+      const isDone=!!state.done[r.k];
+      const em=NOTE_EMOJI[r.note.type]||'📝';
+      return `<div class="lesson-row" onclick="dOpenLesson('${r.sec.id}',${r.l.n})" style="flex-direction:column;align-items:flex-start;gap:4px;padding:10px 12px">
+        <div style="display:flex;align-items:center;gap:7px;width:100%">
+          <span style="font-size:13px">${em}</span>
+          <div class="lesson-title ${isDone?'done':''}" style="flex:1">${highlightHTML(r.note.title||'(sem título)',q)}</div>
+          <div class="lesson-dur">Aula ${r.l.n}</div>
+        </div>
+        <div style="font-size:11px;color:#888;padding-left:20px;line-height:1.5">${r.snippet}</div>
+        <div style="font-size:10px;color:#bbb;padding-left:20px">S${r.sec.num} · ${r.t}</div>
+      </div>`;
+    }).join('');
+  }
+
+  if(results.codes.length){
+    html+=`<div class="search-group-label" style="margin-top:12px">💻 Código (${results.codes.length})</div>`;
+    html+=results.codes.map(r=>{
+      const isDone=!!state.done[r.k];
+      const langColor=LANG_COLORS[r.code.lang]||'#888';
+      return `<div class="lesson-row" onclick="dOpenLesson('${r.sec.id}',${r.l.n})" style="flex-direction:column;align-items:flex-start;gap:4px;padding:10px 12px">
+        <div style="display:flex;align-items:center;gap:7px;width:100%">
+          <span style="font-size:10px;font-weight:800;color:${langColor};background:${langColor}22;padding:2px 6px;border-radius:4px">${(r.code.lang||'?').toUpperCase()}</span>
+          <div class="lesson-title ${isDone?'done':''}" style="flex:1">${highlightHTML(r.code.title||'(sem título)',q)}</div>
+          <div class="lesson-dur">Aula ${r.l.n}</div>
+        </div>
+        <div style="font-size:11px;color:#6b7280;font-family:monospace;padding-left:6px;line-height:1.5;white-space:pre-wrap">${r.snippet}</div>
+        <div style="font-size:10px;color:#bbb;padding-left:6px">S${r.sec.num} · ${r.t}</div>
+      </div>`;
+    }).join('');
+  }
+
+  c.innerHTML=html;
+}
+
+// Helpers para busca
+function highlight(text,q,maxLen=80){
+  if(!text) return '';
+  const i=text.toLowerCase().indexOf(q.toLowerCase());
+  if(i<0) return text.substring(0,maxLen)+(text.length>maxLen?'…':'');
+  const start=Math.max(0,i-30);
+  const end=Math.min(text.length,i+q.length+50);
+  const snippet=(start>0?'…':'')+text.substring(start,end)+(end<text.length?'…':'');
+  return snippet;
+}
+function highlightHTML(text,q){
+  if(!text||!q) return escHtml(text||'');
+  const re=new RegExp('('+q.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+')','gi');
+  return escHtml(text).replace(re,'<mark style="background:#fef08a;color:#1a1a18;border-radius:2px;padding:0 1px">$1</mark>');
 }
 
 // -- TOGGLE DONE ---------------------------------------------
@@ -1576,6 +1714,8 @@ function dOpenLesson(secId,n){
   setCtab('aula', document.querySelector('.ctab-btn:nth-child(2)'));
   dRenderSidebar();
   dRenderLesson(secId,n);
+  // Persistir última aula aberta
+  state.lastLesson={secId,n}; save();
 }
 
 function dRenderLesson(secId,n){
@@ -2540,6 +2680,8 @@ function mOpenLesson(secId,n){
   document.querySelectorAll('.m-screen').forEach(s=>s.style.display='none');
   const t=document.getElementById('ms-aula'); t.style.display='flex'; t.style.flexDirection='column';
   mRenderLesson(secId,n);
+  // Persistir última aula aberta
+  state.lastLesson={secId,n}; save();
 }
 function mExportLesson(){ openExport(expCtx.secId,expCtx.lessonN); }
 
@@ -2763,24 +2905,78 @@ function mCopyFullCode(){
 
 function mSearch(q){
   const c=document.getElementById('m-search-results'); if(!c) return;
-  if(!q||q.length<2){c.innerHTML='<div class="empty">Digite para buscar...</div>';return;}
+  if(!q||q.length<2){c.innerHTML='<div class="empty">Busque aulas, anotações ou código...</div>';return;}
   q=q.toLowerCase();
-  let res=[];
+  const results={lessons:[],notes:[],codes:[]};
+
   SECTIONS.forEach(sec=>sec.lessons.forEach(l=>{
     const k=lk(sec.id,l.n); const t=state.customTitles[k]||l.t;
-    if(t.toLowerCase().includes(q)||String(l.n).includes(q)) res.push({sec,l,k,t});
+    if(t.toLowerCase().includes(q)||String(l.n).includes(q))
+      results.lessons.push({sec,l,k,t});
   }));
-  if(!res.length){c.innerHTML='<div class="empty">Nada encontrado.</div>';return;}
-  c.innerHTML=res.map(r=>{
-    const isDone=!!state.done[r.k];
-    return `<div style="display:flex;align-items:center;gap:9px;padding:11px 12px;background:#fff;border:1px solid #e8e6e0;border-radius:10px;margin-bottom:8px;cursor:pointer" onclick="mOpenLesson('${r.sec.id}',${r.l.n})">
-      <div style="width:18px;height:18px;border:2px solid ${isDone?'#1D9E75':'#ccc'};border-radius:4px;background:${isDone?'#1D9E75':'transparent'};display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:800;color:#fff;flex-shrink:0">${isDone?'✓':''}</div>
+  SECTIONS.forEach(sec=>sec.lessons.forEach(l=>{
+    const k=lk(sec.id,l.n);
+    (state.notes[k]||[]).forEach(note=>{
+      if((note.title||'').toLowerCase().includes(q)||(note.body||'').toLowerCase().includes(q)){
+        const t=state.customTitles[k]||l.t;
+        results.notes.push({sec,l,k,t,note,snippet:highlight(note.body||note.title||'',q,60)});
+      }
+    });
+  }));
+  SECTIONS.forEach(sec=>sec.lessons.forEach(l=>{
+    const k=lk(sec.id,l.n);
+    (state.codes[k]||[]).forEach(code=>{
+      if((code.title||'').toLowerCase().includes(q)||(code.body||'').toLowerCase().includes(q)){
+        const t=state.customTitles[k]||l.t;
+        results.codes.push({sec,l,k,t,code,snippet:highlight(code.body||code.title||'',q,60)});
+      }
+    });
+  }));
+
+  const total=results.lessons.length+results.notes.length+results.codes.length;
+  if(!total){c.innerHTML='<div class="empty">Nada encontrado.</div>';return;}
+
+  let html=`<div style="font-size:11px;color:#888;font-weight:700;padding:4px 0 8px">${total} resultado(s)</div>`;
+
+  const card=(label,onClick,line1,line2,line3,badge)=>`
+    <div style="display:flex;align-items:flex-start;gap:9px;padding:11px 12px;background:#fff;border:1px solid #e8e6e0;border-radius:10px;margin-bottom:7px;cursor:pointer" onclick="${onClick}">
+      <div style="font-size:16px;flex-shrink:0;margin-top:1px">${badge}</div>
       <div style="flex:1;min-width:0">
-        <div style="font-size:13px;color:${isDone?'#bbb':'#1a1a18'};${isDone?'text-decoration:line-through':''};line-height:1.4">${r.t}</div>
-        <div style="font-size:11px;color:#aaa;margin-top:2px">Aula ${r.l.n} . S${r.sec.num} . ${r.l.d}</div>
+        <div style="font-size:13px;color:#1a1a18;font-weight:600;line-height:1.35">${line1}</div>
+        ${line2?`<div style="font-size:11px;color:#888;margin-top:3px;line-height:1.4">${line2}</div>`:''}
+        ${line3?`<div style="font-size:10px;color:#bbb;margin-top:2px">${line3}</div>`:''}
       </div>
+      <div style="font-size:11px;color:#bbb;flex-shrink:0;margin-top:2px">${label}</div>
     </div>`;
-  }).join('');
+
+  if(results.lessons.length){
+    html+=`<div style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.8px;color:#aaa;margin-bottom:6px">📚 Aulas</div>`;
+    html+=results.lessons.map(r=>card(
+      r.l.d, `mOpenLesson('${r.sec.id}',${r.l.n})`,
+      highlightHTML(r.t,q),
+      `S${r.sec.num} · Aula ${r.l.n}`, '',
+      state.done[r.k]?'✅':'⬜'
+    )).join('');
+  }
+  if(results.notes.length){
+    html+=`<div style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.8px;color:#aaa;margin:10px 0 6px">📝 Anotações</div>`;
+    html+=results.notes.map(r=>card(
+      'nota', `mOpenLesson('${r.sec.id}',${r.l.n})`,
+      highlightHTML(r.note.title||'(sem título)',q),
+      r.snippet, `S${r.sec.num} · ${r.t}`,
+      NOTE_EMOJI[r.note.type]||'📝'
+    )).join('');
+  }
+  if(results.codes.length){
+    html+=`<div style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.8px;color:#aaa;margin:10px 0 6px">💻 Código</div>`;
+    html+=results.codes.map(r=>card(
+      r.code.lang||'?', `mOpenLesson('${r.sec.id}',${r.l.n})`,
+      highlightHTML(r.code.title||'(sem título)',q),
+      r.snippet, `S${r.sec.num} · ${r.t}`,
+      '💻'
+    )).join('');
+  }
+  c.innerHTML=html;
 }
 
 function mUpdateProgList(){
@@ -2941,7 +3137,7 @@ function closeLightbox(){
   document.getElementById('lightbox-img').src='';
   document.body.style.overflow='';
 }
-document.addEventListener('keydown',e=>{ if(e.key==='Escape'){ closeExport(); closeLightbox(); closeBackup(); closeCourseModal(); closDelModal(); closeStreakModal(); } });
+document.addEventListener('keydown',e=>{ if(e.key==='Escape'){ if(_focusMode){exitFocusMode();return;} closeExport(); closeLightbox(); closeBackup(); closeCourseModal(); closDelModal(); closeStreakModal(); } });
 
 
 // =============================================================
@@ -3512,78 +3708,55 @@ function cmSelectCourse(id){
 }
 
 // ── POMODORO DRAG ─────────────────────────────────────────────
-let _pomoDrag = { active:false, startX:0, startY:0, origLeft:0, origTop:0 };
-
 function pomoInitDrag(){
   const widget = document.getElementById('pomo-widget');
   const handle = document.getElementById('pomo-drag-handle');
-  if(!widget||!handle) return;
+  if(!widget || !handle) return;
 
-  // Converte bottom/right para top/left para poder mover livremente
-  function anchorToTopLeft(){
-    if(widget.style.top) return; // já ancorado
+  let dragging=false, pointerId=null;
+  let startX=0, startY=0, origLeft=0, origTop=0;
+
+  handle.addEventListener('pointerdown', function(e){
+    if(e.target.closest('.pomo-close')) return;
+    handle.setPointerCapture(e.pointerId);
+    pointerId = e.pointerId;
+    // Converter para top/left fixo pegando rect atual
     const rect = widget.getBoundingClientRect();
-    widget.style.top  = rect.top+'px';
-    widget.style.left = rect.left+'px';
-    widget.style.bottom = 'auto';
+    widget.style.position = 'fixed';
+    widget.style.left   = rect.left + 'px';
+    widget.style.top    = rect.top  + 'px';
     widget.style.right  = 'auto';
-  }
+    widget.style.bottom = 'auto';
+    origLeft = rect.left;
+    origTop  = rect.top;
+    startX = e.clientX;
+    startY = e.clientY;
+    dragging = true;
+    handle.style.cursor = 'grabbing';
+    e.preventDefault();
+  });
 
-  function onDragStart(ex, ey){
-    anchorToTopLeft();
-    const rect = widget.getBoundingClientRect();
-    _pomoDrag = { active:true, startX:ex, startY:ey, origLeft:rect.left, origTop:rect.top };
-    widget.classList.add('dragging');
-    handle.classList.add('grabbing');
-    document.body.style.userSelect='none';
-  }
+  handle.addEventListener('pointermove', function(e){
+    if(!dragging || e.pointerId !== pointerId) return;
+    e.preventDefault();
+    const dx = e.clientX - startX;
+    const dy = e.clientY - startY;
+    const newL = Math.max(8, Math.min(origLeft+dx, window.innerWidth  - widget.offsetWidth  - 8));
+    const newT = Math.max(8, Math.min(origTop +dy, window.innerHeight - widget.offsetHeight - 8));
+    widget.style.left = newL+'px';
+    widget.style.top  = newT+'px';
+  });
 
-  function onDragMove(ex, ey){
-    if(!_pomoDrag.active) return;
-    const dx = ex - _pomoDrag.startX;
-    const dy = ey - _pomoDrag.startY;
-    // Clampar dentro da viewport com margem de 8px
-    const maxLeft = window.innerWidth  - widget.offsetWidth  - 8;
-    const maxTop  = window.innerHeight - widget.offsetHeight - 8;
-    const newLeft = Math.max(8, Math.min(_pomoDrag.origLeft + dx, maxLeft));
-    const newTop  = Math.max(8, Math.min(_pomoDrag.origTop  + dy, maxTop));
-    widget.style.left = newLeft+'px';
-    widget.style.top  = newTop+'px';
-  }
-
-  function onDragEnd(){
-    if(!_pomoDrag.active) return;
-    _pomoDrag.active = false;
-    widget.classList.remove('dragging');
-    handle.classList.remove('grabbing');
-    document.body.style.userSelect='';
-    // Salvar posição para manter após fechar/abrir
+  function endDrag(){
+    if(!dragging) return;
+    dragging=false; pointerId=null;
+    handle.style.cursor = 'grab';
     _pomo.savedLeft = widget.style.left;
     _pomo.savedTop  = widget.style.top;
   }
 
-  // Mouse events
-  handle.addEventListener('mousedown', e=>{
-    if(e.target.classList.contains('pomo-close')) return;
-    e.preventDefault();
-    onDragStart(e.clientX, e.clientY);
-  });
-  document.addEventListener('mousemove', e=>{ if(_pomoDrag.active) onDragMove(e.clientX, e.clientY); });
-  document.addEventListener('mouseup',   ()=>onDragEnd());
-
-  // Touch events
-  handle.addEventListener('touchstart', e=>{
-    if(e.target.classList.contains('pomo-close')) return;
-    const t = e.touches[0];
-    onDragStart(t.clientX, t.clientY);
-  }, {passive:true});
-  document.addEventListener('touchmove', e=>{
-    if(!_pomoDrag.active) return;
-    e.preventDefault();
-    const t = e.touches[0];
-    onDragMove(t.clientX, t.clientY);
-  }, {passive:false});
-  document.addEventListener('touchend', ()=>onDragEnd());
+  handle.addEventListener('pointerup',     endDrag);
+  handle.addEventListener('pointercancel', endDrag);
 }
 
 // ══════════════════════════════════════════════════════════════
@@ -3608,29 +3781,94 @@ let _pomo = {
   widgetOpen: false,
 };
 
+let _pomoDragInited = false;
+
+function pomoDefaultPosition(w){
+  // Calcula posição padrão segura para qualquer tamanho de tela
+  const vw = window.innerWidth;
+  const vh = window.innerHeight;
+  const ww = w.offsetWidth  || 300;
+  const wh = w.offsetHeight || 360;
+  const margin = 12;
+  // Mobile: centraliza horizontalmente, fica acima da navbar
+  // Desktop: canto inferior direito
+  const isMob = vw < 600;
+  const left = isMob
+    ? Math.max(margin, Math.round((vw - ww) / 2))
+    : Math.max(margin, vw - ww - 24);
+  const top = isMob
+    ? Math.max(margin, vh - wh - 80)   // acima da nav mobile
+    : Math.max(margin, vh - wh - 90);  // acima do FAB desktop
+  return { left, top };
+}
+
+function pomoClampToViewport(w){
+  if(!w || w.style.display === 'none') return;
+  const vw = window.innerWidth;
+  const vh = window.innerHeight;
+  const ww = w.offsetWidth;
+  const wh = w.offsetHeight;
+  const curLeft = parseInt(w.style.left) || 0;
+  const curTop  = parseInt(w.style.top)  || 0;
+  const newLeft = Math.max(8, Math.min(curLeft, vw - ww - 8));
+  const newTop  = Math.max(8, Math.min(curTop,  vh - wh - 8));
+  if(newLeft !== curLeft || newTop !== curTop){
+    w.style.left = newLeft + 'px';
+    w.style.top  = newTop  + 'px';
+    _pomo.savedLeft = w.style.left;
+    _pomo.savedTop  = w.style.top;
+  }
+}
+
 function togglePomoWidget(){
   _pomo.widgetOpen = !_pomo.widgetOpen;
   const w = document.getElementById('pomo-widget');
   if(!w) return;
   if(_pomo.widgetOpen){
     w.style.display = 'block';
-    // Restaurar posição salva, se houver
+    // Inicializar drag na primeira abertura
+    if(!_pomoDragInited){ pomoInitDrag(); _pomoDragInited = true; }
+    // Aplicar posição: salva → ou default calculada para este tamanho de tela
+    w.style.position = 'fixed';
+    w.style.right  = 'auto';
+    w.style.bottom = 'auto';
     if(_pomo.savedLeft && _pomo.savedTop){
-      w.style.left   = _pomo.savedLeft;
-      w.style.top    = _pomo.savedTop;
-      w.style.bottom = 'auto';
-      w.style.right  = 'auto';
+      w.style.left = _pomo.savedLeft;
+      w.style.top  = _pomo.savedTop;
+      // Garantir que está dentro da viewport atual
+      requestAnimationFrame(()=> pomoClampToViewport(w));
     } else {
-      // Posição padrão — reseta para bottom/right
-      w.style.left = w.style.top = '';
-      w.style.bottom = window.innerWidth >= 769 ? '90px' : '144px';
-      w.style.right  = window.innerWidth >= 769 ? '24px'  : '18px';
+      // Posição default calculada após o widget estar renderizado
+      requestAnimationFrame(()=>{
+        const pos = pomoDefaultPosition(w);
+        w.style.left = pos.left + 'px';
+        w.style.top  = pos.top  + 'px';
+        _pomo.savedLeft = w.style.left;
+        _pomo.savedTop  = w.style.top;
+      });
     }
     pomoRender();
   } else {
     w.style.display = 'none';
   }
 }
+
+// Reposicionar ao redimensionar a janela
+window.addEventListener('resize', ()=>{
+  const w = document.getElementById('pomo-widget');
+  if(w && _pomo.widgetOpen){
+    // Se posição salva existe, clampa; senão recalcula
+    if(_pomo.savedLeft && _pomo.savedTop){
+      pomoClampToViewport(w);
+    } else {
+      requestAnimationFrame(()=>{
+        const pos = pomoDefaultPosition(w);
+        w.style.left = pos.left + 'px';
+        w.style.top  = pos.top  + 'px';
+      });
+    }
+  }
+}, {passive:true});
 
 function setPomoMode(mode){
   if(_pomo.running) return; // não muda durante execução
@@ -3802,6 +4040,40 @@ function showPomoToast(msg, color='#1a1a18'){
   t.style.opacity='1';
   clearTimeout(_pomoToastTimer);
   _pomoToastTimer=setTimeout(()=>{ t.style.opacity='0'; },3500);
+}
+
+// ── MODO FOCO ─────────────────────────────────────────────────
+let _focusMode = false;
+let _focusToastTimer = null;
+
+function toggleFocusMode(){
+  _focusMode = !_focusMode;
+  document.body.classList.toggle('focus-mode', _focusMode);
+  const btn = document.getElementById('focus-mode-btn');
+  if(btn){
+    btn.textContent = _focusMode ? '✕ Sair do Foco' : '🎯 Foco';
+    btn.style.background = _focusMode ? 'rgba(239,68,68,.25)' : 'rgba(255,255,255,.08)';
+    btn.style.color = _focusMode ? '#fca5a5' : '#ccc';
+    btn.style.borderColor = _focusMode ? 'rgba(239,68,68,.4)' : 'rgba(255,255,255,.25)';
+  }
+  // toast
+  const msg = _focusMode
+    ? '🎯 Modo Foco ativado — pressione Esc para sair'
+    : '✅ Modo Foco desativado';
+  const toast = document.getElementById('focus-toast');
+  if(toast){
+    toast.textContent = msg;
+    toast.style.opacity = '1';
+    clearTimeout(_focusToastTimer);
+    _focusToastTimer = setTimeout(()=>{ toast.style.opacity='0'; }, 2800);
+  }
+  // Mobile: esconder navbar
+  const nav = document.querySelector('.mobile-bottom-nav')||document.getElementById('mobile-nav');
+  if(nav) nav.style.display = _focusMode ? 'none' : '';
+}
+
+function exitFocusMode(){
+  if(_focusMode) toggleFocusMode();
 }
 
 // ── STREAK MODAL ──────────────────────────────────────────────
@@ -4198,14 +4470,21 @@ function init(){
   const today=new Date().toISOString().split('T')[0];
   updateStats();
   updateStreakUI();
-  pomoInitDrag();
   const ldEl=document.getElementById('d-log-date'); if(ldEl) ldEl.value=today;
   populateLogSelects();
 
   if(isMobile()){
     document.querySelector('.desktop-wrap').style.display='none';
-    // defer so layout is painted
-    requestAnimationFrame(()=>requestAnimationFrame(mInit));
+    requestAnimationFrame(()=>requestAnimationFrame(()=>{
+      mInit();
+      // Restaurar última aula aberta no mobile
+      if(state.lastLesson){
+        const {secId,n}=state.lastLesson;
+        const sec=SECTIONS.find(s=>s.id===secId);
+        const lesson=sec&&sec.lessons.find(l=>l.n===n);
+        if(sec&&lesson) setTimeout(()=>mOpenLesson(secId,n),120);
+      }
+    }));
   } else {
     const ml=document.getElementById('mobile-layer'); if(ml) ml.style.display='none';
     dRenderSidebar();
@@ -4213,6 +4492,20 @@ function init(){
     dRenderGlobalNotes();
     dRenderGlobalCode();
     renderLogList();
+    // Restaurar última aula aberta no desktop
+    if(state.lastLesson){
+      const {secId,n}=state.lastLesson;
+      const sec=SECTIONS.find(s=>s.id===secId);
+      const lesson=sec&&sec.lessons.find(l=>l.n===n);
+      if(sec&&lesson){
+        setTimeout(()=>{
+          dOpenLesson(secId,n);
+          // Scroll suave para a aula na sidebar
+          const activeEl=document.querySelector('.active-lesson');
+          if(activeEl) activeEl.scrollIntoView({block:'center',behavior:'smooth'});
+        },100);
+      }
+    }
   }
 }
 
@@ -4226,52 +4519,6 @@ window.addEventListener('resize',()=>{
 
 init();
 </script>
-<!-- ═══ POMODORO ═══ -->
-<button id="pomo-fab" onclick="togglePomoWidget()" title="Pomodoro Timer">🍅</button>
-
-<div id="pomo-widget">
-  <div class="pomo-header" id="pomo-drag-handle">
-    <span class="pomo-title">🍅 Pomodoro</span>
-    <span class="pomo-drag-hint">⠿ arrastar</span>
-    <button class="pomo-close" onclick="togglePomoWidget()">✕</button>
-  </div>
-
-  <!-- Mode selector -->
-  <div class="pomo-modes">
-    <button class="pomo-mode-btn active" id="pomo-m-focus" onclick="setPomoMode('focus')">🎯 Foco 25m</button>
-    <button class="pomo-mode-btn" id="pomo-m-short" onclick="setPomoMode('short')">☕ Pausa 5m</button>
-    <button class="pomo-mode-btn" id="pomo-m-long" onclick="setPomoMode('long')">🛋 Pausa 15m</button>
-  </div>
-
-  <!-- Ring timer -->
-  <div class="pomo-ring-wrap">
-    <svg id="pomo-svg" width="140" height="140" viewBox="0 0 140 140">
-      <circle id="pomo-ring-bg" cx="70" cy="70" r="58" fill="none" stroke-width="8"/>
-      <circle id="pomo-ring-fill" cx="70" cy="70" r="58" fill="none" stroke-width="8"
-        stroke-dasharray="364.4" stroke-dashoffset="0"/>
-    </svg>
-    <div class="pomo-time-overlay">
-      <div id="pomo-display">25:00</div>
-      <div id="pomo-session-label">SESSÃO 1</div>
-    </div>
-  </div>
-
-  <!-- Controls -->
-  <div class="pomo-controls">
-    <button class="pomo-btn" id="pomo-btn-reset" onclick="resetPomo()" title="Reiniciar">↺</button>
-    <button class="pomo-btn" id="pomo-btn-main" onclick="togglePomo()">▶ Iniciar</button>
-    <button class="pomo-btn" id="pomo-btn-skip" onclick="skipPomo()" title="Pular">⏭</button>
-  </div>
-
-  <!-- Session dots -->
-  <div class="pomo-sessions" id="pomo-dots"></div>
-
-  <!-- Footer -->
-  <div class="pomo-footer">
-    <label><input type="checkbox" id="pomo-auto-log" checked> Auto-registrar no Diário</label>
-    <span id="pomo-cycles-label">0 ciclos hoje</span>
-  </div>
-</div>
 
 <!-- ═══ STREAK MODAL ═══ -->
 <div id="streak-modal-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:8500;align-items:center;justify-content:center;padding:16px" onclick="if(event.target===this)closeStreakModal()">
@@ -4361,6 +4608,43 @@ init();
   <div class="lightbox" id="lightbox" onclick="closeLightbox()">
     <button class="lightbox-close" onclick="closeLightbox()">✕</button>
     <img id="lightbox-img" src="" alt="" onclick="event.stopPropagation()"/>
+  </div>
+
+  <!-- POMODORO FAB + WIDGET — sempre último no DOM para máximo z-index -->
+  <button id="pomo-fab" onclick="togglePomoWidget()" title="Pomodoro Timer">🍅</button>
+  <div id="pomo-widget-wrap">
+    <div id="pomo-widget">
+      <div id="pomo-drag-handle" class="pomo-header">
+        <span class="pomo-title">🍅 Pomodoro</span>
+        <span class="pomo-drag-hint">⠿ arrastar</span>
+        <button class="pomo-close" onclick="togglePomoWidget()" type="button">✕</button>
+      </div>
+      <div class="pomo-modes">
+        <button class="pomo-mode-btn active" id="pomo-m-focus" onclick="setPomoMode('focus')">🎯 Foco 25m</button>
+        <button class="pomo-mode-btn" id="pomo-m-short" onclick="setPomoMode('short')">☕ Pausa 5m</button>
+        <button class="pomo-mode-btn" id="pomo-m-long" onclick="setPomoMode('long')">🛋 Pausa 15m</button>
+      </div>
+      <div class="pomo-ring-wrap">
+        <svg id="pomo-svg" width="140" height="140" viewBox="0 0 140 140">
+          <circle id="pomo-ring-bg" cx="70" cy="70" r="58" fill="none" stroke-width="8"/>
+          <circle id="pomo-ring-fill" cx="70" cy="70" r="58" fill="none" stroke-width="8" stroke-dasharray="364.4" stroke-dashoffset="0"/>
+        </svg>
+        <div class="pomo-time-overlay">
+          <div id="pomo-display">25:00</div>
+          <div id="pomo-session-label">SESSÃO 1</div>
+        </div>
+      </div>
+      <div class="pomo-controls">
+        <button class="pomo-btn" id="pomo-btn-reset" onclick="resetPomo()" title="Reiniciar">↺</button>
+        <button class="pomo-btn" id="pomo-btn-main" onclick="togglePomo()">▶ Iniciar</button>
+        <button class="pomo-btn" id="pomo-btn-skip" onclick="skipPomo()" title="Pular">⏭</button>
+      </div>
+      <div class="pomo-sessions" id="pomo-dots"></div>
+      <div class="pomo-footer">
+        <label><input type="checkbox" id="pomo-auto-log" checked> Auto-registrar no Diário</label>
+        <span id="pomo-cycles-label">0 ciclos hoje</span>
+      </div>
+    </div>
   </div>
 </body>
 </html>
