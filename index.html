@@ -3,14 +3,67 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Java COMPLETO — Tracker de Estudos</title>
+
+<!-- ── Identidade principal ── -->
+<title>Hora de Estudar 🎓</title>
+<meta name="description" content="Seu tracker de estudos pessoal. Acompanhe aulas, anote conceitos, salve código e mantenha seu streak de dias estudados."/>
+<meta name="author" content="Hora de Estudar"/>
+<meta name="theme-color" content="#1a1a18"/>
+
+<!-- ── Open Graph (WhatsApp, Facebook, LinkedIn, Telegram) ── -->
+<meta property="og:type"        content="website"/>
+<meta property="og:site_name"   content="Hora de Estudar"/>
+<meta property="og:title"       content="🎓 Hora de Estudar"/>
+<meta property="og:description" content="Seu tracker de estudos pessoal. Acompanhe aulas, anote conceitos, salve código e mantenha seu streak de dias estudados. Grátis e direto no navegador."/>
+<meta property="og:url"         content="https://martinswillians.github.io/HoraDeEstudar/"/>
+<meta property="og:image"       content="https://martinswillians.github.io/HoraDeEstudar/og-image.png"/>
+<meta property="og:image:width" content="1200"/>
+<meta property="og:image:height"content="630"/>
+<meta property="og:locale"      content="pt_BR"/>
+
+<!-- ── Twitter Card ── -->
+<meta name="twitter:card"        content="summary_large_image"/>
+<meta name="twitter:title"       content="🎓 Hora de Estudar"/>
+<meta name="twitter:description" content="Seu tracker de estudos pessoal. Acompanhe aulas, anote conceitos, salve código e mantenha seu streak."/>
+<meta name="twitter:image"       content="https://martinswillians.github.io/HoraDeEstudar/og-image.png"/>
+
+<!-- ── Favicon embutido (SVG emoji) ── -->
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎓</text></svg>"/>
+<link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%231a1a18'/><text y='.85em' x='5' font-size='82'>🎓</text></svg>"/>
+
+<!-- ── PWA / installable ── -->
+<meta name="mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-title" content="Hora de Estudar"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f5f4f0;color:#1a1a18;min-height:100vh}
 /* ── TOPBAR ── */
-.topbar{background:#1a1a18;color:#f5f4f0;padding:12px 20px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;position:sticky;top:0;z-index:100}
+.topbar{background:#1a1a18;color:#f5f4f0;padding:12px 20px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;position:sticky;top:0;z-index:100;overflow:hidden}
 .topbar h1{font-size:14px;font-weight:600}
 .topbar p{font-size:11px;color:#888;margin-top:1px}
+
+/* ── PARTÍCULAS (canvas atrás do topbar) ── */
+#topbar-canvas{position:absolute;inset:0;pointer-events:none;z-index:0;opacity:.35}
+.topbar>*:not(#topbar-canvas){position:relative;z-index:1}
+
+/* ── BOTÃO VOLTAR AO TOPO ── */
+#back-to-top{
+  position:fixed;bottom:88px;left:18px;z-index:8000;
+  width:42px;height:42px;border-radius:50%;border:none;
+  background:rgba(26,26,24,.85);color:#fff;font-size:18px;
+  cursor:pointer;backdrop-filter:blur(8px);
+  box-shadow:0 4px 16px rgba(0,0,0,.35);
+  display:flex;align-items:center;justify-content:center;
+  opacity:0;pointer-events:none;
+  transition:opacity .3s ease, transform .3s ease;
+}
+#back-to-top.visible{opacity:1;pointer-events:auto}
+#back-to-top:hover{transform:translateY(-3px);background:rgba(29,158,117,.9)}
+@media(min-width:769px){
+  #back-to-top{bottom:28px;left:28px}
+}
 .top-badges{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
 .badge{font-size:11px;font-weight:600;padding:4px 11px;border-radius:20px}
 .badge-green{background:#1D9E75;color:#fff}
@@ -356,8 +409,28 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .nsummary-empty{text-align:center;padding:40px 20px;color:#bbb;font-size:13px}
 
 /* ── BRAND LABEL ── */
-#hdr-brand{animation:brandpulse 4s ease-in-out infinite}
-@keyframes brandpulse{0%,100%{opacity:.75}50%{opacity:1}}
+#hdr-brand{
+  display:flex;align-items:center;gap:7px;
+  margin-bottom:3px;
+}
+#hdr-brand-logo{
+  width:28px;height:28px;border-radius:8px;
+  background:linear-gradient(135deg,#1D9E75,#185FA5);
+  display:flex;align-items:center;justify-content:center;
+  font-size:16px;flex-shrink:0;
+  box-shadow:0 2px 8px rgba(29,158,117,.4);
+}
+#hdr-brand-txt-wrap{display:flex;flex-direction:column;gap:0px}
+#hdr-brand-name{
+  font-size:13px;font-weight:800;color:#fff;
+  letter-spacing:.2px;line-height:1;
+}
+#hdr-brand-tagline{
+  font-size:9px;font-weight:600;color:#1D9E75;
+  letter-spacing:1px;text-transform:uppercase;line-height:1;
+  margin-top:2px;
+}
+@keyframes brandpulse{0%,100%{opacity:.85}50%{opacity:1}}
 #cm-json-drop:hover{border-color:#185FA5!important;background:#f0f7ff!important}
 
 /* ── ACTION BUTTONS (Cursos, Compartilhar, Backup) ── */
@@ -599,9 +672,14 @@ body.focus-mode #focus-mode-btn{
 
 <!-- TOPBAR -->
 <div class="topbar">
+  <canvas id="topbar-canvas"></canvas>
   <div>
-    <div id="hdr-brand" style="font-size:10px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;color:#1D9E75;margin-bottom:2px;display:flex;align-items:center;gap:5px">
-      <span>🎓</span><span id="hdr-brand-txt">Hora de estudar 🚀</span>
+    <div id="hdr-brand">
+      <div id="hdr-brand-logo">🎓</div>
+      <div id="hdr-brand-txt-wrap">
+        <div id="hdr-brand-name">Hora de Estudar</div>
+        <div id="hdr-brand-txt" class="hdr-brand-tagline">Tracker de Estudos 🚀</div>
+      </div>
     </div>
     <h1 id="hdr-title">☕ Java COMPLETO — Tracker de Estudos</h1>
     <p id="hdr-subtitle">Nelio Alves · Udemy · POO + Projetos · 263 aulas</p>
@@ -1428,8 +1506,6 @@ function updateStreakUI(){
   renderStreakModal();
 }
 
-function lk(secId, n){ return secId+'_'+n; }
-
 // Cursos customizados (armazenados separadamente para não inflar o state)
 let CUSTOM_COURSES = [];
 
@@ -1747,7 +1823,7 @@ function toggleDone(secId,n){
   mRenderSections(); mUpdateProgList();
   // Refresh brand label (sempre fixo)
   const brand=document.getElementById('hdr-brand-txt');
-  if(brand) brand.textContent='Hora de estudar 🚀';
+  if(brand) brand.textContent='Tracker de Estudos 🚀';
 }
 
 // -- DESKTOP LESSON DETAIL ------------------------------------
@@ -4051,9 +4127,9 @@ function pomoRender(){
   if(_pomo.running){
     const m2=Math.floor(_pomo.remaining/60).toString().padStart(2,'0');
     const s2=(_pomo.remaining%60).toString().padStart(2,'0');
-    document.title = m2+':'+s2+' 🍅 '+ACTIVE_COURSE.name;
+    document.title = m2+':'+s2+' 🍅 Hora de Estudar';
   } else {
-    document.title = ACTIVE_COURSE.name+' — Tracker de Estudos';
+    document.title = 'Hora de Estudar 🎓';
   }
 }
 
@@ -4722,8 +4798,11 @@ function applyActiveCourse(){
   const brand=document.getElementById('hdr-brand-txt');
   if(t) t.textContent=(course.icon||'📚')+' '+course.name+' — Tracker de Estudos';
   if(sb) sb.textContent=[course.instructor,course.platform,course.desc].filter(Boolean).join(' · ');
-  if(brand) brand.textContent='Hora de estudar 🚀';
-  document.title=course.name+' — Tracker de Estudos';
+  // Brand: nome fixo "Hora de Estudar", tagline mostra o curso ativo
+  const brandName=document.getElementById('hdr-brand-name');
+  if(brandName) brandName.textContent='Hora de Estudar';
+  if(brand) brand.textContent='Tracker de Estudos 🚀';
+  document.title='Hora de Estudar 🎓';
 }
 
 function init(){
@@ -4782,6 +4861,119 @@ window.addEventListener('resize',()=>{
   if(mobile){ if(ml&&ml.style.display==='none') mInit(); }
   else { if(ml) ml.style.display='none'; dRenderSidebar(); }
 });
+
+
+// ══════════════════════════════════════════════════════════════
+// V12 POLISH — Cursor, Partículas, Back to Top
+// ══════════════════════════════════════════════════════════════
+
+// ── 2. PARTÍCULAS CONSTELAÇÃO NO TOPBAR ───────────────────────
+(function initParticles(){
+  const canvas = document.getElementById('topbar-canvas');
+  if(!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const PARTICLE_COUNT = 40;
+  const CONNECTION_DIST = 80;
+  let particles = [];
+  let W = 0, H = 0;
+
+  function resize(){
+    W = canvas.width  = canvas.offsetWidth;
+    H = canvas.height = canvas.offsetHeight;
+  }
+
+  function Particle(){
+    this.x  = Math.random() * W;
+    this.y  = Math.random() * H;
+    this.vx = (Math.random() - 0.5) * 0.3;
+    this.vy = (Math.random() - 0.5) * 0.3;
+    this.r  = Math.random() * 1.5 + 0.5;
+    this.a  = Math.random() * 0.6 + 0.2;
+  }
+
+  function init(){
+    resize();
+    particles = Array.from({length: PARTICLE_COUNT}, ()=> new Particle());
+  }
+
+  function draw(){
+    ctx.clearRect(0, 0, W, H);
+
+    // Desenhar conexões
+    for(let i=0; i<particles.length; i++){
+      for(let j=i+1; j<particles.length; j++){
+        const p1 = particles[i], p2 = particles[j];
+        const dx = p1.x-p2.x, dy = p1.y-p2.y;
+        const dist = Math.sqrt(dx*dx + dy*dy);
+        if(dist < CONNECTION_DIST){
+          const alpha = (1 - dist/CONNECTION_DIST) * 0.3;
+          ctx.strokeStyle = `rgba(29,158,117,${alpha})`;
+          ctx.lineWidth = 0.5;
+          ctx.beginPath();
+          ctx.moveTo(p1.x, p1.y);
+          ctx.lineTo(p2.x, p2.y);
+          ctx.stroke();
+        }
+      }
+    }
+
+    // Desenhar partículas
+    particles.forEach(p=>{
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.r, 0, Math.PI*2);
+      ctx.fillStyle = `rgba(255,255,255,${p.a})`;
+      ctx.fill();
+
+      // Mover
+      p.x += p.vx; p.y += p.vy;
+
+      // Rebater nas bordas
+      if(p.x < 0 || p.x > W) p.vx *= -1;
+      if(p.y < 0 || p.y > H) p.vy *= -1;
+    });
+
+    requestAnimationFrame(draw);
+  }
+
+  window.addEventListener('resize', ()=>{ resize(); }, {passive:true});
+  init();
+  draw();
+})();
+
+// ── 3. BOTÃO VOLTAR AO TOPO ───────────────────────────────────
+(function initBackToTop(){
+  const btn = document.getElementById('back-to-top');
+  if(!btn) return;
+
+  // Detectar scroll no elemento certo (mobile usa body, desktop pode ser outro)
+  function onScroll(){
+    // Pega o elemento que está scrollando
+    const scrolled = window.scrollY ||
+      document.documentElement.scrollTop ||
+      document.body.scrollTop ||
+      document.querySelector('.content-panel')?.scrollTop || 0;
+    btn.classList.toggle('visible', scrolled > 300);
+  }
+
+  // Escutar scroll em todos os containers possíveis
+  window.addEventListener('scroll', onScroll, {passive:true});
+  document.addEventListener('scroll', onScroll, {passive:true});
+
+  // Mobile: o scroll pode estar em elementos internos
+  const panels = ['.content-panel','.sidebar','body','#m-sections-screen'];
+  panels.forEach(sel=>{
+    const el = document.querySelector(sel);
+    if(el) el.addEventListener('scroll', onScroll, {passive:true});
+  });
+
+  btn.addEventListener('click', ()=>{
+    // Scroll para o topo em todos os containers possíveis
+    window.scrollTo({top:0, behavior:'smooth'});
+    document.documentElement.scrollTo({top:0, behavior:'smooth'});
+    document.querySelector('.content-panel')?.scrollTo({top:0, behavior:'smooth'});
+    document.querySelector('.sidebar')?.scrollTo({top:0, behavior:'smooth'});
+  });
+})();
 
 init();
 </script>
@@ -4891,6 +5083,9 @@ init();
     <button class="lightbox-close" onclick="closeLightbox()">✕</button>
     <img id="lightbox-img" src="" alt="" onclick="event.stopPropagation()"/>
   </div>
+
+<!-- ═══ BOTÃO VOLTAR AO TOPO ═══ -->
+<button id="back-to-top" onclick="window.scrollTo({top:0,behavior:'smooth'})" title="Voltar ao topo">↑</button>
 
   <!-- POMODORO FAB + WIDGET — sempre último no DOM para máximo z-index -->
   <button id="pomo-fab" onclick="togglePomoWidget()" title="Pomodoro Timer">🍅</button>
